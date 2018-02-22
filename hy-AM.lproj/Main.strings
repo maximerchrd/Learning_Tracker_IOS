@@ -1,0 +1,15 @@
+
+/* Class = "UIButton"; normalTitle = "Start Classroom Activity"; ObjectID = "3GW-TH-Eq6"; */
+"3GW-TH-Eq6.normalTitle" = "Start Classroom Activity";
+
+/* Class = "UIButton"; normalTitle = "Evaluation Results"; ObjectID = "QlR-oR-TPz"; */
+"QlR-oR-TPz.normalTitle" = "Evaluation Results";
+
+/* Class = "UIButton"; normalTitle = "Practice"; ObjectID = "bWm-TL-NY6"; */
+"bWm-TL-NY6.normalTitle" = "Practice";
+
+/* Class = "UILabel"; text = "Hello "; ObjectID = "m7I-va-O77"; */
+"m7I-va-O77.text" = "Hello ";
+
+/* Class = "UIButton"; normalTitle = "Settings"; ObjectID = "wTl-bZ-Pc8"; */
+"wTl-bZ-Pc8.normalTitle" = "Settings";
