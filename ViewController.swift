@@ -10,12 +10,12 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var welcomeMessageLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
-
-    @IBOutlet weak var launchInteractiveMode: UIButton!
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
