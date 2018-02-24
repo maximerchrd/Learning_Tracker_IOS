@@ -202,6 +202,9 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="uZM-n0-nEH"/>
                     </view>
+                    <connections>
+                        <outlet property="InstructionsLabel" destination="9fN-g8-tTM" id="G1F-2R-5qr"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XSo-O8-3vl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
