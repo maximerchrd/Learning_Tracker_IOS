@@ -13,10 +13,18 @@ class ClassroomActivityViewController: UIViewController {
     
     @IBOutlet weak var InstructionsLabel: UILabel!
     
+    public func showMultipleChoiceQuestion(strin: String) {
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as! QuestionMultipleChoiceViewController
+        newViewController.questionLabelText = strin
+        self.present(newViewController, animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        let wifiCommunication = WifiCommunication()
+        //showMultipleChoiceQuestion(strin: "from view did load")
+        let wifiCommunication = WifiCommunication(classroomActivityViewControllerArg: self)
         if (wifiCommunication.connectToServer()) {
             InstructionsLabel.text = "AND WAIT FOR NEXT QUESTION"
         } else {

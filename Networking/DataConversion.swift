@@ -22,7 +22,7 @@ class DataConverstion {
         return dataUTF8
     }
     
-    static public func bytesToMultq(textData: Data, imageData: Data) -> QuestionMultipleChoice {
+    static public func bytesToMultq(textData: [UInt8]?, imageData: [UInt8]?) -> QuestionMultipleChoice {
         var questionMultipleChoice = QuestionMultipleChoice()
         let wholeText = String(bytes: textData!, encoding: .utf8) ?? "oops, problem converting the question text"
         
@@ -38,8 +38,8 @@ class DataConverstion {
         questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[8])
         questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[9])
         questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[10])
-        questionMultipleChoice.ID = Int(wholeText.components(separatedBy: "///")[11])
-        questionMultipleChoice.NbCorrectAnswers = Int(wholeText.components(separatedBy: "///")[12])
+        questionMultipleChoice.ID = Int(wholeText.components(separatedBy: "///")[11])!
+        questionMultipleChoice.NbCorrectAnswers = Int(wholeText.components(separatedBy: "///")[12])!
         questionMultipleChoice.Image = wholeText.components(separatedBy: "///")[15]
         
         //deal with subjects

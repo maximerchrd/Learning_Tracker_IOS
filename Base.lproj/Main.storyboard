@@ -204,8 +204,8 @@
                     </view>
                     <connections>
                         <outlet property="InstructionsLabel" destination="9fN-g8-tTM" id="G1F-2R-5qr"/>
-                        <segue destination="s1x-ZS-Gfr" kind="show" id="YMp-wX-1fP"/>
                         <segue destination="xQz-if-Mve" kind="show" id="sAd-p5-4gd"/>
+                        <segue destination="s1x-ZS-Gfr" kind="show" identifier="" id="2FT-lJ-8Wd"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XSo-O8-3vl" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -224,7 +224,7 @@
                                 <rect key="frame" x="12" y="424" width="292" height="36"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0" green="0.80000000000000004" blue="0.79607843140000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Practice">
+                                <state key="normal" title="Submit Answer">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
@@ -251,10 +251,10 @@
             </objects>
             <point key="canvasLocation" x="1764.375" y="-970"/>
         </scene>
-        <!--View Controller-->
+        <!--Question Multiple Choice View Controller-->
         <scene sceneID="1EJ-Mo-tF1">
             <objects>
-                <viewController id="s1x-ZS-Gfr" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="QuestionMultipleChoiceViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="s1x-ZS-Gfr" customClass="QuestionMultipleChoiceViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="axj-MA-j99">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -263,7 +263,7 @@
                                 <rect key="frame" x="14" y="424" width="292" height="36"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0" green="0.80000000000000004" blue="0.79607843140000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Practice">
+                                <state key="normal" title="Submit Answer">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
@@ -278,6 +278,9 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="SoW-wH-RF2"/>
                     </view>
+                    <connections>
+                        <outlet property="QuestionLabel" destination="huC-Wx-4pk" id="TzP-Lz-i7h"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="q3m-KY-4dG" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
