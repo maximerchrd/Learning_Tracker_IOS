@@ -23,7 +23,7 @@ class DataConverstion {
     }
     
     static public func bytesToMultq(textData: [UInt8]?, imageData: [UInt8]?) -> QuestionMultipleChoice {
-        var questionMultipleChoice = QuestionMultipleChoice()
+        let questionMultipleChoice = QuestionMultipleChoice()
         let wholeText = String(bytes: textData!, encoding: .utf8) ?? "oops, problem converting the question text"
         
         //prepares the question
@@ -42,16 +42,37 @@ class DataConverstion {
         questionMultipleChoice.NbCorrectAnswers = Int(wholeText.components(separatedBy: "///")[12])!
         questionMultipleChoice.Image = wholeText.components(separatedBy: "///")[15]
         
+        //save the picture
+        let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
+        let uiImage: UIImage = UIImage(data: imageNSData as Data)!
+        saveImage(image: uiImage, fileName: questionMultipleChoice.Image)
+        
         //deal with subjects
-        var subjectsArray = wholeText.components(separatedBy: "///")[13].components(separatedBy: "|||")
+        let subjectsArray = wholeText.components(separatedBy: "///")[13].components(separatedBy: "|||")
         for subject in subjectsArray {
             questionMultipleChoice.Subjects.append(subject)
         }
         //deal with objectives
-        var objectivesArray = wholeText.components(separatedBy: "///")[14].components(separatedBy: "|||")
+        let objectivesArray = wholeText.components(separatedBy: "///")[14].components(separatedBy: "|||")
         for objective in objectivesArray {
             questionMultipleChoice.Objectives.append(objective)
         }
         return questionMultipleChoice
+    }
+    
+    static private func saveImage(image: UIImage, fileName: String) -> Bool {
+        guard let data = UIImageJPEGRepresentation(image, 1) ?? UIImagePNGRepresentation(image) else {
+            return false
+        }
+        guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else {
+            return false
+        }
+        do {
+            try data.write(to: directory.appendingPathComponent(fileName)!)
+            return true
+        } catch {
+            print(error.localizedDescription)
+            return false
+        }
     }
 }

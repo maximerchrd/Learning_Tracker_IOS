@@ -57,9 +57,16 @@ class WifiCommunication {
                         textSizeString = String(textSizeString.filter { "01234567890.".contains($0) })
                         let textSize:Int? = Int(textSizeString)
                         
-                        let dataText = self.client!.read(textSize!)
-                        let dataImage = self.client!.read(imageSize!)
-                        print(String(bytes: dataText!, encoding: .utf8) ?? "oops, problem")
+                        var dataText = [UInt8]()
+                        while dataText.count < textSize ?? 0 {
+                            dataText += self.client!.read(textSize!) ?? [UInt8]()
+                        }
+                        print(imageSize!)
+                        var dataImage = [UInt8]()
+                        while dataImage.count < imageSize ?? 0 {
+                            dataImage += self.client!.read(imageSize!) ?? [UInt8]()
+                        }
+                        print(String(bytes: dataText, encoding: .utf8) ?? "oops, problem")
                         do {
                             try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: DataConverstion.bytesToMultq(textData: dataText, imageData: dataImage))
                         } catch {}
