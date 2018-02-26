@@ -44,7 +44,7 @@ class DataConverstion {
         
         //save the picture
         let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
-        let uiImage: UIImage = UIImage(data: imageNSData as Data)!
+        let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
         saveImage(image: uiImage, fileName: questionMultipleChoice.Image)
         
         //deal with subjects
