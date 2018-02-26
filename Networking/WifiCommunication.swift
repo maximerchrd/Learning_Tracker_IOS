@@ -60,16 +60,30 @@ class WifiCommunication {
                         let dataText = self.client!.read(textSize!)
                         let dataImage = self.client!.read(imageSize!)
                         print(String(bytes: dataText!, encoding: .utf8) ?? "oops, problem")
-                        
-                        DispatchQueue.main.async {
+                        do {
+                            try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: DataConverstion.bytesToMultq(textData: dataText, imageData: dataImage))
+                        } catch {}
+                        /*DispatchQueue.main.async {
                             var questionMCToDisplay = DataConverstion.bytesToMultq(textData: dataText, imageData: dataImage)
                             self.classroomActivityViewController.showMultipleChoiceQuestion(strin: questionMCToDisplay.Question)
-                        }
+                        }*/
                     } else if typeID.range(of:"SHRTA") != nil {
                         
                     } else if typeID.range(of:"QID") != nil {
                         DispatchQueue.main.async {
-
+                            var questionMultipleChoice = QuestionMultipleChoice()
+                            if (prefix.components(separatedBy: ":")[1].contains("MLT")) {
+                                let id_global = Int(prefix.components(separatedBy: "///")[1])
+                                do {
+                                questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
+                                } catch {}
+                                    if questionMultipleChoice.Question.count > 0 {
+                                    questionMultipleChoice.ID = id_global!;
+                                    self.classroomActivityViewController.showMultipleChoiceQuestion(strin: questionMultipleChoice.Question)
+                                } else {
+                                    
+                                }
+                            }
                         }
                     } else if typeID.range(of:"EVAL") != nil {
                         
