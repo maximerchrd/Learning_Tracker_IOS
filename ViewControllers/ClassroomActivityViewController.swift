@@ -13,10 +13,10 @@ class ClassroomActivityViewController: UIViewController {
     
     @IBOutlet weak var InstructionsLabel: UILabel!
     
-    public func showMultipleChoiceQuestion(strin: String) {
+    public func showMultipleChoiceQuestion(question: QuestionMultipleChoice) {
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let newViewController = storyBoard.instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as! QuestionMultipleChoiceViewController
-        newViewController.questionLabelText = strin
+        newViewController.questionMultipleChoice = question
         self.present(newViewController, animated: true, completion: nil)
     }
     

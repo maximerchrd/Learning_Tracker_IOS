@@ -63,10 +63,6 @@ class WifiCommunication {
                         do {
                             try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: DataConverstion.bytesToMultq(textData: dataText, imageData: dataImage))
                         } catch {}
-                        /*DispatchQueue.main.async {
-                            var questionMCToDisplay = DataConverstion.bytesToMultq(textData: dataText, imageData: dataImage)
-                            self.classroomActivityViewController.showMultipleChoiceQuestion(strin: questionMCToDisplay.Question)
-                        }*/
                     } else if typeID.range(of:"SHRTA") != nil {
                         
                     } else if typeID.range(of:"QID") != nil {
@@ -78,8 +74,7 @@ class WifiCommunication {
                                 questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
                                 } catch {}
                                     if questionMultipleChoice.Question.count > 0 {
-                                    questionMultipleChoice.ID = id_global!;
-                                    self.classroomActivityViewController.showMultipleChoiceQuestion(strin: questionMultipleChoice.Question)
+                                    self.classroomActivityViewController.showMultipleChoiceQuestion(question:  questionMultipleChoice)
                                 } else {
                                     
                                 }

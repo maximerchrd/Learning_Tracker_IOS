@@ -20,4 +20,15 @@ class QuestionMultipleChoice {
     var Trials = [Int]()
     var Subjects = [String]()
     var Objectives = [String]()
+    
+    func removeEmptyOptions() {
+        var i = 0
+        for singleOption in Options {
+            if singleOption == " " {
+                Options.remove(at: i)
+                i = i - 1
+            }
+            i = i + 1
+        }
+    }
 }

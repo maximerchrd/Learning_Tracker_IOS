@@ -75,7 +75,6 @@ class DbTableQuestionMultipleChoice {
     }
     
     static func retrieveQuestionMultipleChoiceWithID (globalID: Int) throws -> QuestionMultipleChoice {
-        print(DBPath)
         var questionMultipleChoiceToReturn = QuestionMultipleChoice()
         var questionMultipleChoice = QuestionMultipleChoiceRecord(questionMultipleChoiceArg: questionMultipleChoiceToReturn)
         do {
