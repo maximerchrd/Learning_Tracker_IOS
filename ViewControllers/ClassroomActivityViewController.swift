@@ -20,6 +20,13 @@ class ClassroomActivityViewController: UIViewController {
         self.present(newViewController, animated: true, completion: nil)
     }
     
+    public func showShortAnswerQuestion(question: QuestionShortAnswer) {
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "QuestionShortAnswerViewController") as! QuestionShortAnswerViewController
+        newViewController.questionShortAnswer = question
+        self.present(newViewController, animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.

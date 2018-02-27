@@ -80,7 +80,7 @@ class DbTableQuestionMultipleChoice {
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
             try dbQueue.inDatabase { db in
-                questionMultipleChoice = (try QuestionMultipleChoiceRecord.fetchOne(db, key: [KEY_ID_GLOBAL: globalID]))!
+                questionMultipleChoice = (try QuestionMultipleChoiceRecord.fetchOne(db, key: [KEY_ID_GLOBAL: globalID])) ?? QuestionMultipleChoiceRecord(questionMultipleChoiceArg: QuestionMultipleChoice())
             }
         } catch let error {
             print(error)

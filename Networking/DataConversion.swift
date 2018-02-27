@@ -60,6 +60,34 @@ class DataConverstion {
         return questionMultipleChoice
     }
     
+    static public func bytesToShrtaq(textData: [UInt8]?, imageData: [UInt8]?) -> QuestionShortAnswer {
+        let questionShortAnswer = QuestionShortAnswer()
+        let wholeText = String(bytes: textData!, encoding: .utf8) ?? "oops, problem converting the question text"
+        
+        //prepares the question
+        questionShortAnswer.Question = wholeText.components(separatedBy: "///")[0]
+        questionShortAnswer.ID = Int(wholeText.components(separatedBy: "///")[1])!
+        questionShortAnswer.Options = wholeText.components(separatedBy: "///")[2].components(separatedBy: "|||")
+        questionShortAnswer.Image = wholeText.components(separatedBy: "///")[5]
+        
+        //save the picture
+        let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
+        let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
+        saveImage(image: uiImage, fileName: questionShortAnswer.Image)
+        
+        //deal with subjects
+        let subjectsArray = wholeText.components(separatedBy: "///")[3].components(separatedBy: "|||")
+        for subject in subjectsArray {
+            questionShortAnswer.Subjects.append(subject)
+        }
+        //deal with objectives
+        let objectivesArray = wholeText.components(separatedBy: "///")[4].components(separatedBy: "|||")
+        for objective in objectivesArray {
+            questionShortAnswer.Objectives.append(objective)
+        }
+        return questionShortAnswer
+    }
+    
     static private func saveImage(image: UIImage, fileName: String) -> Bool {
         guard let data = UIImageJPEGRepresentation(image, 1) ?? UIImagePNGRepresentation(image) else {
             return false
@@ -75,4 +103,6 @@ class DataConverstion {
             return false
         }
     }
+    
+    
 }

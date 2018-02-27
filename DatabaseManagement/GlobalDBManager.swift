@@ -18,6 +18,7 @@ class GlobalDBManager {
                 .appendingPathComponent(DATABASE_NAME)
             try DbTableSettings.createTable(DatabaseName: databaseURL.path)
             try DbTableQuestionMultipleChoice.createTable(DatabasePath: databaseURL.path)
+            try DbTableQuestionShortAnswer.createTable(DatabasePath: databaseURL.path)
         } catch let error {
             print(error)
             print(error.localizedDescription)
