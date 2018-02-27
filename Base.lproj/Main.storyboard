@@ -227,6 +227,9 @@
                                 <state key="normal" title="Submit Answer">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="submitAnswerButtonTouched:" destination="xQz-if-Mve" eventType="touchUpInside" id="5zt-pX-TuV"/>
+                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Question" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rs9-zO-Mqd">
                                 <rect key="frame" x="16" y="64" width="288" height="21"/>
@@ -255,6 +258,7 @@
                         <viewLayoutGuide key="safeArea" id="y2V-Ss-SUe"/>
                     </view>
                     <connections>
+                        <outlet property="AnswerTextField" destination="GE8-4f-utX" id="Kpg-WA-v9s"/>
                         <outlet property="PictureView" destination="CFj-ZS-RD3" id="g1E-e8-75W"/>
                         <outlet property="QuestionLabel" destination="rs9-zO-Mqd" id="tgW-cc-JYL"/>
                     </connections>
@@ -283,6 +287,9 @@
                                 <state key="normal" title="Submit Answer">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="submitAnswerButtonTouched:" destination="s1x-ZS-Gfr" eventType="touchUpInside" id="x4r-Xp-ypJ"/>
+                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Question" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="huC-Wx-4pk">
                                 <rect key="frame" x="14" y="64" width="288" height="21"/>

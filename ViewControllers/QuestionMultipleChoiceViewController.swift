@@ -21,6 +21,8 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var newImageWidth:Float = 0
     var newImageHeight:Float = 0
     var newImageX:Float = 0
+    var wifiCommunication: WifiCommunication?
+    var checkBoxArray: [CheckBox]
     
     @IBOutlet weak var QuestionLabel: UILabel!
     @IBOutlet weak var PictureView: UIImageView!
@@ -29,6 +31,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         questionMultipleChoice = QuestionMultipleChoice()
         screenHeight = 0
         screenWidth = 0
+        checkBoxArray = [CheckBox]()
         super.init(coder: aDecoder)
     }
     override func viewDidLoad() {
@@ -59,8 +62,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
         
         // Display options
         questionMultipleChoice.removeEmptyOptions()
+        var optionsArray = questionMultipleChoice.Options
+        optionsArray = shuffle(arrayArg: optionsArray)
         var i = 1
-        for singleOption in questionMultipleChoice.Options {
+        for singleOption in optionsArray {
             let computedX = Int(screenWidth / 15)
             let computedY = Int(Float(PictureView.frame.maxY) + (screenHeight / 15) * Float(i))
             let computedWidth = Int(screenWidth * 0.9)
@@ -73,9 +78,22 @@ class QuestionMultipleChoiceViewController: UIViewController {
             checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
             checkBox.contentHorizontalAlignment = .left
             self.view.addSubview(checkBox)
-
+            checkBoxArray.append(checkBox)
             i = i + 1
         }
+    }
+    func shuffle(arrayArg: [String]) -> [String] {
+        var array = arrayArg
+        //implementing Fisher-Yates shuffle
+        for i in 0...array.count-1 {
+            let random = arc4random_uniform(UInt32(array.count))
+            let index = Int(random)
+            // Simple swap
+            let a = array[index];
+            array[index] = array[i];
+            array[i] = a;
+        }
+        return array
     }
     
     @IBAction func imageTouched(_ sender: Any) {
@@ -86,6 +104,19 @@ class QuestionMultipleChoiceViewController: UIViewController {
             PictureView.frame = CGRect(x: CGFloat(newImageX), y: originalImageY, width: CGFloat(newImageWidth), height: CGFloat(newImageHeight))
             self.view.bringSubview(toFront: PictureView)
             imageMagnified = true
+        }
+    }
+    
+    @IBAction func submitAnswerButtonTouched(_ sender: Any) {
+        var answers = ""
+        for singleCheckBox in checkBoxArray {
+            if singleCheckBox.isChecked {
+                answers += (singleCheckBox.titleLabel?.text)! + "|||"
+            }
+        }
+        wifiCommunication?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
+        if let navController = self.navigationController {
+            navController.popViewController(animated: true)
         }
     }
     

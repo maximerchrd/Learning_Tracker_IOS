@@ -21,7 +21,9 @@ class QuestionShortAnswerViewController: UIViewController {
     var newImageWidth:Float = 0
     var newImageHeight:Float = 0
     var newImageX:Float = 0
+    var wifiCommunication: WifiCommunication?
     
+    @IBOutlet weak var AnswerTextField: UITextField!
     @IBOutlet weak var QuestionLabel: UILabel!
     @IBOutlet weak var PictureView: UIImageView!
     
@@ -67,6 +69,13 @@ class QuestionShortAnswerViewController: UIViewController {
             PictureView.frame = CGRect(x: CGFloat(newImageX), y: originalImageY, width: CGFloat(newImageWidth), height: CGFloat(newImageHeight))
             self.view.bringSubview(toFront: PictureView)
             imageMagnified = true
+        }
+    }
+    
+    @IBAction func submitAnswerButtonTouched(_ sender: Any) {
+        wifiCommunication?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
+        if let navController = self.navigationController {
+            navController.popViewController(animated: true)
         }
     }
     

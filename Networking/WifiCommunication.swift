@@ -14,7 +14,7 @@ class WifiCommunication {
     let PORT_NUMBER = 9090
     var host = "xxx.xxx.x.xxx"
     var client: TCPClient?
-    var classroomActivityViewController: ClassroomActivityViewController
+    var classroomActivityViewController: ClassroomActivityViewController?
     
     init(classroomActivityViewControllerArg: ClassroomActivityViewController) {
         classroomActivityViewController = classroomActivityViewControllerArg
@@ -65,10 +65,10 @@ class WifiCommunication {
                                     questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
                                     
                                     if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
-                                        self.classroomActivityViewController.showMultipleChoiceQuestion(question:  questionMultipleChoice)
+                                        self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice)
                                     } else {
                                         questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
-                                        self.classroomActivityViewController.showShortAnswerQuestion(question: questionShortAnswer)
+                                        self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer)
                                     }
                                 } catch {}
                             }
@@ -81,6 +81,24 @@ class WifiCommunication {
                 }
             }
         }
+    }
+    
+    public func sendAnswerToServer(answer: String, globalID: Int, questionType: String) {
+        var message = ""
+        do {
+            var question = ""
+            if questionType == "MULTQ" {
+                let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: globalID)
+                question = questionMultipleChoice.Question
+            } else if questionType == "SHRTQ" {
+                let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: globalID)
+                question = questionShortAnswer.Question
+            }
+            let name = try DbTableSettings.retrieveName()
+            message = questionType + "///" + UIDevice.current.identifierForVendor!.uuidString + "///" + name + "///"
+            message += (answer + "///" + question + "///" + String(globalID));
+            client!.send(string: message)
+        } catch {}
     }
     
     fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String) {
