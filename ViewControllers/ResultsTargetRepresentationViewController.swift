@@ -15,11 +15,6 @@ class ResultsTargetRepresentationViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        if !UIDevice.current.orientation.isLandscape {
-            let value = UIInterfaceOrientation.landscapeLeft.rawValue
-            UIDevice.current.setValue(value, forKey:"orientation")
-            UIViewController.attemptRotationToDeviceOrientation()
-        }
     }
     
     
