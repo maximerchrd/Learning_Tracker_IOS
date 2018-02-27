@@ -70,6 +70,8 @@ class QuestionMultipleChoiceViewController: UIViewController {
             checkBox.setTitle(singleOption, for: .normal)
             checkBox.addTarget(checkBox, action: #selector(checkBox.buttonClicked(sender:)), for: .touchUpInside)
             checkBox.setTitleColor(.black, for: .normal)
+            checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+            checkBox.contentHorizontalAlignment = .left
             self.view.addSubview(checkBox)
 
             i = i + 1
