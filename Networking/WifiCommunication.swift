@@ -29,6 +29,7 @@ class WifiCommunication {
         case .success:
             switch client!.send(data: dataConverter.connection()) {
             case .success:
+                (UIApplication.shared.delegate as! AppDelegate).wifiCommunicationAppDelegate = self
                 listenToServer()
                 return true
             case .failure(let error):
@@ -102,7 +103,12 @@ class WifiCommunication {
     }
     
     public func sendDisconnectionSignal() {
-        print("student about to leave task")
+        print("student is leaving the task")
+        do {
+            var message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///"
+            client!.send(string: message)
+        } catch {}
+            
     }
     
     fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String) {
