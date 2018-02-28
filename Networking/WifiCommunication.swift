@@ -75,7 +75,9 @@ class WifiCommunication {
                             }
                         }
                     } else if typeID.range(of:"EVAL") != nil {
-                        
+                        do {
+                            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, quantitativeEval: prefix.components(separatedBy: "///")[1])
+                        } catch {}
                     } else if typeID.range(of:"UPDEV") != nil {
                         
                     }
@@ -105,7 +107,7 @@ class WifiCommunication {
     public func sendDisconnectionSignal() {
         print("student is leaving the task")
         do {
-            var message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///"
+            let message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///"
             client!.send(string: message)
         } catch {}
             

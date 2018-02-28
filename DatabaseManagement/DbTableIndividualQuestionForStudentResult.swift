@@ -51,6 +51,18 @@ class DbTableIndividualQuestionForResult {
             try individualQuestionForResult.insert(db)
         }
     }
+    static func insertIndividualQuestionForResult(questionID: Int, quantitativeEval: String) throws {
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        let dateNow = formatter.string(from: date)
+        print(dateNow)
+        try dbQueue.inDatabase { db in
+            let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: dateNow, answers: "none", timeForSolving: "none", questionWeight: -1, evalType: "none", quantitativeEval: quantitativeEval, qualitativeEval: "none", testBelonging: "none", weightsOfAnswers: "none")
+            try individualQuestionForResult.insert(db)
+        }
+    }
     
     static func setEvalForQuestionAndStudentIDs (eval: String, idQuestion: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
