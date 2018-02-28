@@ -101,6 +101,10 @@ class WifiCommunication {
         } catch {}
     }
     
+    public func sendDisconnectionSignal() {
+        print("student about to leave task")
+    }
+    
     fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String) {
         let imageSize:Int? = Int(prefix.components(separatedBy: ":")[1])
         var textSizeString = prefix.components(separatedBy: ":")[2]
