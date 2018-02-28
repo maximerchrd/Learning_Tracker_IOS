@@ -23,7 +23,7 @@ class DbTableAnswerOptions {
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
-                t.column(KEY_OPTION, .text).notNull()
+                t.column(KEY_OPTION, .text).notNull().unique(onConflict: .ignore)
             }
         }
     }
