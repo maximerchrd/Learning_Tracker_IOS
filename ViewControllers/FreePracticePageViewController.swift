@@ -1,15 +1,15 @@
 //
-//  ResultsOverviewViewController.swift
+//  FreePracticePageViewController.swift
 //  Learning_Tracker_IOS
 //
-//  Created by Maxime Richard on 27.02.18.
+//  Created by Maxime Richard on 28.02.18.
 //  Copyright © 2018 Maxime Richard. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+class FreePracticePageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     var pageControl = UIPageControl()
     
     func configurePageControl() {
@@ -81,11 +81,6 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         self.dataSource = self
-        if !UIDevice.current.orientation.isLandscape {
-            let value = UIInterfaceOrientation.landscapeLeft.rawValue
-            UIDevice.current.setValue(value, forKey:"orientation")
-            UIViewController.attemptRotationToDeviceOrientation()
-        }
         // This sets up the first view that will show up on our page control
         if let firstViewController = orderedViewControllers.first {
             setViewControllers([firstViewController],
@@ -96,18 +91,11 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
         self.delegate = self
         configurePageControl()
     }
-    override func viewWillDisappear(_ animated: Bool) {
-        if UIDevice.current.orientation.isLandscape {
-            let value = UIInterfaceOrientation.portrait.rawValue
-            UIDevice.current.setValue(value, forKey:"orientation")
-            UIViewController.attemptRotationToDeviceOrientation()
-        }
-    }
     
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         let pageContentViewController = pageViewController.viewControllers![0]
         self.pageControl.currentPage = orderedViewControllers.index(of: pageContentViewController)!
-    }    
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
