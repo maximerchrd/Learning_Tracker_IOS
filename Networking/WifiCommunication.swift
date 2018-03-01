@@ -45,7 +45,8 @@ class WifiCommunication {
     private func listenToServer() {
         var prefix = "not initialized"
         DispatchQueue.global(qos: .background).async {
-            while (self.client != nil) {
+            var ableToRead = true
+            while (self.client != nil && ableToRead) {
                 let data = self.client!.read(40, timeout: 5400)
                 if data != nil {
                     prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem"
@@ -71,16 +72,22 @@ class WifiCommunication {
                                         questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
                                         self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer)
                                     }
-                                } catch {}
+                                } catch let error {
+                                    print(error)
+                                }
                             }
                         }
                     } else if typeID.range(of:"EVAL") != nil {
                         do {
                             try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, quantitativeEval: prefix.components(separatedBy: "///")[1])
-                        } catch {}
+                        } catch let error {
+                            print(error)
+                        }
                     } else if typeID.range(of:"UPDEV") != nil {
                         
                     }
+                } else {
+                    ableToRead = false
                 }
             }
         }
