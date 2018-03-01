@@ -119,7 +119,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dMN-R2-6aL" customClass="BarChartView" customModule="Charts">
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dMN-R2-6aL" customClass="HorizontalBarChartView" customModule="Charts">
                                 <rect key="frame" x="0.0" y="63" width="320" height="366"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -129,7 +129,7 @@
                         <viewLayoutGuide key="safeArea" id="eLR-9W-Bq3"/>
                     </view>
                     <connections>
-                        <outlet property="BarChart" destination="dMN-R2-6aL" id="hjf-4L-I1o"/>
+                        <outlet property="BarChart" destination="dMN-R2-6aL" id="NLX-fx-y7n"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="I1r-O3-cIY" userLabel="First Responder" sceneMemberID="firstResponder"/>
