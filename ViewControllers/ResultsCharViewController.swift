@@ -22,18 +22,38 @@ class ResultsChartViewController: UIViewController {
     }
     
     func barChartUpdate () {
-        let entry1 = BarChartDataEntry(x: 1.0, y: Double(45))
-        let entry2 = BarChartDataEntry(x: 2.0, y: Double(97))
-        let entry3 = BarChartDataEntry(x: 3.0, y: Double(4))
-        let dataSet = BarChartDataSet(values: [entry1, entry2, entry3], label: "Widgets Type")
-        let data = BarChartData(dataSets: [dataSet])
-        BarChart.data = data
-        BarChart.chartDescription?.text = "Number of Widgets by Type"
-        
-        //All other additions to this function will go here
-        
-        //This must stay at end of function
-        BarChart.notifyDataSetChanged()
+        do {
+            var evalForObjectives = try DbTableLearningObjective.getResultsPerObjective(subject: "All")
+            var objectives = evalForObjectives[0]
+            var results = evalForObjectives[1]
+            var entries = [BarChartDataEntry]()
+            for i in 0..<results.count {
+                let entry = BarChartDataEntry(x: Double(i + 1), y: Double(results[i]) ?? 0.0)
+                entries.append(entry)
+            }
+            let dataSet = BarChartDataSet(values: entries, label: "Evaluation for each learning objective")
+            let data = BarChartData(dataSets: [dataSet])
+            BarChart.data = data
+            
+            let xAxis = BarChart.xAxis
+            xAxis.granularity = 1.0
+            //xAxis.setPosition(XAxis.XAxisPosition.TOP_INSIDE);
+            //xAxis.setDrawGridLines(false);
+            xAxis.valueFormatter = IndexAxisValueFormatter(values: objectives)
+            xAxis.labelPosition = XAxis.LabelPosition.bottom
+            xAxis.labelCount = objectives.count
+            
+            let yAxis = BarChart.leftAxis
+            yAxis.axisMaximum = 100.0
+            yAxis.axisMinimum = 0.0
+            let yAxisright = BarChart.rightAxis
+            yAxisright.axisMaximum = 100.0
+            yAxisright.axisMinimum = 0.0
+
+            BarChart.notifyDataSetChanged()
+        } catch let error {
+            print(error)
+        }
     }
     
     override func didReceiveMemoryWarning() {

@@ -135,6 +135,8 @@ class WifiCommunication {
             } else if typeOfQuest.range(of: "SHRTA") != nil {
                 try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: DataConverstion.bytesToShrtaq(textData: dataText, imageData: dataImage))
             }
-        } catch {}
+        } catch let error {
+            print(error)
+        }
     }
 }

@@ -14,9 +14,9 @@ class DataConverstion {
     public func connection() -> Data {
         var input = "problem retrieving name from DB"
         do {
-        try input = "CONN" + "///"
-            + UIDevice.current.identifierForVendor!.uuidString + "///"
-            + DbTableSettings.retrieveName()
+            try input = "CONN" + "///"
+                + UIDevice.current.identifierForVendor!.uuidString + "///"
+                + DbTableSettings.retrieveName()
         } catch {}
         let dataUTF8 = input.data(using: .utf8)!
         return dataUTF8
@@ -47,15 +47,21 @@ class DataConverstion {
         let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
         saveImage(image: uiImage, fileName: questionMultipleChoice.Image)
         
-        //deal with subjects
-        let subjectsArray = wholeText.components(separatedBy: "///")[13].components(separatedBy: "|||")
-        for subject in subjectsArray {
-            questionMultipleChoice.Subjects.append(subject)
-        }
-        //deal with objectives
-        let objectivesArray = wholeText.components(separatedBy: "///")[14].components(separatedBy: "|||")
-        for objective in objectivesArray {
-            questionMultipleChoice.Objectives.append(objective)
+        do {
+            //deal with subjects
+            let subjectsArray = wholeText.components(separatedBy: "///")[13].components(separatedBy: "|||")
+            for subject in subjectsArray {
+                questionMultipleChoice.Subjects.append(subject)
+                try DbTableSubject.insertSubject(questionID: questionMultipleChoice.ID, subject: subject)
+            }
+            //deal with objectives
+            let objectivesArray = wholeText.components(separatedBy: "///")[14].components(separatedBy: "|||")
+            for objective in objectivesArray {
+                questionMultipleChoice.Objectives.append(objective)
+                try DbTableLearningObjective.insertLearningObjective(questionID: questionMultipleChoice.ID, objective: objective, levelCognitiveAbility: 0)
+            }
+        } catch let error {
+            print(error)
         }
         return questionMultipleChoice
     }
@@ -75,15 +81,21 @@ class DataConverstion {
         let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
         saveImage(image: uiImage, fileName: questionShortAnswer.Image)
         
-        //deal with subjects
-        let subjectsArray = wholeText.components(separatedBy: "///")[3].components(separatedBy: "|||")
-        for subject in subjectsArray {
-            questionShortAnswer.Subjects.append(subject)
-        }
-        //deal with objectives
-        let objectivesArray = wholeText.components(separatedBy: "///")[4].components(separatedBy: "|||")
-        for objective in objectivesArray {
-            questionShortAnswer.Objectives.append(objective)
+        do {
+            //deal with subjects
+            let subjectsArray = wholeText.components(separatedBy: "///")[3].components(separatedBy: "|||")
+            for subject in subjectsArray {
+                questionShortAnswer.Subjects.append(subject)
+                try DbTableSubject.insertSubject(questionID: questionShortAnswer.ID, subject: subject)
+            }
+            //deal with objectives
+            let objectivesArray = wholeText.components(separatedBy: "///")[4].components(separatedBy: "|||")
+            for objective in objectivesArray {
+                questionShortAnswer.Objectives.append(objective)
+                try DbTableLearningObjective.insertLearningObjective(questionID: questionShortAnswer.ID, objective: objective, levelCognitiveAbility: 0)
+            }
+        } catch let error {
+            print(error)
         }
         return questionShortAnswer
     }

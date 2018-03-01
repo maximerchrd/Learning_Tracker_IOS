@@ -56,7 +56,7 @@ class RelationQuestionAnswerOptionRecord : Record {
     }
     
     override class var databaseTableName: String {
-        return DbTableRelationQuestionAnswerOption.DBPath
+        return DbTableRelationQuestionAnswerOption.TABLE_NAME
     }
     
     override func encode(to container: inout PersistenceContainer) {

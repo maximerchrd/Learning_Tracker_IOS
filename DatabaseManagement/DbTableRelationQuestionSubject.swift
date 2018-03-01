@@ -14,6 +14,7 @@ class DbTableRelationQuestionSubject {
     static let KEY_ID = "id"
     static let KEY_ID_GLOBAL = "ID_GLOBAL"
     static let KEY_SUBJECT = "SUBJECT"
+    static let KEY_IDGLOBALSUBJECT = "IDGLOBALSUBJECT"
     static var DBPath = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -24,6 +25,7 @@ class DbTableRelationQuestionSubject {
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
                 t.column(KEY_SUBJECT, .text).notNull()
+                t.column(KEY_IDGLOBALSUBJECT, .text).notNull().unique(onConflict: .ignore)
             }
         }
     }
@@ -31,8 +33,9 @@ class DbTableRelationQuestionSubject {
     static func insertRelationQuestionSubject(questionID: Int, subject: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
-            let relationQuestionSubject = RelationQuestionSubjectRecord(idGlobal: questionID, subject: subject)
-            try relationQuestionSubject.insert(db)
+            let idGlobalSubject = String(questionID) + subject
+            let relationQuestionSubjectRecord = RelationQuestionSubjectRecord(idGlobal: questionID, subject: subject, idGlobalSubject: idGlobalSubject)
+            try relationQuestionSubjectRecord.insert(db)
         }
     }
 }
@@ -41,10 +44,12 @@ class RelationQuestionSubjectRecord : Record {
     var id: Int64?
     var idGlobal: Int
     var subject: String
+    var idGlobalSubject: String
     
-    init(idGlobal: Int, subject: String) {
+    init(idGlobal: Int, subject: String, idGlobalSubject: String) {
         self.idGlobal = idGlobal
         self.subject = subject
+        self.idGlobalSubject = idGlobalSubject
         super.init()
     }
     
@@ -52,17 +57,19 @@ class RelationQuestionSubjectRecord : Record {
         id = row[DbTableRelationQuestionSubject.KEY_ID]
         idGlobal = row[DbTableRelationQuestionSubject.KEY_ID_GLOBAL]
         subject = row[DbTableRelationQuestionSubject.KEY_SUBJECT]
+        idGlobalSubject = row[DbTableRelationQuestionSubject.KEY_IDGLOBALSUBJECT]
         super.init()
     }
     
     override class var databaseTableName: String {
-        return DbTableRelationQuestionSubject.DBPath
+        return DbTableRelationQuestionSubject.TABLE_NAME
     }
     
     override func encode(to container: inout PersistenceContainer) {
         container[DbTableRelationQuestionSubject.KEY_ID] = id
         container[DbTableRelationQuestionSubject.KEY_ID_GLOBAL] = idGlobal
         container[DbTableRelationQuestionSubject.KEY_SUBJECT] = subject
+        container[DbTableRelationQuestionSubject.KEY_IDGLOBALSUBJECT] = idGlobalSubject
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

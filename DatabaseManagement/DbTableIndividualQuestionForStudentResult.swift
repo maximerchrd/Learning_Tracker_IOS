@@ -116,7 +116,7 @@ class IndividualQuestionForResultRecord : Record {
     }
     
     override class var databaseTableName: String {
-        return DbTableIndividualQuestionForResult.DBPath
+        return DbTableIndividualQuestionForResult.TABLE_NAME
     }
     
     override func encode(to container: inout PersistenceContainer) {

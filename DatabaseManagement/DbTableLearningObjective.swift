@@ -35,16 +35,66 @@ class DbTableLearningObjective {
         try dbQueue.inDatabase { db in
             let learningObjective = LearningObjectiveRecord(idGlobal: 2000000, objective: objective, levelCognitiveAbility: levelCognitiveAbility)
             try learningObjective.insert(db)
-            var learningObjectiveToUpdate = try LearningObjectiveRecord.fetchOne(db, key: [KEY_ID_GLOBAL: 2000000])
-            learningObjectiveToUpdate?.idGlobal = 2000000 + Int((learningObjectiveToUpdate?.id)!)
-            try learningObjectiveToUpdate?.update(db)
+            let learningObjectiveToUpdate = try LearningObjectiveRecord.fetchOne(db, key: [KEY_OBJECTIVE: objective])
+            if learningObjectiveToUpdate?.idGlobal == 2000000 {
+                learningObjectiveToUpdate?.idGlobal = 2000000 + Int((learningObjectiveToUpdate?.id)!)
+                try learningObjectiveToUpdate?.update(db)
+            }
+            try DbTableRelationQuestionObjective.insertRelationQuestionObjective(questionID: questionID, objective: objective)
         }
     }
     
-    static func getResultsPerObjective(objective: String) -> [[String]] {
-        //to implement after relations are implemented
+    static func getResultsPerObjective(subject: String) throws -> [[String]] {
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        var objectives = [String]()
+        var results = [String]()
+        var idQuestions = [Int]()
+        var evaluationsForEachQuestion = [String]()
+        var objectivesForEachQuestion = [[String]]()
+        var resultsForEachObjective = [[String]]()
         
-        return [[String]]()
+        if subject == "All" {
+            try dbQueue.inDatabase { db in
+                let individualResultsRecord = try IndividualQuestionForResultRecord.fetchAll(db)
+                for singleRecord in individualResultsRecord {
+                    idQuestions.append(singleRecord.idGlobal)
+                    evaluationsForEachQuestion.append(singleRecord.quantitativeEval)
+                    var request = "SELECT * FROM " + DbTableRelationQuestionObjective.TABLE_NAME
+                    request += " WHERE " + DbTableRelationQuestionObjective.KEY_ID_GLOBAL + "=" + String(singleRecord.idGlobal)
+                    let objectivesOfCurrentQuestionRecords = try RelationQuestionObjectiveRecord.fetchAll(db, request)
+                    var objectivesOfCurrentQuestion = [String]()
+                    for singleObjective in objectivesOfCurrentQuestionRecords {
+                        objectivesOfCurrentQuestion.append(singleObjective.objective)
+                    }
+                    objectivesForEachQuestion.append(objectivesOfCurrentQuestion)
+                }
+            }
+        }
+        
+        for i in 0..<evaluationsForEachQuestion.count {
+            for j in 0..<objectivesForEachQuestion[i].count {
+                if !objectives.contains(objectivesForEachQuestion[i][j]) {
+                    objectives.append(objectivesForEachQuestion[i][j])
+                    results.append(evaluationsForEachQuestion[i])
+                } else {
+                    results[objectives.index(of: objectivesForEachQuestion[i][j])!] += ";" + evaluationsForEachQuestion[i]
+                }
+                
+            }
+        }
+        for i in 0..<results.count {
+            let resultsString = results[i].components(separatedBy: ";")
+            var numericResult = 0.0
+            for result in resultsString {
+                numericResult += Double(result) ?? 0.0
+            }
+            results[i] = String(numericResult / Double(resultsString.count))
+        }
+        
+        resultsForEachObjective.append(objectives)
+        resultsForEachObjective.append(results)
+        
+        return resultsForEachObjective
     }
 }
 
@@ -70,7 +120,7 @@ class LearningObjectiveRecord : Record {
     }
     
     override class var databaseTableName: String {
-        return DbTableLearningObjective.DBPath
+        return DbTableLearningObjective.TABLE_NAME
     }
     
     override func encode(to container: inout PersistenceContainer) {
