@@ -97,10 +97,10 @@ class WifiCommunication {
         var message = ""
         do {
             var question = ""
-            if questionType == "MULTQ" {
+            if questionType == "ANSW0" {
                 let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: globalID)
                 question = questionMultipleChoice.Question
-            } else if questionType == "SHRTQ" {
+            } else if questionType == "ANSW1" {
                 let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: globalID)
                 question = questionShortAnswer.Question
             }
