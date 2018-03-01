@@ -203,10 +203,10 @@
             </objects>
             <point key="canvasLocation" x="533" y="1303"/>
         </scene>
-        <!--View Controller-->
+        <!--Free Practice View Controller-->
         <scene sceneID="EF9-C0-aIt">
             <objects>
-                <viewController id="foS-ZY-GFt" sceneMemberID="viewController">
+                <viewController id="foS-ZY-GFt" customClass="FreePracticeViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="KFN-CK-bFC">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -237,6 +237,7 @@
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
+                                    <action selector="StartPracticeButtonTouched:" destination="foS-ZY-GFt" eventType="touchUpInside" id="SrI-vE-z8M"/>
                                     <segue destination="0br-Zn-AmA" kind="show" id="Dz4-3f-Acp"/>
                                 </connections>
                             </button>
@@ -244,6 +245,9 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="tTj-8m-vPr"/>
                     </view>
+                    <connections>
+                        <outlet property="SubjectPicker" destination="0pS-gv-VXT" id="XR6-sa-cua"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0ua-QC-ZcB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

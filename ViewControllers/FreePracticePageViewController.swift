@@ -11,7 +11,7 @@ import UIKit
 
 class FreePracticePageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     var pageControl = UIPageControl()
-    
+    var ouaich = "meuh non"
     func configurePageControl() {
         // The total number of pages that are available is based on how many available colors we have.
         pageControl = UIPageControl(frame: CGRect(x: 0,y: UIScreen.main.bounds.maxY - 50,width: UIScreen.main.bounds.width,height: 50))
@@ -90,6 +90,7 @@ class FreePracticePageViewController: UIPageViewController, UIPageViewController
         }
         self.delegate = self
         configurePageControl()
+        print(ouaich)
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
