@@ -238,7 +238,6 @@
                                 </state>
                                 <connections>
                                     <action selector="StartPracticeButtonTouched:" destination="foS-ZY-GFt" eventType="touchUpInside" id="SrI-vE-z8M"/>
-                                    <segue destination="0br-Zn-AmA" kind="show" id="Dz4-3f-Acp"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -296,7 +295,7 @@
         <!--Question Short Answer View Controller-->
         <scene sceneID="IwT-Pj-0By">
             <objects>
-                <viewController storyboardIdentifier="QuestionShortAnswerViewController" id="xQz-if-Mve" customClass="QuestionShortAnswerViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="QuestionShortAnswerViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="xQz-if-Mve" customClass="QuestionShortAnswerViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0pK-M9-iNc">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -17,10 +17,17 @@ class FreePracticeViewController: UIViewController {
     
     @IBOutlet weak var SubjectPicker: UIPickerView!
     @IBAction func StartPracticeButtonTouched(_ sender: Any) {
-        print("blabla")
-        let myVC = storyboard?.instantiateViewController(withIdentifier: "freePractice") as! FreePracticePageViewController
-        myVC.ouaich = "ouaich"
-        navigationController?.pushViewController(myVC, animated: true)
+        let newViewController = storyboard?.instantiateViewController(withIdentifier: "freePractice") as! FreePracticePageViewController
+        let question = QuestionMultipleChoice()
+        question.Question = "some kind of question"
+        let question2 = QuestionMultipleChoice()
+        question2.Question = "just another question"
+        Global.exerciceQuestionMultipleChoiceArray.append(question)
+        Global.exerciceQuestionMultipleChoiceArray.append(question2)
+        //var questionsArray = [QuestionMultipleChoice]()
+        //questionsArray.append(question)
+        //presentVC.questionsMultipleChoice = questionsArray
+        navigationController?.pushViewController(newViewController, animated: true)
     }
     
     override func viewDidLoad() {

@@ -11,14 +11,16 @@ import UIKit
 
 class FreePracticePageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     var pageControl = UIPageControl()
-    var ouaich = "meuh non"
+    var questionsMultipleChoice = [QuestionMultipleChoice]()
+    var viewControllersArray = [UIViewController]()
+    
     func configurePageControl() {
         // The total number of pages that are available is based on how many available colors we have.
         pageControl = UIPageControl(frame: CGRect(x: 0,y: UIScreen.main.bounds.maxY - 50,width: UIScreen.main.bounds.width,height: 50))
         self.pageControl.numberOfPages = orderedViewControllers.count
         self.pageControl.currentPage = 0
         self.pageControl.tintColor = UIColor.black
-        self.pageControl.pageIndicatorTintColor = UIColor.white
+        self.pageControl.pageIndicatorTintColor = UIColor.lightGray
         self.pageControl.currentPageIndicatorTintColor = UIColor.black
         self.view.addSubview(pageControl)
     }
@@ -33,9 +35,9 @@ class FreePracticePageViewController: UIPageViewController, UIPageViewController
         // User is on the first view controller and swiped left to loop to
         // the last view controller.
         guard previousIndex >= 0 else {
-            return orderedViewControllers.last
+            //return orderedViewControllers.last
             // Uncommment the line below, remove the line above if you don't want the page control to loop.
-            // return nil
+            return nil
         }
         
         guard orderedViewControllers.count > previousIndex else {
@@ -56,9 +58,9 @@ class FreePracticePageViewController: UIPageViewController, UIPageViewController
         // User is on the last view controller and swiped right to loop to
         // the first view controller.
         guard orderedViewControllersCount != nextIndex else {
-            return orderedViewControllers.first
+            //return orderedViewControllers.first
             // Uncommment the line below, remove the line above if you don't want the page control to loop.
-            // return nil
+            return nil
         }
         
         guard orderedViewControllersCount > nextIndex else {
@@ -72,13 +74,19 @@ class FreePracticePageViewController: UIPageViewController, UIPageViewController
         return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: viewController)
     }
     lazy var orderedViewControllers: [UIViewController] = {
-        return [self.newVc(viewController: "chart"),
-                self.newVc(viewController: "target")]
+        return viewControllersArray
     }()
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if (viewControllersArray.count < 1) {
+            for questionMC in Global.exerciceQuestionMultipleChoiceArray {
+                let questionVC = storyboard?.instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as! QuestionMultipleChoiceViewController
+                questionVC.questionMultipleChoice = questionMC
+                viewControllersArray.append(questionVC)
+            }
+        }
         // Do any additional setup after loading the view, typically from a nib.
         self.dataSource = self
         // This sets up the first view that will show up on our page control
@@ -89,8 +97,8 @@ class FreePracticePageViewController: UIPageViewController, UIPageViewController
                                completion: nil)
         }
         self.delegate = self
+        self.automaticallyAdjustsScrollViewInsets = false;
         configurePageControl()
-        print(ouaich)
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {

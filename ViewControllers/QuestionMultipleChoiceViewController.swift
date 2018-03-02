@@ -85,7 +85,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
     func shuffle(arrayArg: [String]) -> [String] {
         var array = arrayArg
         //implementing Fisher-Yates shuffle
-        for i in 0...array.count-1 {
+        for i in 0..<array.count {
             let random = arc4random_uniform(UInt32(array.count))
             let index = Int(random)
             // Simple swap
