@@ -12,7 +12,7 @@ import UIKit
 
 class FreePracticeViewController: UIViewController {
     
-    var selectedSubject = "All"
+    var selectedSubject = "All Subjects"
     var subjects = [String]()
     
     @IBOutlet weak var SubjectPicker: UIPickerView!
@@ -66,6 +66,7 @@ class FreePracticeViewController: UIViewController {
         SubjectPicker.delegate = self
         do {
             subjects = try DbTableSubject.getAllSubjects()
+            subjects.insert("All Subjects", at: 0)
         } catch let error {
             print(error)
         }
