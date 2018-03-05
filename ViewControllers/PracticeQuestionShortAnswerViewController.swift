@@ -1,15 +1,15 @@
 //
-//  QuestionShortAnswerViewController.swift
+//  PracticeQuestionShortAnswerViewController.swift
 //  Learning_Tracker_IOS
 //
-//  Created by Maxime Richard on 27.02.18.
+//  Created by Maxime Richard on 05.03.18.
 //  Copyright © 2018 Maxime Richard. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-class QuestionShortAnswerViewController: UIViewController {
+class PracticeQuestionShortAnswerViewController: UIViewController {
     var questionShortAnswer: QuestionShortAnswer
     var screenHeight: Float
     var screenWidth: Float
@@ -23,6 +23,7 @@ class QuestionShortAnswerViewController: UIViewController {
     var newImageX:Float = 0
     var wifiCommunication: WifiCommunication?
     
+    @IBOutlet weak var SubmitButton: UIButton!
     @IBOutlet weak var AnswerTextField: UITextField!
     @IBOutlet weak var QuestionLabel: UILabel!
     @IBOutlet weak var PictureView: UIImageView!
@@ -73,9 +74,33 @@ class QuestionShortAnswerViewController: UIViewController {
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
-        wifiCommunication?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
-        if let navController = self.navigationController {
-            navController.popViewController(animated: true)
+        var evaluation = -1.0
+        let studentAnswer = AnswerTextField.text!
+        var rightAnswers = [String]()
+        let options = questionShortAnswer.Options
+        for option in options {
+            rightAnswers.append(option)
+        }
+        if rightAnswers.contains(studentAnswer) {
+            evaluation = 100.0
+            let alert = UIAlertController(title: "Correct!", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+            SubmitButton.isEnabled = false
+            SubmitButton.alpha = 0.4
+        } else {
+            evaluation = 0.0
+            let message = "The right answer was for example: " + rightAnswers[0]
+            let alert = UIAlertController(title: "Incorrect :-(", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+            SubmitButton.isEnabled = false
+            SubmitButton.alpha = 0.4
+        }
+        do {
+            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: questionShortAnswer.ID, quantitativeEval: String(evaluation))
+        } catch let error {
+            print(error)
         }
     }
     

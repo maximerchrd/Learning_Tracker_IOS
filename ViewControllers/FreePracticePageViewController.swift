@@ -12,6 +12,7 @@ import UIKit
 class FreePracticePageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     var pageControl = UIPageControl()
     var questionsMultipleChoice = [QuestionMultipleChoice]()
+    var questionsShortAnswer = [QuestionShortAnswer]()
     var viewControllersArray = [UIViewController]()
     
     func configurePageControl() {
@@ -81,9 +82,14 @@ class FreePracticePageViewController: UIPageViewController, UIPageViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         if (viewControllersArray.count < 1) {
-            for questionMC in Global.exerciceQuestionMultipleChoiceArray {
-                let questionVC = storyboard?.instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as! QuestionMultipleChoiceViewController
+            for questionMC in questionsMultipleChoice {
+                let questionVC = storyboard?.instantiateViewController(withIdentifier: "PracticeQuestionMultipleChoiceViewController") as! PracticeQuestionMultipleChoiceViewController
                 questionVC.questionMultipleChoice = questionMC
+                viewControllersArray.append(questionVC)
+            }
+            for questionSA in questionsShortAnswer {
+                let questionVC = storyboard?.instantiateViewController(withIdentifier: "PracticeQuestionShortAnswerViewController") as! PracticeQuestionShortAnswerViewController
+                questionVC.questionShortAnswer = questionSA
                 viewControllersArray.append(questionVC)
             }
         }

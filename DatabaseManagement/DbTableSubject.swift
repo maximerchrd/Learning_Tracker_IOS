@@ -42,12 +42,6 @@ class DbTableSubject {
         }
     }
     
-    static func getSubjectsForQuestionID(questionID: Int) -> [String] {
-        //to implement after relations are implemented
-        
-        return [String]()
-    }
-    
     static func getAllSubjects() throws -> [String] {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var subjectsRecords = [SubjectRecord]()

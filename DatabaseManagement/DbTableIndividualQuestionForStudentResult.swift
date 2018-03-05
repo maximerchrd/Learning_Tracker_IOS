@@ -71,6 +71,18 @@ class DbTableIndividualQuestionForResult {
             try individualQuestionForResult[0].update(db)
         }
     }
+    
+    static func getLatestEvaluationForQuestionID (questionID: Int) throws -> Double {
+        var result = 0.0
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        try dbQueue.inDatabase { db in
+            var request = "SELECT * FROM " + TABLE_NAME
+            request += " WHERE " + KEY_ID + "=(SELECT MAX (" + KEY_ID + ") FROM " + TABLE_NAME + " WHERE ID_GLOBAL='" + String(questionID) + "')"
+            var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request)
+            result = Double(resultRecord[0].quantitativeEval) ?? -1
+        }
+        return result
+    }
 }
 
 class IndividualQuestionForResultRecord : Record {

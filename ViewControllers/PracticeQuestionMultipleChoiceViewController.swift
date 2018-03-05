@@ -1,15 +1,15 @@
 //
-//  QuestionMultipleChoiceViewController.swift
+//  PracticeQuestionMultipleChoiceViewController.swift
 //  Learning_Tracker_IOS
 //
-//  Created by Maxime Richard on 24.02.18.
+//  Created by Maxime Richard on 05.03.18.
 //  Copyright © 2018 Maxime Richard. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-class QuestionMultipleChoiceViewController: UIViewController {
+class PracticeQuestionMultipleChoiceViewController: UIViewController {
     var questionMultipleChoice: QuestionMultipleChoice
     var screenHeight: Float
     var screenWidth: Float
@@ -24,6 +24,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var wifiCommunication: WifiCommunication?
     var checkBoxArray: [CheckBox]
     
+    @IBOutlet weak var SubmitAnswerButton: UIButton!
     @IBOutlet weak var QuestionLabel: UILabel!
     @IBOutlet weak var PictureView: UIImageView!
     
@@ -116,12 +117,36 @@ class QuestionMultipleChoiceViewController: UIViewController {
                 answersArray.append((singleCheckBox.titleLabel?.text)!)
             }
         }
-        
-        wifiCommunication?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
-        if let navController = self.navigationController {
-            navController.popViewController(animated: true)
+        var evaluation = -1.0
+        var options = questionMultipleChoice.Options
+        var rightAnswers = [String]()
+        for i in 0..<questionMultipleChoice.NbCorrectAnswers {
+            rightAnswers.append(options[i])
         }
-        
+        if rightAnswers.containsSameElements(as: answersArray) {
+            evaluation = 100.0
+            let alert = UIAlertController(title: "Correct!", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+            SubmitAnswerButton.isEnabled = false
+            SubmitAnswerButton.alpha = 0.4
+        } else {
+            evaluation = 0.0
+            var message = "The right answer was: "
+            for answer in rightAnswers {
+                message += answer + "; "
+            }
+            let alert = UIAlertController(title: "Incorrect :-(", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+            SubmitAnswerButton.isEnabled = false
+            SubmitAnswerButton.alpha = 0.4
+        }
+        do {
+            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: questionMultipleChoice.ID, quantitativeEval: String(evaluation))
+        } catch let error {
+            print(error)
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -130,4 +155,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
     }
     
     
+}
+
+extension Array where Element: Comparable {
+    func containsSameElements(as other: [Element]) -> Bool {
+        return self.count == other.count && self.sorted() == other.sorted()
+    }
 }

@@ -17,17 +17,47 @@ class FreePracticeViewController: UIViewController {
     
     @IBOutlet weak var SubjectPicker: UIPickerView!
     @IBAction func StartPracticeButtonTouched(_ sender: Any) {
-        let newViewController = storyboard?.instantiateViewController(withIdentifier: "freePractice") as! FreePracticePageViewController
-        let question = QuestionMultipleChoice()
-        question.Question = "some kind of question"
-        let question2 = QuestionMultipleChoice()
-        question2.Question = "just another question"
-        Global.exerciceQuestionMultipleChoiceArray.append(question)
-        Global.exerciceQuestionMultipleChoiceArray.append(question2)
-        //var questionsArray = [QuestionMultipleChoice]()
-        //questionsArray.append(question)
-        //presentVC.questionsMultipleChoice = questionsArray
-        navigationController?.pushViewController(newViewController, animated: true)
+        var questionIds = [Int]()
+        var results = [Double]()
+        do {
+            questionIds = try DbTableRelationQuestionSubject.getQuestionsForSubject(subject: selectedSubject)
+            for questionId in questionIds {
+                let result = try DbTableIndividualQuestionForResult.getLatestEvaluationForQuestionID(questionID: questionId)
+                results.append(result)
+            }
+        } catch let error {
+            print(error)
+        }
+        var i = 0
+        while i < results.count {
+            if results[i] > 90 {
+                questionIds.remove(at: i)
+                results.remove(at: i)
+                i = i - 1
+            }
+            i = i + 1
+        }
+        if questionIds.count > 0 {
+            let newViewController = storyboard?.instantiateViewController(withIdentifier: "freePractice") as! FreePracticePageViewController
+            do {
+                for questionId in questionIds {
+                    let questionMC = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: questionId)
+                    if questionMC.Question.count < 1 {
+                        let questionSA = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: questionId)
+                        newViewController.questionsShortAnswer.append(questionSA)
+                    } else {
+                        newViewController.questionsMultipleChoice.append(questionMC)
+                    }
+                }
+            } catch let error {
+                print(error)
+            }
+            navigationController?.pushViewController(newViewController, animated: true)
+        } else {
+            let alert = UIAlertController(title: "You are quite good! You don\'t have any more questions needing practice.", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+        }
     }
     
     override func viewDidLoad() {

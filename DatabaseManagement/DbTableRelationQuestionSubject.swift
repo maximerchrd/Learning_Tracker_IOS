@@ -38,6 +38,21 @@ class DbTableRelationQuestionSubject {
             try relationQuestionSubjectRecord.insert(db)
         }
     }
+    
+    static func getQuestionsForSubject(subject: String) throws -> [Int] {
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        var relationQuestionSubjectRecords = [RelationQuestionSubjectRecord]()
+        var subjectPurged = subject.replacingOccurrences(of: "'", with: "''")
+        let request = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_SUBJECT + "='" + subjectPurged + "'"
+        try dbQueue.inDatabase { db in
+            relationQuestionSubjectRecords = try RelationQuestionSubjectRecord.fetchAll(db, request)
+        }
+        var questionIDs = [Int]()
+        for singleRecord in relationQuestionSubjectRecords {
+            questionIDs.append(singleRecord.idGlobal)
+        }
+        return questionIDs
+    }
 }
 
 class RelationQuestionSubjectRecord : Record {
