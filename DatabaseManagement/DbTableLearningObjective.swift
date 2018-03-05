@@ -53,7 +53,7 @@ class DbTableLearningObjective {
         var objectivesForEachQuestion = [[String]]()
         var resultsForEachObjective = [[String]]()
         
-        if subject == "All" {
+        if subject == "All" || subject == "All Subjects" {
             try dbQueue.inDatabase { db in
                 let individualResultsRecord = try IndividualQuestionForResultRecord.fetchAll(db)
                 for singleRecord in individualResultsRecord {
