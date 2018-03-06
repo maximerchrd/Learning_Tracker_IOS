@@ -14,12 +14,24 @@ class ResultsTargetRepresentationViewController: UIViewController {
     var evaluations_middle = [String]()
     var evaluations_high = [String]()
     var evaluations_top = [String]()
+    var labelsArray = [UILabel]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        updateTargetRepresentation(subject: "All Subjects")
+    }
+    
+    public func updateTargetRepresentation(subject: String) {
+        for singleLabel in labelsArray {
+            singleLabel.removeFromSuperview()
+        }
+        evaluations_low.removeAll(keepingCapacity: true)
+        evaluations_middle.removeAll(keepingCapacity: true)
+        evaluations_high.removeAll(keepingCapacity: true)
+        evaluations_top.removeAll(keepingCapacity: true)
         var allEvals = [[String]]()
         do {
-            allEvals = try DbTableLearningObjective.getResultsPerObjective(subject: "All Subjects")
+            allEvals = try DbTableLearningObjective.getResultsPerObjective(subject: subject)
         } catch let error {
             print(error)
         }
@@ -59,6 +71,7 @@ class ResultsTargetRepresentationViewController: UIViewController {
             label.textColor = color
             label.text = objectives[i]
             self.view.addSubview(label)
+            labelsArray.append(label)
             
             //add action listener to the label
             let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapFunction))

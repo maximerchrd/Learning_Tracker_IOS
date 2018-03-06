@@ -69,6 +69,25 @@ class DbTableLearningObjective {
                     objectivesForEachQuestion.append(objectivesOfCurrentQuestion)
                 }
             }
+        } else {
+            try dbQueue.inDatabase { db in
+                let individualResultsRecord = try IndividualQuestionForResultRecord.fetchAll(db)
+                let questionsOfSubject = try DbTableRelationQuestionSubject.getQuestionsForSubject(subject: subject)
+                for singleRecord in individualResultsRecord {
+                    if questionsOfSubject.contains(singleRecord.idGlobal) {
+                        idQuestions.append(singleRecord.idGlobal)
+                        evaluationsForEachQuestion.append(singleRecord.quantitativeEval)
+                        var request = "SELECT * FROM " + DbTableRelationQuestionObjective.TABLE_NAME
+                        request += " WHERE " + DbTableRelationQuestionObjective.KEY_ID_GLOBAL + "=" + String(singleRecord.idGlobal)
+                        let objectivesOfCurrentQuestionRecords = try RelationQuestionObjectiveRecord.fetchAll(db, request)
+                        var objectivesOfCurrentQuestion = [String]()
+                        for singleObjective in objectivesOfCurrentQuestionRecords {
+                            objectivesOfCurrentQuestion.append(singleObjective.objective)
+                        }
+                        objectivesForEachQuestion.append(objectivesOfCurrentQuestion)
+                    }
+                }
+            }
         }
         
         for i in 0..<evaluationsForEachQuestion.count {

@@ -18,15 +18,15 @@ class ResultsChartViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        barChartUpdate()
+        barChartUpdate(subject: "All")
     }
     
-    func barChartUpdate () {
+    public func barChartUpdate (subject: String) {
         do {
-            var evalForObjectives = try DbTableLearningObjective.getResultsPerObjective(subject: "All")
+            var evalForObjectives = try DbTableLearningObjective.getResultsPerObjective(subject: subject)
             var objectives = evalForObjectives[0]
             var results = evalForObjectives[1]
-            var indexOfEmpty = objectives.index(of: "")
+            let indexOfEmpty = objectives.index(of: "")
             if indexOfEmpty != nil {
                 results.remove(at: indexOfEmpty!)
                 objectives.remove(at: indexOfEmpty!)
