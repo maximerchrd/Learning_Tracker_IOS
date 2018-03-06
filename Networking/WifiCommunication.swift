@@ -84,7 +84,11 @@ class WifiCommunication {
                             print(error)
                         }
                     } else if typeID.range(of:"UPDEV") != nil {
-                        
+                        do {
+                        try DbTableIndividualQuestionForResult.setEvalForQuestionAndStudentIDs(eval: prefix.components(separatedBy: "///")[1], idQuestion: prefix.components(separatedBy: "///")[2])
+                        } catch let error {
+                            print(error)
+                        }
                     }
                 } else {
                     ableToRead = false

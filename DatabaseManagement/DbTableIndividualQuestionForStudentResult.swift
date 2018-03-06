@@ -65,9 +65,12 @@ class DbTableIndividualQuestionForResult {
     }
     
     static func setEvalForQuestionAndStudentIDs (eval: String, idQuestion: String) throws {
+        var evaluation = "nothing"
+        evaluation = eval
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             var individualQuestionForResult = try IndividualQuestionForResultRecord.fetchAll(db, "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_ID + "=(SELECT MAX (" + KEY_ID + ") FROM (SELECT * FROM '" + TABLE_NAME + "') WHERE ID_GLOBAL='" + idQuestion + "')")
+            individualQuestionForResult[0].quantitativeEval = eval
             try individualQuestionForResult[0].update(db)
         }
     }
