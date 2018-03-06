@@ -42,7 +42,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
         screenHeight = Float(screenSize.height)
         
         // Set question text
+        QuestionLabel.numberOfLines = 0
         QuestionLabel.text = questionMultipleChoice.Question
+        QuestionLabel.sizeToFit()
+        
         
         // Display picture
         let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory
@@ -51,6 +54,12 @@ class QuestionMultipleChoiceViewController: UIViewController {
         if let dirPath          = paths.first {
             let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.Image)
             PictureView.image    = UIImage(contentsOfFile: imageURL.path)
+        }
+        //get the answer options to adapt the size of the imageview
+        questionMultipleChoice.removeEmptyOptions()
+        var optionsArray = questionMultipleChoice.Options
+        if optionsArray.count > 5 {
+            PictureView.frame = CGRect(x: 0, y: QuestionLabel.frame.maxY, width: 30, height: 30)
         }
         originaImageWidth = PictureView.frame.width
         originalImageHeight = PictureView.frame.height
@@ -61,22 +70,19 @@ class QuestionMultipleChoiceViewController: UIViewController {
         newImageX = 0
         
         // Display options
-        questionMultipleChoice.removeEmptyOptions()
-        var optionsArray = questionMultipleChoice.Options
         optionsArray = shuffle(arrayArg: optionsArray)
         var i = 1
         for singleOption in optionsArray {
-            let computedX = Int(screenWidth / 15)
-            let computedY = Int(Float(PictureView.frame.maxY) + (screenHeight / 15) * Float(i))
+            let computedY = Int(Float(PictureView.frame.maxY) + (screenHeight / 12) * Float(i))
             let computedWidth = Int(screenWidth * 0.9)
             let computedHeight = Int(screenHeight / 20)
-            let checkBox = CheckBox(frame: CGRect(x: computedX, y: computedY, width: computedWidth, height: computedHeight))
+            let checkBox = CheckBox(frame: CGRect(x: 0, y: computedY, width: computedWidth, height: computedHeight))
             checkBox.isChecked = false
             checkBox.setTitle(singleOption, for: .normal)
             checkBox.addTarget(checkBox, action: #selector(checkBox.buttonClicked(sender:)), for: .touchUpInside)
             checkBox.setTitleColor(.black, for: .normal)
             checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-            checkBox.contentHorizontalAlignment = .left
+            //checkBox.contentHorizontalAlignment = .left
             self.view.addSubview(checkBox)
             checkBoxArray.append(checkBox)
             i = i + 1

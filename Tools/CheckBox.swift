@@ -17,13 +17,22 @@ class CheckBox: UIButton {
     // Bool property
     var isChecked: Bool = false {
         didSet{
+            let buttonWidth = self.frame.width
             if isChecked == true {
                 self.setImage(checkedImage, for: UIControlState.normal)
                 self.imageView!.contentMode = UIViewContentMode.scaleAspectFit;
+                if UIDevice.current.userInterfaceIdiom == .phone {
+                    self.contentEdgeInsets = UIEdgeInsetsMake(0, -buttonWidth / 4, 0, 0)
+                    self.titleEdgeInsets = UIEdgeInsetsMake(0, -buttonWidth / 4, 0, 0)
+                }
                 self.contentHorizontalAlignment = .left
             } else {
                 self.setImage(uncheckedImage, for: UIControlState.normal)
                 self.imageView!.contentMode = UIViewContentMode.scaleAspectFit;
+                if UIDevice.current.userInterfaceIdiom == .phone {
+                    self.contentEdgeInsets = UIEdgeInsetsMake(0, -buttonWidth / 4, 0, 0)
+                    self.titleEdgeInsets = UIEdgeInsetsMake(0, -buttonWidth / 4, 0, 0)
+                }
                 self.contentHorizontalAlignment = .left
             }
         }

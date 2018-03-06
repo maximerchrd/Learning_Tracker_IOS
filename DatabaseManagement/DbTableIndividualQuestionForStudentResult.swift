@@ -82,7 +82,9 @@ class DbTableIndividualQuestionForResult {
             var request = "SELECT * FROM " + TABLE_NAME
             request += " WHERE " + KEY_ID + "=(SELECT MAX (" + KEY_ID + ") FROM " + TABLE_NAME + " WHERE ID_GLOBAL='" + String(questionID) + "')"
             var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request)
-            result = Double(resultRecord[0].quantitativeEval) ?? -1
+            if resultRecord.count > 0 {
+                result = Double(resultRecord[0].quantitativeEval) ?? -1
+            }
         }
         return result
     }
