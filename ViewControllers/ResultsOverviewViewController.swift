@@ -11,6 +11,8 @@ import UIKit
 
 class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     var pageControl = UIPageControl()
+    var selectedSubject = "All Subjects"
+    var subjects = [String]()
     
     func configurePageControl() {
         // The total number of pages that are available is based on how many available colors we have.
@@ -18,6 +20,7 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
         self.pageControl.numberOfPages = orderedViewControllers.count
         self.pageControl.currentPage = 0
         self.pageControl.tintColor = UIColor.black
+        self.pageControl.pageIndicatorTintColor = UIColor.lightGray
         self.pageControl.currentPageIndicatorTintColor = UIColor.black
         self.view.addSubview(pageControl)
     }
@@ -79,6 +82,18 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        do {
+            subjects = try DbTableSubject.getAllSubjects()
+        } catch let error {
+            print(error)
+        }
+        subjects.insert("All Subjects", at: 0)
+        let indexOfEmpty = subjects.index(of: "")
+        if indexOfEmpty != nil {
+            subjects.remove(at: subjects.index(of: "")!)
+        }
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Subject: " + selectedSubject, style: .plain, target: self, action: #selector(addTapped))
+        
         self.dataSource = self
         if !UIDevice.current.orientation.isLandscape {
             let value = UIInterfaceOrientation.landscapeLeft.rawValue
@@ -95,6 +110,35 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
         self.delegate = self
         configurePageControl()
     }
+    @objc func addTapped() {
+        let alertView = UIAlertController(
+            title: "Select item from list",
+            message: "\n\n\n\n\n\n\n\n\n",
+            preferredStyle: .alert)
+        
+        let pickerView = UIPickerView(frame:
+            CGRect(x: 0, y: 50, width: 260, height: 162))
+        pickerView.dataSource = self as UIPickerViewDataSource
+        pickerView.delegate = self as UIPickerViewDelegate
+        
+        // comment this line to use white color
+        pickerView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
+        pickerView.selectRow(subjects.index(of: selectedSubject) ?? 0, inComponent: 0, animated: false)
+        
+        alertView.view.addSubview(pickerView)
+        
+        let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in self.OKButtonPressed()})
+        
+        alertView.addAction(action)
+        present(alertView, animated: true)
+    }
+    
+    func OKButtonPressed() {
+        (orderedViewControllers[0] as! ResultsChartViewController).barChartUpdate(subject: selectedSubject)
+        (orderedViewControllers[1] as! ResultsTargetRepresentationViewController).updateTargetRepresentation(subject: selectedSubject)
+        navigationItem.rightBarButtonItem?.title = "Subject: " + selectedSubject
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         if UIDevice.current.orientation.isLandscape {
             let value = UIInterfaceOrientation.portrait.rawValue
@@ -114,4 +158,42 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
     }
     
     
+}
+extension ResultsOverviewViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return subjects.count
+    }
+    
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return subjects[row]
+    }
+    
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        
+        selectedSubject = subjects[row]
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        var label: UILabel
+        
+        if let view = view as? UILabel {
+            label = view
+        } else {
+            label = UILabel()
+        }
+        
+        label.textAlignment = .center
+        label.font = UIFont(name: "Menlo-Regular", size: 17)
+        
+        label.text = subjects[row]
+        
+        return label
+    }
 }
