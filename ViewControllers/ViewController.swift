@@ -25,9 +25,7 @@ class ViewController: UIViewController {
             print (error)
         }
         var welcomeMessage = NSLocalizedString("Hello ", comment: "first part of welcome message")
-        if name != nil {
-            welcomeMessage += name.components(separatedBy: " ")[0]
-        }
+        welcomeMessage += name.components(separatedBy: " ")[0]
         welcomeMessage += NSLocalizedString(". Welcome to Learning Tracker. Check in parameters that you have the right ip address before starting a classroom activity.", comment: "second part of welcome message")
         welcomeMessageLabel.text = welcomeMessage
     }

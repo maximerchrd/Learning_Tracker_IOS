@@ -42,7 +42,7 @@ class DbTableRelationQuestionSubject {
     static func getQuestionsForSubject(subject: String) throws -> [Int] {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var relationQuestionSubjectRecords = [RelationQuestionSubjectRecord]()
-        var subjectPurged = subject.replacingOccurrences(of: "'", with: "''")
+        let subjectPurged = subject.replacingOccurrences(of: "'", with: "''")
         var request = ""
         if subject == NSLocalizedString("All subjects", comment: "All subjects in the database") {
             request = "SELECT * FROM " + TABLE_NAME
