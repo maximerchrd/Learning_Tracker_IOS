@@ -11,7 +11,7 @@ import UIKit
 
 class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     var pageControl = UIPageControl()
-    var selectedSubject = "All Subjects"
+    var selectedSubject = NSLocalizedString("All subjects", comment: "All subjects in the database")
     var subjects = [String]()
     
     func configurePageControl() {
@@ -87,12 +87,12 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
         } catch let error {
             print(error)
         }
-        subjects.insert("All Subjects", at: 0)
+        subjects.insert(NSLocalizedString("All subjects", comment: "All subjects in the database"), at: 0)
         let indexOfEmpty = subjects.index(of: "")
         if indexOfEmpty != nil {
             subjects.remove(at: subjects.index(of: "")!)
         }
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Subject: " + selectedSubject, style: .plain, target: self, action: #selector(addTapped))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject, style: .plain, target: self, action: #selector(addTapped))
         
         self.dataSource = self
         if !UIDevice.current.orientation.isLandscape {
@@ -112,7 +112,7 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
     }
     @objc func addTapped() {
         let alertView = UIAlertController(
-            title: "Select item from list",
+            title: NSLocalizedString("Choose a subject", comment: "in the item picker for the evaluation charts"),
             message: "\n\n\n\n\n\n\n\n\n",
             preferredStyle: .alert)
         
@@ -136,7 +136,7 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
     func OKButtonPressed() {
         (orderedViewControllers[0] as! ResultsChartViewController).barChartUpdate(subject: selectedSubject)
         (orderedViewControllers[1] as! ResultsTargetRepresentationViewController).updateTargetRepresentation(subject: selectedSubject)
-        navigationItem.rightBarButtonItem?.title = "Subject: " + selectedSubject
+        navigationItem.rightBarButtonItem?.title = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
     }
     
     override func viewWillDisappear(_ animated: Bool) {

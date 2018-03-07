@@ -43,9 +43,9 @@ class ClassroomActivityViewController: UIViewController {
         //showMultipleChoiceQuestion(strin: "from view did load")
         wifiCommunication = WifiCommunication(classroomActivityViewControllerArg: self)
         if (wifiCommunication!.connectToServer()) {
-            InstructionsLabel.text = "AND WAIT FOR NEXT QUESTION"
+            InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
         } else {
-            InstructionsLabel.text = "AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings"
+            InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")
         }
     }
     

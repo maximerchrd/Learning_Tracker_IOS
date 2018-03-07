@@ -18,7 +18,7 @@ class ResultsTargetRepresentationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateTargetRepresentation(subject: "All Subjects")
+        updateTargetRepresentation(subject: NSLocalizedString("All subjects", comment: "All subjects in the database"))
     }
     
     public func updateTargetRepresentation(subject: String) {
@@ -38,11 +38,11 @@ class ResultsTargetRepresentationViewController: UIViewController {
         var allObjectives = allEvals[0]
         var allResults = allEvals[1]
         for i in 0..<allObjectives.count {
-            if Double(allResults[i]) ?? 0 < 40.0 {
+            if Double(allResults[i]) ?? 0 < 50.0 {
                 evaluations_low.append(allObjectives[i])
-            } else if Double(allResults[i]) ?? 0 < 50.0 {
+            } else if Double(allResults[i]) ?? 0 < 70.0 {
                 evaluations_middle.append(allObjectives[i])
-            } else if Double(allResults[i]) ?? 0 < 60.0 {
+            } else if Double(allResults[i]) ?? 0 < 90.0 {
                 evaluations_high.append(allObjectives[i])
             } else {
                 evaluations_top.append(allObjectives[i])

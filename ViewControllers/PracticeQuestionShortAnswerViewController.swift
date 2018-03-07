@@ -83,15 +83,15 @@ class PracticeQuestionShortAnswerViewController: UIViewController {
         }
         if rightAnswers.contains(studentAnswer) {
             evaluation = 100.0
-            let alert = UIAlertController(title: "Correct!", message: "", preferredStyle: .alert)
+            let alert = UIAlertController(title: NSLocalizedString("Correct!", comment: "pop up if answer right"), message: "", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true)
             SubmitButton.isEnabled = false
             SubmitButton.alpha = 0.4
         } else {
             evaluation = 0.0
-            let message = "The right answer was for example: " + rightAnswers[0]
-            let alert = UIAlertController(title: "Incorrect :-(", message: message, preferredStyle: .alert)
+            let message = NSLocalizedString("The right answer was for example: ", comment: "pop up message if answer wrong") + rightAnswers[0]
+            let alert = UIAlertController(title: NSLocalizedString("Incorrect :-(", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true)
             SubmitButton.isEnabled = false

@@ -39,7 +39,7 @@ class ResultsChartViewController: UIViewController {
                 let entry = BarChartDataEntry(x: Double(i) - 0.5, yValues: [Double(results[i]) ?? 0.0])
                 entries.append(entry)
             }
-            let dataSet = BarChartDataSet(values: entries, label: "Evaluation for each learning objective")
+            let dataSet = BarChartDataSet(values: entries, label: NSLocalizedString("Evaluation for each learning objective", comment: "chart label"))
             dataSet.drawValuesEnabled = false
             let data = BarChartData(dataSets: [dataSet])
             

@@ -1,0 +1,32 @@
+/* 
+  Localizable.strings
+  Learning_Tracker_IOS
+
+  Created by Maxime Richard on 07.03.18.
+  Copyright © 2018 Maxime Richard. All rights reserved.
+*/
+"Hello " = "Bonjour ";
+
+". Welcome to Learning Tracker. Check in parameters that you have the right ip address before starting a classroom activity." = ". Bienvenue dans Learning Tracker. Vérifie dans les paramètres que tu as la bonne adresse ip avant de commencer une activité en classe.";
+
+"AND WAIT FOR NEXT QUESTION" = "ET ATTENDS LA QUESTION SUIVANTE";
+
+"AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)" =  "ET REDEMARRE L'ACTIVITE EN CLASSE (mais avant, vérifie que tu as la bonne adresse IP dans les paramètres)";
+
+"All subjects" = "Tous les sujets";
+
+"Subject: " = "Sujet: ";
+
+"Evaluation for each learning objective" = "Evaluation pour chaque objectif d'apprentissage";
+
+"Choose a subject" = "Choisis un sujet";
+
+"You are quite good! You don\'t have any more questions needing practice." = "Bravo! Il n'y a plus de question que tu devrais encore exercer.";
+
+"Correct!" = "C\'est juste!";
+
+"Incorrect :-(" = "Malheureusement, c'est faux :-(";
+
+"The right answer was for example: " = "La bonne réponse était par exemple: ";
+
+"The right answer was: " = "La bonne réponse était: ";

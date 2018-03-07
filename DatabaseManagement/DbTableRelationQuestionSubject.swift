@@ -44,7 +44,7 @@ class DbTableRelationQuestionSubject {
         var relationQuestionSubjectRecords = [RelationQuestionSubjectRecord]()
         var subjectPurged = subject.replacingOccurrences(of: "'", with: "''")
         var request = ""
-        if subject == "All Subjects" {
+        if subject == NSLocalizedString("All subjects", comment: "All subjects in the database") {
             request = "SELECT * FROM " + TABLE_NAME
         } else {
             request = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_SUBJECT + "='" + subjectPurged + "'"
@@ -56,7 +56,7 @@ class DbTableRelationQuestionSubject {
         for singleRecord in relationQuestionSubjectRecords {
             questionIDs.append(singleRecord.idGlobal)
         }
-        if subject == "All Subjects" {
+        if subject == NSLocalizedString("All subjects", comment: "All subjects in the database") {
             questionIDs = Array(Set(questionIDs))
         }
         return questionIDs

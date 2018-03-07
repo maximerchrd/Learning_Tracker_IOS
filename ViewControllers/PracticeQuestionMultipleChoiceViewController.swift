@@ -131,18 +131,18 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
         }
         if rightAnswers.containsSameElements(as: answersArray) {
             evaluation = 100.0
-            let alert = UIAlertController(title: "Correct!", message: "", preferredStyle: .alert)
+            let alert = UIAlertController(title: NSLocalizedString("Correct!", comment: "pop up if answer right"), message: "", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true)
             SubmitAnswerButton.isEnabled = false
             SubmitAnswerButton.alpha = 0.4
         } else {
             evaluation = 0.0
-            var message = "The right answer was: "
+            var message = NSLocalizedString("The right answer was: ", comment: "pop up message if answer wrong")
             for answer in rightAnswers {
                 message += answer + "; "
             }
-            let alert = UIAlertController(title: "Incorrect :-(", message: message, preferredStyle: .alert)
+            let alert = UIAlertController(title: NSLocalizedString("Incorrect :-(", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true)
             SubmitAnswerButton.isEnabled = false
