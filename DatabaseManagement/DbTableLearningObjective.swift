@@ -109,7 +109,16 @@ class DbTableLearningObjective {
             }
             results[i] = String(numericResult / Double(resultsString.count))
         }
-        
+        let indexOfEmpty = objectives.index(of: "")
+        if indexOfEmpty != nil {
+            results.remove(at: indexOfEmpty!)
+            objectives.remove(at: indexOfEmpty!)
+        }
+        let index = objectives.index(of: " ")
+        if index != nil {
+            results.remove(at: index!)
+            objectives.remove(at: index!)
+        }
         resultsForEachObjective.append(objectives)
         resultsForEachObjective.append(results)
         

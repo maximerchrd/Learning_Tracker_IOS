@@ -26,11 +26,6 @@ class ResultsChartViewController: UIViewController {
             var evalForObjectives = try DbTableLearningObjective.getResultsPerObjective(subject: subject)
             var objectives = evalForObjectives[0]
             var results = evalForObjectives[1]
-            let indexOfEmpty = objectives.index(of: "")
-            if indexOfEmpty != nil {
-                results.remove(at: indexOfEmpty!)
-                objectives.remove(at: indexOfEmpty!)
-            }
             objectives.insert("", at: 0)
             results.insert("0.0", at: 0)
             

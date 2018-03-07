@@ -52,11 +52,15 @@ class DbTableSubject {
         for singleRecord in subjectsRecords {
             subjects.append(singleRecord.subject)
         }
+        let index = subjects.index(of: "")
+        if index != nil {
+            subjects.remove(at: index!)
+        }
+        let index2 = subjects.index(of: " ")
+        if index2 != nil {
+            subjects.remove(at: index2!)
+        }
         return subjects
-    }
-    
-    static func getSubjectsAndQuestionsNeedingPractice() -> [[String]] {
-        return [[String]]()
     }
 }
 
