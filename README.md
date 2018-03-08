@@ -1,0 +1,2 @@
+## README
+This is the Client version of the Learning Tracker program which can be downloaded [here](https://github.com/maximerchrd/sciquiz_server). It is designed to enable teachers to send questions to students and receive their answers in real time. It doesn't require an internet connection but all the devices (students' smartphones and teacher's computer) must be connected to the same Local Area Network (LAN).
