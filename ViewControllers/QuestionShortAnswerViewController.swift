@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class QuestionShortAnswerViewController: UIViewController {
+class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     var questionShortAnswer: QuestionShortAnswer
     var screenHeight: Float
     var screenWidth: Float
@@ -59,6 +59,33 @@ class QuestionShortAnswerViewController: UIViewController {
         newImageHeight = Float(originalImageHeight) / Float(originaImageWidth) * screenWidth
         newImageX = 0
         
+        //add observer to push view when keyboard shows up
+        NotificationCenter.default.addObserver(self, selector: #selector(QuestionShortAnswerViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(QuestionShortAnswerViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
+        //set delegate to hide keyboard when return pressed
+        self.AnswerTextField.delegate = self
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+            if self.view.frame.origin.y == 0{
+                self.view.frame.origin.y -= keyboardSize.height
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+            if self.view.frame.origin.y != 0{
+                self.view.frame.origin.y += keyboardSize.height
+            }
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        AnswerTextField.endEditing(true)
+        return false
     }
     
     @IBAction func imageTouched(_ sender: Any) {

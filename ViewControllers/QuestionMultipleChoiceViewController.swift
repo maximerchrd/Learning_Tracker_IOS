@@ -26,6 +26,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
     
     @IBOutlet weak var QuestionLabel: UILabel!
     @IBOutlet weak var PictureView: UIImageView!
+    @IBOutlet weak var OptionsScrollView: UIScrollView!
     
     required init?(coder aDecoder: NSCoder) {
         questionMultipleChoice = QuestionMultipleChoice()
