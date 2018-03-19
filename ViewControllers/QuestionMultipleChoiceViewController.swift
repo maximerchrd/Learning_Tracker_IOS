@@ -108,13 +108,8 @@ class QuestionMultipleChoiceViewController: UIViewController {
         optionsArray = shuffle(arrayArg: optionsArray)
         var i = 1
         for singleOption in optionsArray {
-            /*let computedY = Int(Float(PictureView.frame.maxY) + (screenHeight / 12) * Float(i))
-            let computedWidth = Int(screenWidth * 0.9)
-            let computedHeight = Int(screenHeight / 20)
-            let checkBox = CheckBox(frame: CGRect(x: 0, y: computedY, width: computedWidth, height: computedHeight))*/
             let checkBox = CheckBox()
             checkBox.isChecked = false
-            //checkBox.frame.size = CGSize(width: 100, height: checkBox.frame.height)
             checkBox.setTitle(singleOption, for: .normal)
             checkBox.addTarget(checkBox, action: #selector(checkBox.buttonClicked(sender:)), for: .touchUpInside)
             checkBox.setTitleColor(.black, for: .normal)
@@ -126,20 +121,6 @@ class QuestionMultipleChoiceViewController: UIViewController {
             checkBoxArray.append(checkBox)
             i = i + 1
         }
-    }
-    
-    func shuffle(arrayArg: [String]) -> [String] {
-        var array = arrayArg
-        //implementing Fisher-Yates shuffle
-        for i in 0..<array.count {
-            let random = arc4random_uniform(UInt32(array.count))
-            let index = Int(random)
-            // Simple swap
-            let a = array[index];
-            array[index] = array[i];
-            array[i] = a;
-        }
-        return array
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -159,6 +140,20 @@ class QuestionMultipleChoiceViewController: UIViewController {
         OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
         OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)
         OptionsScrollView.contentOffset.y = scrollPosition
+    }
+    
+    func shuffle(arrayArg: [String]) -> [String] {
+        var array = arrayArg
+        //implementing Fisher-Yates shuffle
+        for i in 0..<array.count {
+            let random = arc4random_uniform(UInt32(array.count))
+            let index = Int(random)
+            // Simple swap
+            let a = array[index];
+            array[index] = array[i];
+            array[i] = a;
+        }
+        return array
     }
     
     @IBAction func imageTouched(_ sender: Any) {

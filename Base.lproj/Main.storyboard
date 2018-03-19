@@ -474,11 +474,16 @@
                                     <outletCollection property="gestureRecognizers" destination="kEI-Px-VvM" appends="YES" id="iOj-xS-sUq"/>
                                 </connections>
                             </imageView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s9p-e2-gT2">
+                                <rect key="frame" x="7" y="176" width="306" height="230"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="dcj-OY-mAc"/>
                     </view>
                     <connections>
+                        <outlet property="OptionsScrollView" destination="s9p-e2-gT2" id="6JY-p5-0vp"/>
                         <outlet property="PictureView" destination="T3V-nQ-F3l" id="Bz3-28-GhR"/>
                         <outlet property="QuestionLabel" destination="1wH-sp-rWp" id="tig-bR-Bpp"/>
                         <outlet property="SubmitAnswerButton" destination="cYc-EF-bAw" id="cLK-cP-4hE"/>
@@ -491,7 +496,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="3426" y="-678"/>
+            <point key="canvasLocation" x="3425.625" y="-678.75"/>
         </scene>
         <!--Practice Question Short Answer View Controller-->
         <scene sceneID="fRe-MM-imF">
