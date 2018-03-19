@@ -402,6 +402,7 @@
                         <outlet property="OptionsScrollView" destination="58F-UC-oXn" id="dSt-t7-JgH"/>
                         <outlet property="PictureView" destination="7pa-5j-lUU" id="bAb-Fm-IZM"/>
                         <outlet property="QuestionLabel" destination="huC-Wx-4pk" id="TzP-Lz-i7h"/>
+                        <outlet property="SubmitButton" destination="njN-aR-w3O" id="Z4W-NM-zH0"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="q3m-KY-4dG" userLabel="First Responder" sceneMemberID="firstResponder"/>

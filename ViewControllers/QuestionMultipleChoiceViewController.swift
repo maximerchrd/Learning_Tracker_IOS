@@ -23,18 +23,31 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var newImageX:Float = 0
     var wifiCommunication: WifiCommunication?
     var checkBoxArray: [CheckBox]
+    var stackView: UIStackView!
+    var scrollViewWidth: CGFloat
+    var scrollViewHeight: CGFloat
+    var scrollViewX: CGFloat
+    var scrollViewY: CGFloat
+    var scrollPosition: CGFloat
     
     @IBOutlet weak var QuestionLabel: UILabel!
     @IBOutlet weak var PictureView: UIImageView!
     @IBOutlet weak var OptionsScrollView: UIScrollView!
+    @IBOutlet weak var SubmitButton: UIButton!
     
     required init?(coder aDecoder: NSCoder) {
         questionMultipleChoice = QuestionMultipleChoice()
         screenHeight = 0
         screenWidth = 0
         checkBoxArray = [CheckBox]()
+        scrollViewWidth = 0
+        scrollViewHeight = 0
+        scrollViewX = 0
+        scrollViewY = 0
+        scrollPosition = 0
         super.init(coder: aDecoder)
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -70,25 +83,51 @@ class QuestionMultipleChoiceViewController: UIViewController {
         newImageHeight = Float(originalImageHeight) / Float(originaImageWidth) * screenWidth
         newImageX = 0
         
-        // Display options
+        // DISPLAY OPTIONS
+        //First implements stackview inside scrollview
+        scrollViewWidth = OptionsScrollView.frame.size.width
+        scrollViewHeight = OptionsScrollView.frame.size.height
+        scrollViewX = OptionsScrollView.frame.minX
+        scrollViewY = OptionsScrollView.frame.minY
+        OptionsScrollView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(OptionsScrollView)
+        
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[OptionsScrollView]|", options: .alignAllCenterX, metrics: nil, views: ["OptionsScrollView": OptionsScrollView]))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[OptionsScrollView]|", options: .alignAllCenterX, metrics: nil, views: ["OptionsScrollView": OptionsScrollView]))
+        
+        
+        stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        OptionsScrollView.addSubview(stackView)
+        
+        OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[stackView]|", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
+        OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stackView]", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
+        
+        
         optionsArray = shuffle(arrayArg: optionsArray)
         var i = 1
         for singleOption in optionsArray {
-            let computedY = Int(Float(PictureView.frame.maxY) + (screenHeight / 12) * Float(i))
+            /*let computedY = Int(Float(PictureView.frame.maxY) + (screenHeight / 12) * Float(i))
             let computedWidth = Int(screenWidth * 0.9)
             let computedHeight = Int(screenHeight / 20)
-            let checkBox = CheckBox(frame: CGRect(x: 0, y: computedY, width: computedWidth, height: computedHeight))
+            let checkBox = CheckBox(frame: CGRect(x: 0, y: computedY, width: computedWidth, height: computedHeight))*/
+            let checkBox = CheckBox()
             checkBox.isChecked = false
+            //checkBox.frame.size = CGSize(width: 100, height: checkBox.frame.height)
             checkBox.setTitle(singleOption, for: .normal)
             checkBox.addTarget(checkBox, action: #selector(checkBox.buttonClicked(sender:)), for: .touchUpInside)
             checkBox.setTitleColor(.black, for: .normal)
             checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-            //checkBox.contentHorizontalAlignment = .left
-            self.view.addSubview(checkBox)
+            checkBox.widthAnchor.constraint(equalToConstant: scrollViewWidth - checkBox.checkedImage.size.width * 1.3).isActive = true
+            
+            stackView.addArrangedSubview(checkBox)
+            stackView.spacing = checkBox.checkedImage.size.height * 1
             checkBoxArray.append(checkBox)
             i = i + 1
         }
     }
+    
     func shuffle(arrayArg: [String]) -> [String] {
         var array = arrayArg
         //implementing Fisher-Yates shuffle
@@ -101,6 +140,25 @@ class QuestionMultipleChoiceViewController: UIViewController {
             array[i] = a;
         }
         return array
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        //set scrolling size
+        OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
+        OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        scrollPosition = OptionsScrollView.contentOffset.y
+    }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
+        OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)
+        OptionsScrollView.contentOffset.y = scrollPosition
     }
     
     @IBAction func imageTouched(_ sender: Any) {
@@ -128,13 +186,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
         if let navController = self.navigationController {
             navController.popViewController(animated: true)
         }
-        
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    
+    }    
 }

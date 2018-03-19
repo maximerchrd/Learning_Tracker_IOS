@@ -77,7 +77,7 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
             let computedY = Int(Float(PictureView.frame.maxY) + (screenHeight / 12) * Float(i))
             let computedWidth = Int(screenWidth * 0.9)
             let computedHeight = Int(screenHeight / 20)
-            let checkBox = CheckBox(frame: CGRect(x: 0, y: computedY, width: computedWidth, height: computedHeight))
+            let checkBox = CheckBox()
             checkBox.isChecked = false
             checkBox.setTitle(singleOption, for: .normal)
             checkBox.addTarget(checkBox, action: #selector(checkBox.buttonClicked(sender:)), for: .touchUpInside)
