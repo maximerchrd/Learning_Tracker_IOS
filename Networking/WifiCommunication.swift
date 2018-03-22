@@ -89,6 +89,12 @@ class WifiCommunication {
                         } catch let error {
                             print(error)
                         }
+                    } else if typeID.range(of:"CORR") != nil {
+                        do {
+                            
+                        } catch let error {
+                            print(error)
+                        }
                     }
                 } else {
                     ableToRead = false

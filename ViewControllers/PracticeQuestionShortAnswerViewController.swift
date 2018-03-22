@@ -25,7 +25,7 @@ class PracticeQuestionShortAnswerViewController: UIViewController, UITextFieldDe
     
     @IBOutlet weak var SubmitButton: UIButton!
     @IBOutlet weak var AnswerTextField: UITextField!
-    @IBOutlet weak var QuestionLabel: UILabel!
+    @IBOutlet weak var QuestionTextView: UITextView!
     @IBOutlet weak var PictureView: UIImageView!
     
     required init?(coder aDecoder: NSCoder) {
@@ -42,7 +42,8 @@ class PracticeQuestionShortAnswerViewController: UIViewController, UITextFieldDe
         screenHeight = Float(screenSize.height)
         
         // Set question text
-        QuestionLabel.text = questionShortAnswer.Question
+        QuestionTextView.text = questionShortAnswer.Question
+        QuestionTextView.isEditable = false
         
         // Display picture
         let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory

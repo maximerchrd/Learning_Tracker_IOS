@@ -30,7 +30,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var scrollViewY: CGFloat
     var scrollPosition: CGFloat
     
-    @IBOutlet weak var QuestionLabel: UILabel!
+    @IBOutlet weak var QuestionTextView: UITextView!
     @IBOutlet weak var PictureView: UIImageView!
     @IBOutlet weak var OptionsScrollView: UIScrollView!
     @IBOutlet weak var SubmitButton: UIButton!
@@ -56,9 +56,9 @@ class QuestionMultipleChoiceViewController: UIViewController {
         screenHeight = Float(screenSize.height)
         
         // Set question text
-        QuestionLabel.numberOfLines = 0
-        QuestionLabel.text = questionMultipleChoice.Question
-        QuestionLabel.sizeToFit()
+        QuestionTextView.text = questionMultipleChoice.Question
+        QuestionTextView.isEditable = false
+        QuestionTextView.sizeToFit()
         
         
         // Display picture
@@ -73,7 +73,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         questionMultipleChoice.removeEmptyOptions()
         var optionsArray = questionMultipleChoice.Options
         if optionsArray.count > 5 {
-            PictureView.frame = CGRect(x: 0, y: QuestionLabel.frame.maxY, width: 30, height: 30)
+            PictureView.frame = CGRect(x: 0, y: QuestionTextView.frame.maxY, width: 30, height: 30)
         }
         originaImageWidth = PictureView.frame.width
         originalImageHeight = PictureView.frame.height
