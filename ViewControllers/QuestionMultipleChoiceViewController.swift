@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 class QuestionMultipleChoiceViewController: UIViewController {
+    var isCorrection: Bool
     var questionMultipleChoice: QuestionMultipleChoice
     var screenHeight: Float
     var screenWidth: Float
@@ -45,6 +46,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         scrollViewX = 0
         scrollViewY = 0
         scrollPosition = 0
+        isCorrection = false
         super.init(coder: aDecoder)
     }
     
@@ -104,12 +106,19 @@ class QuestionMultipleChoiceViewController: UIViewController {
         OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[stackView]|", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
         OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stackView]", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
         
-        
-        optionsArray = shuffle(arrayArg: optionsArray)
+        if !isCorrection {
+            optionsArray = shuffle(arrayArg: optionsArray)
+        }
         var i = 1
         for singleOption in optionsArray {
             let checkBox = CheckBox()
             checkBox.isChecked = false
+            if isCorrection {
+                if i <= questionMultipleChoice.NbCorrectAnswers {
+                    checkBox.isChecked = true
+                }
+                checkBox.isEnabled = false
+            }
             checkBox.setTitle(singleOption, for: .normal)
             checkBox.addTarget(checkBox, action: #selector(checkBox.buttonClicked(sender:)), for: .touchUpInside)
             checkBox.setTitleColor(.black, for: .normal)
@@ -120,6 +129,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
             stackView.spacing = checkBox.checkedImage.size.height * 1
             checkBoxArray.append(checkBox)
             i = i + 1
+        }
+        
+        if isCorrection {
+            SubmitButton.setTitle(NSLocalizedString("OK", comment: "OK button"), for: .normal)
         }
     }
 
@@ -168,16 +181,18 @@ class QuestionMultipleChoiceViewController: UIViewController {
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
-        var answers = ""
-        var answersArray = [String]()
-        for singleCheckBox in checkBoxArray {
-            if singleCheckBox.isChecked {
-                answers += (singleCheckBox.titleLabel?.text)! + "|||"
-                answersArray.append((singleCheckBox.titleLabel?.text)!)
+        if !isCorrection {
+            var answers = ""
+            var answersArray = [String]()
+            for singleCheckBox in checkBoxArray {
+                if singleCheckBox.isChecked {
+                    answers += (singleCheckBox.titleLabel?.text)! + "|||"
+                    answersArray.append((singleCheckBox.titleLabel?.text)!)
+                }
             }
+            
+            wifiCommunication?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
         }
-        
-        wifiCommunication?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
         if let navController = self.navigationController {
             navController.popViewController(animated: true)
         }

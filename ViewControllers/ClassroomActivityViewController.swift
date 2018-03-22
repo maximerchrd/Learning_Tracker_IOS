@@ -15,23 +15,25 @@ class ClassroomActivityViewController: UIViewController {
     
     @IBOutlet weak var InstructionsLabel: UILabel!
     
-    public func showMultipleChoiceQuestion(question: QuestionMultipleChoice) {
+    public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool) {
         // Safe Push VC
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as? QuestionMultipleChoiceViewController {
             if let navigator = navigationController {
                 newViewController.questionMultipleChoice = question
                 newViewController.wifiCommunication = wifiCommunication
+                newViewController.isCorrection = isCorr
                 navigator.pushViewController(newViewController, animated: true)
             }
         }
     }
     
-    public func showShortAnswerQuestion(question: QuestionShortAnswer) {
+    public func showShortAnswerQuestion(question: QuestionShortAnswer, isCorr: Bool) {
         // Safe Push VC
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionShortAnswerViewController") as? QuestionShortAnswerViewController {
             if let navigator = navigationController {
                 newViewController.questionShortAnswer = question
                 newViewController.wifiCommunication = wifiCommunication
+                newViewController.isCorrection = isCorr
                 navigator.pushViewController(newViewController, animated: true)
             }
         }

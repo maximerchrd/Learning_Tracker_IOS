@@ -346,6 +346,7 @@
                         <outlet property="AnswerTextField" destination="GE8-4f-utX" id="Kpg-WA-v9s"/>
                         <outlet property="PictureView" destination="CFj-ZS-RD3" id="g1E-e8-75W"/>
                         <outlet property="QuestionTextView" destination="B2h-9g-XqR" id="voR-tU-om7"/>
+                        <outlet property="SubmitButton" destination="Fd8-7A-Sn6" id="9O1-cG-sw1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N3U-iA-n7w" userLabel="First Responder" sceneMemberID="firstResponder"/>

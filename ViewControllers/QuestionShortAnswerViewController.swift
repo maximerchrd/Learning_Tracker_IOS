@@ -11,6 +11,7 @@ import UIKit
 
 class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     var questionShortAnswer: QuestionShortAnswer
+    var isCorrection: Bool
     var screenHeight: Float
     var screenWidth: Float
     var imageMagnified = false
@@ -26,11 +27,13 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var AnswerTextField: UITextField!
     @IBOutlet weak var QuestionTextView: UITextView!
     @IBOutlet weak var PictureView: UIImageView!
+    @IBOutlet weak var SubmitButton: UIButton!
     
     required init?(coder aDecoder: NSCoder) {
         questionShortAnswer = QuestionShortAnswer()
         screenHeight = 0
         screenWidth = 0
+        isCorrection = false
         super.init(coder: aDecoder)
     }
     override func viewDidLoad() {
@@ -66,6 +69,17 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         
         //set delegate to hide keyboard when return pressed
         self.AnswerTextField.delegate = self
+        
+        //if in correction mode, give the answer and change button label
+        if isCorrection {
+            var exampleAnswer = NSLocalizedString("The right answer was for example: ", comment: "in short answer question text field") as! String
+            if questionShortAnswer.Options.count > 0 {
+                exampleAnswer += questionShortAnswer.Options[0]
+            }
+            self.AnswerTextField.text = exampleAnswer
+            self.AnswerTextField.isEnabled = false
+            SubmitButton.setTitle(NSLocalizedString("OK", comment: "OK button"), for: .normal)
+        }
     }
     
     @objc func keyboardWillShow(notification: NSNotification) {

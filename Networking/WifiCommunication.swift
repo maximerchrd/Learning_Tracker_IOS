@@ -67,10 +67,10 @@ class WifiCommunication {
                                     questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
                                     
                                     if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
-                                        self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice)
+                                        self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false)
                                     } else {
                                         questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
-                                        self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer)
+                                        self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false)
                                     }
                                 } catch let error {
                                     print(error)
@@ -90,10 +90,22 @@ class WifiCommunication {
                             print(error)
                         }
                     } else if typeID.range(of:"CORR") != nil {
-                        do {
-                            
-                        } catch let error {
-                            print(error)
+                        DispatchQueue.main.async {
+                            var questionMultipleChoice = QuestionMultipleChoice()
+                            var questionShortAnswer = QuestionShortAnswer()
+                            let id_global = Int(prefix.components(separatedBy: "///")[1])
+                            do {
+                                questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
+                                
+                                if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
+                                    self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: true)
+                                } else {
+                                    questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
+                                    self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: true)
+                                }
+                            } catch let error {
+                                print(error)
+                            }
                         }
                     }
                 } else {
