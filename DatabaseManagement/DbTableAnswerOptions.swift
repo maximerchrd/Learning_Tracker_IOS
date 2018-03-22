@@ -12,7 +12,7 @@ import GRDB
 class DbTableAnswerOptions {
     static let TABLE_NAME = "answer_options"
     static let KEY_ID = "id"
-    static let KEY_ID_GLOBAL = "ID_ANSWEROPTION_GLOBAL"
+    static let KEY_ID_GLOBAL = "ID_GLOBAL"
     static let KEY_OPTION = "OPTION"
     static var DBPath = "NoName"
     
@@ -35,6 +35,25 @@ class DbTableAnswerOptions {
             try answerOption.insert(db)
         }
     }
+    
+    static func retrieveAnswerOptions(questionID: Int) throws -> [String]{
+        var answerOptions = [String]()
+        var answerOptionRecord = [AnswerOptionRecord]()
+        do {
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            let query = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_ID_GLOBAL + "='" + String(questionID) + "';"
+            try dbQueue.inDatabase { db in
+                answerOptionRecord = try AnswerOptionRecord.fetchAll(db, query)
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+        for optionRecord in answerOptionRecord {
+            answerOptions.append(optionRecord.option)
+        }
+        return answerOptions
+    }
 }
 
 class AnswerOptionRecord : Record {
@@ -49,9 +68,9 @@ class AnswerOptionRecord : Record {
     }
     
     required init(row: Row) {
-        id = row[DbTableAnswerOptions.KEY_ID]
-        idGlobal = row[DbTableAnswerOptions.KEY_ID_GLOBAL]
-        option = row[DbTableAnswerOptions.KEY_OPTION]
+        self.id = row[DbTableAnswerOptions.KEY_ID]
+        self.idGlobal = row[DbTableAnswerOptions.KEY_ID_GLOBAL]
+        self.option = row[DbTableAnswerOptions.KEY_OPTION]
         super.init()
     }
     

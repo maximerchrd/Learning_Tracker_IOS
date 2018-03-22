@@ -39,22 +39,31 @@ class DbTableQuestionShortAnswer {
         try dbQueue.inDatabase { db in
             let questionShortAnswer = QuestionShortAnswerRecord(questionShortAnswerArg: Question)
             try questionShortAnswer.insert(db)
+        
+            //insert options for question Short Answer
+            for option in Question.Options {
+                try DbTableAnswerOptions.insertAnswerOption(questionID: Question.ID, option: option)
+            }
         }
     }
     
     static func retrieveQuestionShortAnswerWithID (globalID: Int) throws -> QuestionShortAnswer {
         var questionShortAnswerToReturn = QuestionShortAnswer()
+        var optionsArray = [String]()
         var questionShortAnswerRec = QuestionShortAnswerRecord(questionShortAnswerArg: questionShortAnswerToReturn)
+        var answerOptionRecord = [AnswerOptionRecord]()
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
             try dbQueue.inDatabase { db in
                 questionShortAnswerRec = (try QuestionShortAnswerRecord.fetchOne(db, key: [KEY_ID_GLOBAL: globalID])) ?? QuestionShortAnswerRecord(questionShortAnswerArg: QuestionShortAnswer())
+                optionsArray = try DbTableAnswerOptions.retrieveAnswerOptions(questionID: questionShortAnswerRec.questionShortAnswer.ID)
             }
         } catch let error {
             print(error)
             print(error.localizedDescription)
         }
         questionShortAnswerToReturn = questionShortAnswerRec.questionShortAnswer
+        questionShortAnswerToReturn.Options = optionsArray
         return questionShortAnswerToReturn
     }
 }

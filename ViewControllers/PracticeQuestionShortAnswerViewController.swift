@@ -117,7 +117,10 @@ class PracticeQuestionShortAnswerViewController: UIViewController, UITextFieldDe
             SubmitButton.alpha = 0.4
         } else {
             evaluation = 0.0
-            let message = NSLocalizedString("The right answer was for example: ", comment: "pop up message if answer wrong") + rightAnswers[0]
+            var message = NSLocalizedString("There was no right answer.", comment: "pop up message if answer wrong and no answer right")
+            if rightAnswers.count > 0 {
+                message = NSLocalizedString("The right answer was for example: ", comment: "pop up message if answer wrong") + rightAnswers[0]
+            }
             let alert = UIAlertController(title: NSLocalizedString("Incorrect :-(", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true)

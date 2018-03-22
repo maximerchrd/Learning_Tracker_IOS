@@ -74,6 +74,10 @@ class DataConverstion {
         questionShortAnswer.Question = wholeText.components(separatedBy: "///")[0]
         questionShortAnswer.ID = Int(wholeText.components(separatedBy: "///")[1])!
         questionShortAnswer.Options = wholeText.components(separatedBy: "///")[2].components(separatedBy: "|||")
+        let indexOfEmptyOption = questionShortAnswer.Options.index(of: "")
+        if indexOfEmptyOption != nil {
+            questionShortAnswer.Options.remove(at: indexOfEmptyOption!)
+        }
         questionShortAnswer.Image = wholeText.components(separatedBy: "///")[5]
         
         //save the picture
@@ -83,13 +87,21 @@ class DataConverstion {
         
         do {
             //deal with subjects
-            let subjectsArray = wholeText.components(separatedBy: "///")[3].components(separatedBy: "|||")
+            var subjectsArray = wholeText.components(separatedBy: "///")[3].components(separatedBy: "|||")
+            let indexOfEmptySubject = subjectsArray.index(of: "")
+            if indexOfEmptySubject != nil {
+                subjectsArray.remove(at: indexOfEmptySubject!)
+            }
             for subject in subjectsArray {
                 questionShortAnswer.Subjects.append(subject)
                 try DbTableSubject.insertSubject(questionID: questionShortAnswer.ID, subject: subject)
             }
             //deal with objectives
-            let objectivesArray = wholeText.components(separatedBy: "///")[4].components(separatedBy: "|||")
+            var objectivesArray = wholeText.components(separatedBy: "///")[4].components(separatedBy: "|||")
+            let indexOfEmptyObjective = objectivesArray.index(of: "")
+            if indexOfEmptyObjective != nil {
+                objectivesArray.remove(at: indexOfEmptyObjective!)
+            }
             for objective in objectivesArray {
                 questionShortAnswer.Objectives.append(objective)
                 try DbTableLearningObjective.insertLearningObjective(questionID: questionShortAnswer.ID, objective: objective, levelCognitiveAbility: 0)

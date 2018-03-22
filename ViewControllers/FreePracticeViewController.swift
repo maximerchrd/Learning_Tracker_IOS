@@ -42,7 +42,7 @@ class FreePracticeViewController: UIViewController {
             do {
                 for questionId in questionIds {
                     let questionMC = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: questionId)
-                    if questionMC.Question.count < 1 {
+                    if questionMC.Question.count < 1 || questionMC.Question == "none" {
                         let questionSA = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: questionId)
                         newViewController.questionsShortAnswer.append(questionSA)
                     } else {
