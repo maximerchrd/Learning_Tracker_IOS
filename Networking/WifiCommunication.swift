@@ -120,7 +120,9 @@ class WifiCommunication {
         do {
             let message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///"
             client!.send(string: message)
-        } catch {}
+        } catch let error {
+            print(error)
+        }
             
     }
     

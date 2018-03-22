@@ -13,18 +13,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var wifiCommunicationAppDelegate: WifiCommunication?
+    var disconnectionDetection = 0
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         GlobalDBManager.createTables()
+        registerforDeviceLockNotification()
+        application.isIdleTimerDisabled = true
         return true
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-        if wifiCommunicationAppDelegate != nil {
+        if wifiCommunicationAppDelegate != nil && disconnectionDetection < 1 {
             wifiCommunicationAppDelegate?.sendDisconnectionSignal()
         }
     }
@@ -46,6 +49,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
+    // Following code used to distinguish screen lock from other inactivation triggers in order to send disconnection signal
+    // !!!Device connects to server every time its unlocked!!! (because connection is mysteriously lost when device locked)
+    func registerforDeviceLockNotification() {
+        //Screen lock notifications
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),     //center
+            Unmanaged.passUnretained(self).toOpaque(),     // observer
+            displayStatusChangedCallback,     // callback
+            "com.apple.springboard.lockcomplete" as CFString,     // event name
+            nil,     // object
+            .deliverImmediately)
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),     //center
+            Unmanaged.passUnretained(self).toOpaque(),     // observer
+            displayStatusChangedCallback,     // callback
+            "com.apple.springboard.lockstate" as CFString,    // event name
+            nil,     // object
+            .deliverImmediately)
+    }
+    
+    private let displayStatusChangedCallback: CFNotificationCallback = { _, cfObserver, cfName, _, _ in
+        guard let lockState = cfName?.rawValue as String? else {
+            return
+        }
+        
+        let catcher = Unmanaged<AppDelegate>.fromOpaque(UnsafeRawPointer(OpaquePointer(cfObserver)!)).takeUnretainedValue()
+        catcher.displayStatusChanged(lockState)
+    }
+    
+    private func displayStatusChanged(_ lockState: String) {
+        // the "com.apple.springboard.lockcomplete" notification will always come after the "com.apple.springboard.lockstate" notification
+        //print("Darwin notification NAME = \(lockState)")
+        if (lockState == "com.apple.springboard.lockcomplete") {
+            //print("DEVICE LOCKED")
+            disconnectionDetection = 2
+        } else {
+            //print("LOCK STATUS CHANGED")
+            disconnectionDetection = disconnectionDetection - 1
+            if disconnectionDetection < 1 {
+                wifiCommunicationAppDelegate?.connectToServer()
+            }
+        }
+    }
 }
 
