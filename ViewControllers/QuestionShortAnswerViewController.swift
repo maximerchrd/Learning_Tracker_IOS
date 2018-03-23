@@ -72,7 +72,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         
         //if in correction mode, give the answer and change button label
         if isCorrection {
-            var exampleAnswer = NSLocalizedString("The right answer was for example: ", comment: "in short answer question text field") as! String
+            var exampleAnswer = NSLocalizedString("The right answer was for example: ", comment: "in short answer question text field")
             if questionShortAnswer.Options.count > 0 {
                 exampleAnswer += questionShortAnswer.Options[0]
             }

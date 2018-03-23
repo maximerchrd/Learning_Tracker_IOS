@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import GRDB
 
 class GlobalDBManager {
     static let DATABASE_NAME = "learning_tracker.sqlite"
@@ -26,6 +27,23 @@ class GlobalDBManager {
             try DbTableRelationQuestionSubject.createTable(DatabaseName: databaseURL.path)
             try DbTableRelationQuestionObjective.createTable(DatabaseName: databaseURL.path)
             try DbTableSubject.createTable(DatabaseName: databaseURL.path)
+            
+            //Register migrations
+            var migrator = DatabaseMigrator()
+            // v1 database
+            migrator.registerMigration("v1") { db in
+                try db.drop(table: DbTableAnswerOptions.TABLE_NAME)
+                try db.create(table: DbTableAnswerOptions.TABLE_NAME, ifNotExists: true) { t in
+                    t.column(DbTableAnswerOptions.KEY_ID, .integer).primaryKey()
+                    t.column(DbTableAnswerOptions.KEY_ID_GLOBAL, .integer).notNull()
+                    t.column(DbTableAnswerOptions.KEY_OPTION, .text).notNull().unique(onConflict: .ignore)
+                }
+                print("migration to v1")
+            }
+            
+            //Do migrations
+            let dbQueue = try DatabaseQueue(path: databaseURL.path)
+            try migrator.migrate(dbQueue)
         } catch let error {
             print(error)
             print(error.localizedDescription)

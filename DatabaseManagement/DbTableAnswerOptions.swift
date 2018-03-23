@@ -28,6 +28,14 @@ class DbTableAnswerOptions {
         }
     }
     
+    static func dropTable(DatabaseName: String) throws {
+        DBPath = DatabaseName
+        let dbQueue = try DatabaseQueue(path: DatabaseName)
+        try dbQueue.inDatabase { db in
+            try db.drop(table: TABLE_NAME)
+        }
+    }
+    
     static func insertAnswerOption(questionID: Int, option: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
