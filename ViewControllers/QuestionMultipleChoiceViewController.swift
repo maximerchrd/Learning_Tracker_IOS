@@ -75,7 +75,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         questionMultipleChoice.removeEmptyOptions()
         var optionsArray = questionMultipleChoice.Options
         if optionsArray.count > 5 {
-            PictureView.frame = CGRect(x: 0, y: QuestionTextView.frame.maxY, width: 30, height: 30)
+            PictureView.frame = CGRect(x: 0, y: QuestionTextView.frame.maxY, width: 60, height: 60)
         }
         originaImageWidth = PictureView.frame.width
         originalImageHeight = PictureView.frame.height
@@ -128,9 +128,9 @@ class QuestionMultipleChoiceViewController: UIViewController {
             //make some tweaks to put more space above and below longer answer options
             var factorAccordingTextLength = 1
             if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-                factorAccordingTextLength = Int((checkBox.titleLabel?.text?.count)! / 200)
+                factorAccordingTextLength = Int(((checkBox.titleLabel?.text?.count) ?? 200) / 200)
             } else {
-                factorAccordingTextLength = Int((checkBox.titleLabel?.text?.count)! / 75)
+                factorAccordingTextLength = Int(((checkBox.titleLabel?.text?.count) ?? 75) / 75)
             }
             for _ in 0..<factorAccordingTextLength {
                 let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
