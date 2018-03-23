@@ -125,8 +125,31 @@ class QuestionMultipleChoiceViewController: UIViewController {
             checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
             checkBox.widthAnchor.constraint(equalToConstant: scrollViewWidth - checkBox.checkedImage.size.width * 1.3).isActive = true
             
+            //make some tweaks to put more space above and below longer answer options
+            var factorAccordingTextLength = 1
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                factorAccordingTextLength = Int((checkBox.titleLabel?.text?.count)! / 200)
+            } else {
+                factorAccordingTextLength = Int((checkBox.titleLabel?.text?.count)! / 75)
+            }
+            for _ in 0..<factorAccordingTextLength {
+                let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
+                ghostButton.setTitle(" ", for: .normal)
+                ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
+                stackView.addArrangedSubview(ghostButton)
+            }
             stackView.addArrangedSubview(checkBox)
-            stackView.spacing = checkBox.checkedImage.size.height * 1
+            for _ in 0..<factorAccordingTextLength {
+                let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
+                ghostButton.setTitle(" ", for: .normal)
+                ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
+                stackView.addArrangedSubview(ghostButton)
+            }
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                stackView.spacing = checkBox.checkedImage.size.height * 0.5
+            } else {
+                stackView.spacing = checkBox.checkedImage.size.height * 1.7
+            }
             checkBoxArray.append(checkBox)
             i = i + 1
         }
