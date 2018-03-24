@@ -71,9 +71,6 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
         //get the answer options to adapt the size of the imageview
         questionMultipleChoice.removeEmptyOptions()
         var optionsArray = questionMultipleChoice.Options
-        if optionsArray.count > 5 {
-            PictureView.frame = CGRect(x: 0, y: QuestionTextView.frame.maxY, width: 30, height: 30)
-        }
         originaImageWidth = PictureView.frame.width
         originalImageHeight = PictureView.frame.height
         originalImageX = PictureView.frame.minX
@@ -103,7 +100,6 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
         OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[stackView]|", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
         OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stackView]", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
         optionsArray = shuffle(arrayArg: optionsArray)
-        var i = 1
         for singleOption in optionsArray {
             let checkBox = CheckBox()
             checkBox.isChecked = false
@@ -113,10 +109,32 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
             checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
             checkBox.widthAnchor.constraint(equalToConstant: scrollViewWidth - checkBox.checkedImage.size.width * 1.3).isActive = true
             
+            //make some tweaks to put more space above and below longer answer options
+            var factorAccordingTextLength = 1
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                factorAccordingTextLength = Int(((checkBox.titleLabel?.text?.count) ?? 200) / 200)
+            } else {
+                factorAccordingTextLength = Int(((checkBox.titleLabel?.text?.count) ?? 75) / 75)
+            }
+            for _ in 0..<factorAccordingTextLength {
+                let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
+                ghostButton.setTitle(" ", for: .normal)
+                ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
+                stackView.addArrangedSubview(ghostButton)
+            }
             stackView.addArrangedSubview(checkBox)
-            stackView.spacing = checkBox.checkedImage.size.height * 1
+            for _ in 0..<factorAccordingTextLength {
+                let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
+                ghostButton.setTitle(" ", for: .normal)
+                ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
+                stackView.addArrangedSubview(ghostButton)
+            }
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                stackView.spacing = checkBox.checkedImage.size.height * 0.5
+            } else {
+                stackView.spacing = checkBox.checkedImage.size.height * 1.7
+            }
             checkBoxArray.append(checkBox)
-            i = i + 1
         }
     }
     

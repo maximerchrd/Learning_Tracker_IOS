@@ -74,9 +74,6 @@ class QuestionMultipleChoiceViewController: UIViewController {
         //get the answer options to adapt the size of the imageview
         questionMultipleChoice.removeEmptyOptions()
         var optionsArray = questionMultipleChoice.Options
-        if optionsArray.count > 5 {
-            PictureView.frame = CGRect(x: 0, y: QuestionTextView.frame.maxY, width: 60, height: 60)
-        }
         originaImageWidth = PictureView.frame.width
         originalImageHeight = PictureView.frame.height
         originalImageX = PictureView.frame.minX
