@@ -141,7 +141,15 @@ class WifiCommunication {
         } catch let error {
             print(error)
         }
-            
+    }
+    
+    public func receivedQuestion(questionID: String) {
+        do {
+            let message = "GOTIT///" + questionID + "///"
+            client!.send(string: message)
+        } catch let error {
+            print(error)
+        }
     }
     
     fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String) {
@@ -161,15 +169,21 @@ class WifiCommunication {
                 dataImage += self.client!.read(imageSize!) ?? [UInt8]()
             }
             print(String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil")
+            var questionID = -1
             do {
                 if typeOfQuest.range(of: "MULTQ") != nil {
-                    try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: DataConverstion.bytesToMultq(textData: dataText, imageData: dataImage))
+                    let questionMult = DataConverstion.bytesToMultq(textData: dataText, imageData: dataImage)
+                    questionID = questionMult.ID
+                    try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
                 } else if typeOfQuest.range(of: "SHRTA") != nil {
-                    try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: DataConverstion.bytesToShrtaq(textData: dataText, imageData: dataImage))
+                    let questionShrt = DataConverstion.bytesToShrtaq(textData: dataText, imageData: dataImage)
+                    questionID = questionShrt.ID
+                    try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
                 }
             } catch let error {
                 print(error)
             }
+            receivedQuestion(questionID: String(questionID))
         } else {
             print("error reading questions: prefix not in correct format or buffer truncated")
         }
