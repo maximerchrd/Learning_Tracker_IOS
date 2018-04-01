@@ -33,10 +33,12 @@ class WifiCommunication {
                 listenToServer()
                 return true
             case .failure(let error):
+                DbTableLogs.insertLog(log: error.localizedDescription)
                 print(error)
                 return false
             }
         case .failure(let error):
+            DbTableLogs.insertLog(log: error.localizedDescription)
             print(error)
             return false
         }
@@ -50,6 +52,9 @@ class WifiCommunication {
                 let data = self.client!.read(40, timeout: 5400)
                 if data != nil {
                     prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
+                    if prefix.contains("oops") {
+                        DbTableLogs.insertLog(log: prefix)
+                    }
                     print(prefix)
                     let typeID = prefix.components(separatedBy: ":")[0]
                     
@@ -164,11 +169,16 @@ class WifiCommunication {
                 dataText += self.client!.read(textSize!) ?? [UInt8]()
             }
             print(imageSize!)
-            var dataImage = [UInt8]()
+
+                var dataImage = [UInt8]()
             while dataImage.count < imageSize ?? 0 {
                 dataImage += self.client!.read(imageSize!) ?? [UInt8]()
             }
-            print(String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil")
+            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"
+            if prefix.contains("oops") {
+                DbTableLogs.insertLog(log: dataTextString)
+            }
+            print(dataTextString)
             var questionID = -1
             do {
                 if typeOfQuest.range(of: "MULTQ") != nil {
@@ -185,6 +195,7 @@ class WifiCommunication {
             }
             receivedQuestion(questionID: String(questionID))
         } else {
+            DbTableLogs.insertLog(log: "error reading questions: prefix not in correct format or buffer truncated")
             print("error reading questions: prefix not in correct format or buffer truncated")
         }
     }
