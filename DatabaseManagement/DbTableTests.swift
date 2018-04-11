@@ -72,6 +72,16 @@ class DbTableTests {
         } catch let error {
             print(error)
         }
+        
+        //remove empty objectives
+        let index = objectives.index(of: "")
+        if index != nil {
+            objectives.remove(at: index!)
+        }
+        let index2 = objectives.index(of: " ")
+        if index2 != nil {
+            objectives.remove(at: index2!)
+        }
         return objectives
     }
     
