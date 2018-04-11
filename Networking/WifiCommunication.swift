@@ -28,17 +28,21 @@ class WifiCommunication {
         switch client!.connect(timeout: 10) {
         case .success:
             switch client!.send(data: dataConverter.connection()) {
-            case .success:
-                (UIApplication.shared.delegate as! AppDelegate).wifiCommunicationAppDelegate = self
-                listenToServer()
-                return true
-            case .failure(let error):
-                DbTableLogs.insertLog(log: error.localizedDescription)
-                print(error)
-                return false
+                case .success:
+                    (UIApplication.shared.delegate as! AppDelegate).wifiCommunicationAppDelegate = self
+                    listenToServer()
+                    return true
+                case .failure(let error):
+                    DbTableLogs.insertLog(log: error.localizedDescription)
+                    print(error)
+                    return false
             }
         case .failure(let error):
-            DbTableLogs.insertLog(log: error.localizedDescription)
+            if error.localizedDescription.contains("3") {
+                DbTableLogs.insertLog(log: error.localizedDescription + "(could connect to ip but server not running?)")
+            } else {
+                DbTableLogs.insertLog(log: error.localizedDescription + "(ip not valid?)")
+            }
             print(error)
             return false
         }
@@ -112,6 +116,42 @@ class WifiCommunication {
                                 print(error)
                             }
                         }
+                    } else if typeID.range(of:"TEST") != nil {
+                        if prefix.components(separatedBy: ":").count > 1 {
+                            let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+                            var dataText = [UInt8]()
+                            while dataText.count < textSize {
+                                dataText += self.client!.read(textSize) ?? [UInt8]()
+                            }
+                            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: dataText to string yields nil"
+                            if dataTextString.contains("oops") {
+                                DbTableLogs.insertLog(log: dataTextString)
+                            }
+                            do {
+                                if dataTextString.components(separatedBy: "///").count > 3 {
+                                    let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
+                                    let test = dataTextString.components(separatedBy: "///")[1]
+                                    let objectivesArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
+                                    var objectiveIDS = [Int]()
+                                    var objectives = [String]()
+                                    for objectiveANDid in objectivesArray {
+                                        if objectiveANDid.count > 0 {
+                                            objectiveIDS.append(Int(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
+                                            if objectiveANDid.components(separatedBy: "/|/").count > 1 {
+                                                objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
+                                            } else {
+                                                print("problem reading objectives for test: objective - ID pair not complete")
+                                            }
+                                        }
+                                    }
+                                    try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
+                                } else {
+                                    print("problem reading test: text array to short")
+                                }
+                            } catch let error {
+                                print(error)
+                            }
+                        }
                     }
                 } else {
                     ableToRead = false
@@ -175,7 +215,7 @@ class WifiCommunication {
                 dataImage += self.client!.read(imageSize!) ?? [UInt8]()
             }
             let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"
-            if prefix.contains("oops") {
+            if dataTextString.contains("oops") {
                 DbTableLogs.insertLog(log: dataTextString)
             }
             print(dataTextString)

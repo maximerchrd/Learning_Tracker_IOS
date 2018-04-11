@@ -44,6 +44,14 @@ class DbTableLearningObjective {
         }
     }
     
+    static func insertLearningObjective(objectiveID: Int, objective: String, levelCognitiveAbility: Int) throws {
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        try dbQueue.inDatabase { db in
+            let learningObjective = LearningObjectiveRecord(idGlobal: objectiveID, objective: objective, levelCognitiveAbility: levelCognitiveAbility)
+            try learningObjective.insert(db)
+        }
+    }
+    
     static func getResultsPerObjective(subject: String) throws -> [[String]] {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var objectives = [String]()

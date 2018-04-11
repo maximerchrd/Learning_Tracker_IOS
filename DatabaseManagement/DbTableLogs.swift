@@ -30,7 +30,7 @@ class DbTableLogs {
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
             try dbQueue.inDatabase { db in
-                let logRecord = LogRecord(log: log)
+                let logRecord = LogRecord(log: Date().description + log)
                 try logRecord.insert(db)
             }
         } catch let error {
