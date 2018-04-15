@@ -433,6 +433,7 @@
                         <outlet property="InstructionsLabel" destination="9fN-g8-tTM" id="G1F-2R-5qr"/>
                         <segue destination="xQz-if-Mve" kind="show" id="sAd-p5-4gd"/>
                         <segue destination="s1x-ZS-Gfr" kind="show" identifier="" id="2FT-lJ-8Wd"/>
+                        <segue destination="Nov-ND-jnI" kind="show" id="xv7-18-U8c"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XSo-O8-3vl" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -500,6 +501,14 @@
                 </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="1712" y="-1279"/>
+        </scene>
+        <!--Synchroneous Questions Test View Controller-->
+        <scene sceneID="fDh-V5-xgv">
+            <objects>
+                <pageViewController storyboardIdentifier="testNavigation" autoresizesArchivedViewToFullSize="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" transitionStyle="pageCurl" navigationOrientation="horizontal" spineLocation="min" id="Nov-ND-jnI" customClass="SynchroneousQuestionsTestViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="r9f-P4-kfS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="934" y="-2411"/>
         </scene>
         <!--Question Multiple Choice View Controller-->
         <scene sceneID="1EJ-Mo-tF1">

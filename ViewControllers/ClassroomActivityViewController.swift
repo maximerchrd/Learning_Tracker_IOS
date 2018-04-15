@@ -39,6 +39,33 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     
+    public func showTest(questionIDs: [Int]) {
+        if questionIDs.count > 0 {
+            if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "testNavigation") as? SynchroneousQuestionsTestViewController {
+                if let navigator = navigationController {
+                    do {
+                        for questionId in questionIDs {
+                            let questionMC = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: questionId)
+                            if questionMC.Question.count < 1 || questionMC.Question == "none" {
+                                let questionSA = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: questionId)
+                                newViewController.questionsShortAnswer.append(questionSA)
+                            } else {
+                                newViewController.questionsMultipleChoice.append(questionMC)
+                            }
+                        }
+                        newViewController.wifiCommunication = wifiCommunication!
+                        navigator.pushViewController(newViewController, animated: true)
+                    } catch let error {
+                        print(error)
+                    }
+                }
+            }
+            
+        } else {
+            print("Problem trying to display test: no question ID received")
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.

@@ -20,6 +20,8 @@ class WifiCommunication {
     init(classroomActivityViewControllerArg: ClassroomActivityViewController) {
         classroomActivityViewController = classroomActivityViewControllerArg
     }
+    init() {
+    }
     
     public func connectToServer() -> Bool {
         do { try host = DbTableSettings.retrieveMaster() } catch {}
@@ -59,7 +61,7 @@ class WifiCommunication {
                     prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
                     if prefix.contains("oops") {
                         DbTableLogs.insertLog(log: prefix)
-                        fatalError("Problem receiving data(prefix is nil)")
+                        break
                     }
                     print(prefix)
                     let typeID = prefix.components(separatedBy: ":")[0]
@@ -155,39 +157,27 @@ class WifiCommunication {
                             }
                         }
                     } else if typeID.range(of:"TESYN") != nil {
-                        if prefix.components(separatedBy: ":").count > 1 {
-                            let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-                            var dataText = [UInt8]()
-                            while dataText.count < textSize {
-                                dataText += self.client!.read(textSize) ?? [UInt8]()
-                            }
-                            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: dataText to string yields nil"
-                            if dataTextString.contains("oops") {
-                                DbTableLogs.insertLog(log: dataTextString)
-                            }
-                            do {
-                                if dataTextString.components(separatedBy: "///").count > 3 {
-                                    let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
-                                    let test = dataTextString.components(separatedBy: "///")[1]
-                                    let objectivesArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
-                                    var objectiveIDS = [Int]()
-                                    var objectives = [String]()
-                                    for objectiveANDid in objectivesArray {
-                                        if objectiveANDid.count > 0 {
-                                            objectiveIDS.append(Int(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
-                                            if objectiveANDid.components(separatedBy: "/|/").count > 1 {
-                                                objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
-                                            } else {
-                                                print("problem reading objectives for test: objective - ID pair not complete")
-                                            }
-                                        }
-                                    }
-                                    try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
-                                } else {
-                                    print("problem reading test: text array to short")
+                        DispatchQueue.main.async {
+                            if prefix.components(separatedBy: ":").count > 1 {
+                                let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+                                var dataText = [UInt8]()
+                                while dataText.count < textSize {
+                                    dataText += self.client!.read(textSize) ?? [UInt8]()
                                 }
-                            } catch let error {
-                                print(error)
+                                let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: dataText to string yields nil"
+                                if dataTextString.contains("oops") {
+                                    DbTableLogs.insertLog(log: dataTextString)
+                                }
+                                if dataTextString.components(separatedBy: "///").count > 2 {
+                                    let questionIDs = dataTextString.components(separatedBy: "///")
+                                    var IDs = [Int]()
+                                    for questionID in questionIDs {
+                                        IDs.append(Int(questionID) ?? -1)
+                                    }
+                                    self.classroomActivityViewController?.showTest(questionIDs: IDs)
+                                } else {
+                                    print("problem reading test: no question ID")
+                                }
                             }
                         }
                     }

@@ -14,6 +14,7 @@ class DbTableLogs {
     static let KEY_ID = "id"
     static let KEY_LOG = "LOG"
     static var DBPath = "NoName"
+    static var errorsCounter = 0
     
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
@@ -35,6 +36,10 @@ class DbTableLogs {
             }
         } catch let error {
             print(error)
+        }
+        errorsCounter = errorsCounter + 1
+        if errorsCounter > 1000 {
+            fatalError("too many errors. Killing process to avoid being caught inside an infinite loop")
         }
     }
     

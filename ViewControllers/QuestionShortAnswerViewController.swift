@@ -11,6 +11,7 @@ import UIKit
 
 class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     var questionShortAnswer: QuestionShortAnswer
+    var isSyncTest: Bool
     var isCorrection: Bool
     var screenHeight: Float
     var screenWidth: Float
@@ -34,6 +35,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         screenHeight = 0
         screenWidth = 0
         isCorrection = false
+        isSyncTest = false
         super.init(coder: aDecoder)
     }
     override func viewDidLoad() {

@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 class QuestionMultipleChoiceViewController: UIViewController {
+    var isSyncTest: Bool
     var isCorrection: Bool
     var questionMultipleChoice: QuestionMultipleChoice
     var screenHeight: Float
@@ -47,6 +48,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         scrollViewY = 0
         scrollPosition = 0
         isCorrection = false
+        isSyncTest = false
         super.init(coder: aDecoder)
     }
     
@@ -213,8 +215,13 @@ class QuestionMultipleChoiceViewController: UIViewController {
             
             wifiCommunication?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
         }
-        if let navController = self.navigationController {
-            navController.popViewController(animated: true)
+        if !isSyncTest {
+            if let navController = self.navigationController {
+                navController.popViewController(animated: true)
+            }
+        } else {
+            SubmitButton.isEnabled = false
+            SubmitButton.alpha = 0.4
         }
     }
     
