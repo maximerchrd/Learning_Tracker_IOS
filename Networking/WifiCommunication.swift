@@ -15,6 +15,7 @@ class WifiCommunication {
     var host = "xxx.xxx.x.xxx"
     var client: TCPClient?
     var classroomActivityViewController: ClassroomActivityViewController?
+    var pendingAnswer = "none"
     
     init(classroomActivityViewControllerArg: ClassroomActivityViewController) {
         classroomActivityViewController = classroomActivityViewControllerArg
@@ -88,7 +89,7 @@ class WifiCommunication {
                         }
                     } else if typeID.range(of:"EVAL") != nil {
                         do {
-                            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, quantitativeEval: prefix.components(separatedBy: "///")[1])
+                            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, answer: self.pendingAnswer, quantitativeEval: prefix.components(separatedBy: "///")[1])
                         } catch let error {
                             print(error)
                         }
@@ -161,6 +162,7 @@ class WifiCommunication {
     }
     
     public func sendAnswerToServer(answer: String, globalID: Int, questionType: String) {
+        pendingAnswer = answer
         var message = ""
         do {
             var question = ""

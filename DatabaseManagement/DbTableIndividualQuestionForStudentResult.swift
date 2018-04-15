@@ -63,6 +63,18 @@ class DbTableIndividualQuestionForResult {
             try individualQuestionForResult.insert(db)
         }
     }
+    static func insertIndividualQuestionForResult(questionID: Int, answer: String, quantitativeEval: String) throws {
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        let dateNow = formatter.string(from: date)
+        print(dateNow)
+        try dbQueue.inDatabase { db in
+            let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: dateNow, answers: answer, timeForSolving: "none", questionWeight: -1, evalType: "none", quantitativeEval: quantitativeEval, qualitativeEval: "none", testBelonging: "none", weightsOfAnswers: "none")
+            try individualQuestionForResult.insert(db)
+        }
+    }
     
     static func setEvalForQuestionAndStudentIDs (eval: String, idQuestion: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
@@ -71,6 +83,34 @@ class DbTableIndividualQuestionForResult {
             individualQuestionForResult[0].quantitativeEval = eval
             try individualQuestionForResult[0].update(db)
         }
+    }
+    
+    static func getResultsForSubject (subject: String) throws -> [[String]] {
+        var results = [[String]]()
+        let relSubj = DbTableRelationQuestionSubject.TABLE_NAME
+        let subj = DbTableRelationQuestionSubject.KEY_SUBJECT
+        let questid = DbTableRelationQuestionSubject.KEY_ID_GLOBAL
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        try dbQueue.inDatabase { db in
+            var request = "SELECT * FROM " + TABLE_NAME
+            if subject != "All" {
+                request += " INNER JOIN \(relSubj) ON \(TABLE_NAME).\(KEY_ID_GLOBAL) = \(relSubj).\(questid) WHERE \(relSubj).\(subj) = \(subject)"
+            }
+            var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request)
+            for i in 0..<resultRecord.count {
+                results.append([String]())
+                let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: resultRecord[i].idGlobal)
+                if questionMultipleChoice.Question.count > 0 {
+                    results[i].append(questionMultipleChoice.Question)
+                } else {
+                    let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: resultRecord[i].idGlobal)
+                    results[i].append(questionShortAnswer.Question)
+                }
+                results[i].append(resultRecord[i].answers)
+                results[i].append(String(resultRecord[i].quantitativeEval))
+            }
+        }
+        return results
     }
     
     static func getLatestEvaluationForQuestionID (questionID: Int) throws -> Double {
