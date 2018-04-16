@@ -61,7 +61,8 @@ class WifiCommunication {
                     prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
                     if prefix.contains("oops") {
                         DbTableLogs.insertLog(log: prefix)
-                        break
+                        print(prefix)
+                        fatalError()
                     }
                     print(prefix)
                     let typeID = prefix.components(separatedBy: ":")[0]
@@ -180,6 +181,9 @@ class WifiCommunication {
                                 }
                             }
                         }
+                    } else {
+                        DbTableLogs.insertLog(log: "message received but prefix not supported: " + prefix)
+                        print("message received but prefix not supported")
                     }
                 } else {
                     ableToRead = false
@@ -220,6 +224,7 @@ class WifiCommunication {
     public func receivedQuestion(questionID: String) {
         do {
             let message = "GOTIT///" + questionID + "///"
+            print(message)
             client!.send(string: message)
         } catch let error {
             print(error)
@@ -235,14 +240,15 @@ class WifiCommunication {
             
             var dataText = [UInt8]()
             while dataText.count < textSize ?? 0 {
-                dataText += self.client!.read(textSize!) ?? [UInt8]()
+                dataText += self.client!.read(textSize! - dataText.count) ?? [UInt8]()
             }
             print(imageSize!)
 
-                var dataImage = [UInt8]()
+            var dataImage = [UInt8]()
             while dataImage.count < imageSize ?? 0 {
-                dataImage += self.client!.read(imageSize!) ?? [UInt8]()
+                dataImage += self.client!.read(imageSize! - dataImage.count) ?? [UInt8]()
             }
+            print("Image size actually read:" + String(dataImage.count))
             let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"
             if dataTextString.contains("oops") {
                 DbTableLogs.insertLog(log: dataTextString)
