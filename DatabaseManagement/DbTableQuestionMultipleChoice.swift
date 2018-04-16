@@ -89,6 +89,24 @@ class DbTableQuestionMultipleChoice {
         questionMultipleChoiceToReturn = questionMultipleChoice.questionMultipleChoice
         return questionMultipleChoiceToReturn
     }
+    
+    static func getAllQuestionsMultipleChoiceIDs () throws -> String {
+        var questionMultipleChoice = [QuestionMultipleChoiceRecord(questionMultipleChoiceArg: QuestionMultipleChoice())]
+        do {
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            try dbQueue.inDatabase { db in
+                questionMultipleChoice = try QuestionMultipleChoiceRecord.fetchAll(db)
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+        var questionIDs = ""
+        for singleRecord in questionMultipleChoice {
+            questionIDs = questionIDs + String(singleRecord.questionMultipleChoice.ID) + "|"
+        }
+        return questionIDs
+    }
 }
 
 class QuestionMultipleChoiceRecord : Record {

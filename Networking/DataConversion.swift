@@ -14,9 +14,12 @@ class DataConverstion {
     public func connection() -> Data {
         var input = "problem retrieving name from DB"
         do {
+            let MCQIDsList = try DbTableQuestionMultipleChoice.getAllQuestionsMultipleChoiceIDs()
+            let SHRTAQIDsList = try DbTableQuestionShortAnswer.getAllQuestionsShortAnswersIDs()
             try input = "CONN" + "///"
                 + UIDevice.current.identifierForVendor!.uuidString + "///"
-                + DbTableSettings.retrieveName()
+                + DbTableSettings.retrieveName() + "///"
+                + MCQIDsList + "|" + SHRTAQIDsList
         } catch {}
         let dataUTF8 = input.data(using: .utf8)!
         return dataUTF8
