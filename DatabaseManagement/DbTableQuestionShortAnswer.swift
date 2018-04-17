@@ -39,8 +39,10 @@ class DbTableQuestionShortAnswer {
         try dbQueue.inDatabase { db in
             let questionShortAnswer = QuestionShortAnswerRecord(questionShortAnswerArg: Question)
             try questionShortAnswer.insert(db)
-        
+            
             //insert options for question Short Answer
+            //first remove answer options if we are overriding a question
+            try DbTableAnswerOptions.deleteAnswerOptions(questionID: Question.ID)
             for option in Question.Options {
                 try DbTableAnswerOptions.insertAnswerOption(questionID: Question.ID, option: option)
             }

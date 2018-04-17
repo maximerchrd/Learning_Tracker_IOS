@@ -23,7 +23,7 @@ class DbTableAnswerOptions {
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
-                t.column(KEY_OPTION, .text).notNull().unique(onConflict: .ignore)
+                t.column(KEY_OPTION, .text).notNull()
             }
         }
     }
@@ -50,6 +50,25 @@ class DbTableAnswerOptions {
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
             let query = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_ID_GLOBAL + "='" + String(questionID) + "';"
+            try dbQueue.inDatabase { db in
+                answerOptionRecord = try AnswerOptionRecord.fetchAll(db, query)
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+        for optionRecord in answerOptionRecord {
+            answerOptions.append(optionRecord.option)
+        }
+        return answerOptions
+    }
+    
+    static func deleteAnswerOptions(questionID: Int) throws -> [String]{
+        var answerOptions = [String]()
+        var answerOptionRecord = [AnswerOptionRecord]()
+        do {
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            let query = "DELETE FROM " + TABLE_NAME + " WHERE " + KEY_ID_GLOBAL + "='" + String(questionID) + "';"
             try dbQueue.inDatabase { db in
                 answerOptionRecord = try AnswerOptionRecord.fetchAll(db, query)
             }
