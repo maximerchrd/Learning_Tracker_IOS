@@ -150,6 +150,7 @@ class WifiCommunication {
                                         }
                                     }
                                     try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
+                                    self.receivedQuestion(questionID: String(testID))
                                 } else {
                                     print("problem reading test: text array to short")
                                 }
@@ -173,7 +174,10 @@ class WifiCommunication {
                                     let questionIDs = dataTextString.components(separatedBy: "///")
                                     var IDs = [Int]()
                                     for questionID in questionIDs {
-                                        IDs.append(Int(questionID) ?? -1)
+                                        let ID = Int(questionID) ?? -1
+                                        if ID != -1 {
+                                            IDs.append(ID)
+                                        }
                                     }
                                     self.classroomActivityViewController?.showTest(questionIDs: IDs)
                                 } else {
