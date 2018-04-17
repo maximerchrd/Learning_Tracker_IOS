@@ -15,6 +15,7 @@ class SynchroneousQuestionsTestViewController: UIPageViewController, UIPageViewC
     var questionsShortAnswer = [QuestionShortAnswer]()
     var viewControllersArray = [UIViewController]()
     var wifiCommunication = WifiCommunication()
+    var directCorrection = 0
     
     func configurePageControl() {
         pageControl = UIPageControl(frame: CGRect(x: 0,y: UIScreen.main.bounds.maxY - 50,width: UIScreen.main.bounds.width,height: 50))
@@ -87,6 +88,7 @@ class SynchroneousQuestionsTestViewController: UIPageViewController, UIPageViewC
                 questionVC.questionMultipleChoice = questionMC
                 questionVC.isSyncTest = true
                 questionVC.wifiCommunication = wifiCommunication
+                questionVC.directCorrection = directCorrection
                 viewControllersArray.append(questionVC)
             }
             for questionSA in questionsShortAnswer {
@@ -94,6 +96,7 @@ class SynchroneousQuestionsTestViewController: UIPageViewController, UIPageViewC
                 questionVC.questionShortAnswer = questionSA
                 questionVC.isSyncTest = true
                 questionVC.wifiCommunication = wifiCommunication
+                questionVC.directCorrection = directCorrection
                 viewControllersArray.append(questionVC)
             }
         }

@@ -15,31 +15,33 @@ class ClassroomActivityViewController: UIViewController {
     
     @IBOutlet weak var InstructionsLabel: UILabel!
     
-    public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool) {
+    public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool, directCorrection: Int = 0) {
         // Safe Push VC
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as? QuestionMultipleChoiceViewController {
             if let navigator = navigationController {
                 newViewController.questionMultipleChoice = question
                 newViewController.wifiCommunication = wifiCommunication
                 newViewController.isCorrection = isCorr
+                newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
             }
         }
     }
     
-    public func showShortAnswerQuestion(question: QuestionShortAnswer, isCorr: Bool) {
+    public func showShortAnswerQuestion(question: QuestionShortAnswer, isCorr: Bool, directCorrection: Int = 0) {
         // Safe Push VC
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionShortAnswerViewController") as? QuestionShortAnswerViewController {
             if let navigator = navigationController {
                 newViewController.questionShortAnswer = question
                 newViewController.wifiCommunication = wifiCommunication
                 newViewController.isCorrection = isCorr
+                newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
             }
         }
     }
     
-    public func showTest(questionIDs: [Int]) {
+    public func showTest(questionIDs: [Int], directCorrection: Int = 0) {
         if questionIDs.count > 0 {
             if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "testNavigation") as? SynchroneousQuestionsTestViewController {
                 if let navigator = navigationController {
@@ -54,6 +56,7 @@ class ClassroomActivityViewController: UIViewController {
                             }
                         }
                         newViewController.wifiCommunication = wifiCommunication!
+                        newViewController.directCorrection = directCorrection
                         navigator.pushViewController(newViewController, animated: true)
                     } catch let error {
                         print(error)

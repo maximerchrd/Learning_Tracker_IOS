@@ -31,6 +31,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var scrollViewX: CGFloat
     var scrollViewY: CGFloat
     var scrollPosition: CGFloat
+    var directCorrection = 0
     
     @IBOutlet weak var QuestionTextView: UITextView!
     @IBOutlet weak var PictureView: UIImageView!
@@ -203,6 +204,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
+        //first send answer to server
         if !isCorrection {
             var answers = ""
             var answersArray = [String]()
@@ -215,6 +217,48 @@ class QuestionMultipleChoiceViewController: UIViewController {
             
             wifiCommunication?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
         }
+        
+        //show correct/incorrect message if direct correction mode activated
+        if (directCorrection == 1) {
+            var answers = ""
+            var answersArray = [String]()
+            for singleCheckBox in checkBoxArray {
+                if singleCheckBox.isChecked {
+                    answers += (singleCheckBox.titleLabel?.text)! + "|||"
+                    answersArray.append((singleCheckBox.titleLabel?.text)!)
+                }
+            }
+            var options = questionMultipleChoice.Options
+            var rightAnswers = [String]()
+            for i in 0..<questionMultipleChoice.NbCorrectAnswers {
+                rightAnswers.append(options[i])
+            }
+            if rightAnswers.containsSameElements(as: answersArray) {
+                let alert = UIAlertController(title: NSLocalizedString("Correct!", comment: "pop up if answer right"), message: "", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: handleNavigation))
+                self.present(alert, animated: true)
+            } else {
+                var message = NSLocalizedString("The right answer was: ", comment: "pop up message if answer wrong")
+                for answer in rightAnswers {
+                    message += answer + "; "
+                }
+                let alert = UIAlertController(title: NSLocalizedString("Incorrect :-(", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: handleNavigation))
+                self.present(alert, animated: true)
+            }
+        } else {
+            if !isSyncTest {
+                if let navController = self.navigationController {
+                    navController.popViewController(animated: true)
+                }
+            } else {
+                SubmitButton.isEnabled = false
+                SubmitButton.alpha = 0.4
+            }
+        }
+    }
+    
+    func handleNavigation(alert: UIAlertAction!) {
         if !isSyncTest {
             if let navController = self.navigationController {
                 navController.popViewController(animated: true)

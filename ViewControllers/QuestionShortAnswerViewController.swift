@@ -24,6 +24,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     var newImageHeight:Float = 0
     var newImageX:Float = 0
     var wifiCommunication: WifiCommunication?
+    var directCorrection = 0
     
     @IBOutlet weak var AnswerTextField: UITextField!
     @IBOutlet weak var QuestionTextView: UITextView!
@@ -117,9 +118,56 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
-        wifiCommunication?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
-        if let navController = self.navigationController {
-            navController.popViewController(animated: true)
+        //first send answer to server
+        if !isCorrection {
+            wifiCommunication?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
+        }
+        
+        //show correct/incorrect message if direct correction mode activated
+        if (directCorrection == 1) {
+            let studentAnswer = AnswerTextField.text!
+            var rightAnswers = [String]()
+            let options = questionShortAnswer.Options
+            for option in options {
+                rightAnswers.append(option)
+            }
+            if rightAnswers.contains(studentAnswer) {
+                let alert = UIAlertController(title: NSLocalizedString("Correct!", comment: "pop up if answer right"), message: "", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: handleNavigation))
+                self.present(alert, animated: true)
+                SubmitButton.isEnabled = false
+                SubmitButton.alpha = 0.4
+            } else {
+                var message = NSLocalizedString("There was no right answer.", comment: "pop up message if answer wrong and no answer right")
+                if rightAnswers.count > 0 {
+                    message = NSLocalizedString("The right answer was for example: ", comment: "pop up message if answer wrong") + rightAnswers[0]
+                }
+                let alert = UIAlertController(title: NSLocalizedString("Incorrect :-(", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: handleNavigation))
+                self.present(alert, animated: true)
+                SubmitButton.isEnabled = false
+                SubmitButton.alpha = 0.4
+            }
+        } else {
+            if !isSyncTest {
+                if let navController = self.navigationController {
+                    navController.popViewController(animated: true)
+                }
+            } else {
+                SubmitButton.isEnabled = false
+                SubmitButton.alpha = 0.4
+            }
+        }
+    }
+    
+    func handleNavigation(alert: UIAlertAction!) {
+        if !isSyncTest {
+            if let navController = self.navigationController {
+                navController.popViewController(animated: true)
+            }
+        } else {
+            SubmitButton.isEnabled = false
+            SubmitButton.alpha = 0.4
         }
     }
     

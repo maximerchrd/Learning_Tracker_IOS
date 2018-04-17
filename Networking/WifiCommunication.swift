@@ -77,14 +77,15 @@ class WifiCommunication {
                             var questionShortAnswer = QuestionShortAnswer()
                             if (prefix.components(separatedBy: ":")[1].contains("MLT")) {
                                 let id_global = Int(prefix.components(separatedBy: "///")[1])
+                                let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
                                 do {
                                     questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
                                     
                                     if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
-                                        self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false)
+                                        self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
                                     } else {
                                         questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
-                                        self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false)
+                                        self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false, directCorrection: directCorrection)
                                     }
                                 } catch let error {
                                     print(error)
@@ -160,8 +161,9 @@ class WifiCommunication {
                         }
                     } else if typeID.range(of:"TESYN") != nil {
                         DispatchQueue.main.async {
-                            if prefix.components(separatedBy: ":").count > 1 {
+                            if prefix.components(separatedBy: ":").count > 2 {
                                 let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+                                let directCorrection = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
                                 var dataText = [UInt8]()
                                 while dataText.count < textSize {
                                     dataText += self.client!.read(textSize) ?? [UInt8]()
@@ -179,7 +181,7 @@ class WifiCommunication {
                                             IDs.append(ID)
                                         }
                                     }
-                                    self.classroomActivityViewController?.showTest(questionIDs: IDs)
+                                    self.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection)
                                 } else {
                                     print("problem reading test: no question ID")
                                 }
