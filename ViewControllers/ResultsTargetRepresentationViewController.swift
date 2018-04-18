@@ -39,7 +39,21 @@ class ResultsTargetRepresentationViewController: UIViewController {
         if indexOfEmpty != nil {
             subjects.remove(at: subjects.index(of: "")!)
         }
-        let subjectsButton = UIBarButtonItem(title: NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject, style: .plain, target: self, action: #selector(addTapped))
+        
+        let uiButtonSubject = UIButton(frame: CGRect(x: 0, y: 0, width: 250, height: 30))
+        var titleString = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
+        if titleString.count < 28 {
+            for _ in titleString.count..<28 {
+                titleString.append(" ")
+            }
+        }
+        uiButtonSubject.setTitle(titleString, for: .normal)
+        uiButtonSubject.backgroundColor = UIColor.gray
+        uiButtonSubject.tintColor = UIColor.blue
+        uiButtonSubject.layer.cornerRadius = 4.0
+        uiButtonSubject.layer.masksToBounds = true
+        uiButtonSubject.addTarget(self, action: #selector(addTapped), for: .touchUpInside)
+        let subjectsButton = UIBarButtonItem(customView: uiButtonSubject)
         
         //load the tests and setup the corresponding picker view
         do {
@@ -53,7 +67,23 @@ class ResultsTargetRepresentationViewController: UIViewController {
         }
         tests.insert(NSLocalizedString("All tests", comment: "All tests in the database"), at: 0)
         testIDs.insert(0, at: 0)
-        let testsButton = UIBarButtonItem(title: NSLocalizedString("Test: ", comment: "on button to chose subject") + selectedTest, style: .plain, target: self, action: #selector(addTestTapped))
+        
+        let uiButtonTest = UIButton(frame: CGRect(x: 0, y: 0, width: 250, height: 30))
+        var testTitleString = NSLocalizedString("Test: ", comment: "on button to chose subject") + selectedTest
+        if testTitleString.count < 28 {
+            for _ in testTitleString.count..<28 {
+                testTitleString.append(" ")
+            }
+        }
+        uiButtonTest.setTitle(testTitleString, for: .normal)
+        uiButtonTest.backgroundColor = UIColor.gray
+        uiButtonTest.tintColor = UIColor.blue
+        uiButtonTest.layer.cornerRadius = 4.0
+        uiButtonTest.layer.masksToBounds = true
+        uiButtonTest.addTarget(self, action: #selector(addTestTapped), for: .touchUpInside)
+        let testsButton = UIBarButtonItem(customView: uiButtonTest)
+        
+        
         navigationItem.rightBarButtonItems = [subjectsButton, testsButton]
         
         
@@ -183,9 +213,9 @@ class ResultsTargetRepresentationViewController: UIViewController {
         let testIndex = tests.index(of: selectedTest) ?? 0
         let testID = testIDs[testIndex]
         updateTargetRepresentation(subject: selectedSubject, testID: testID)
-        navigationItem.rightBarButtonItems![1].title = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
+        (navigationItem.rightBarButtonItems![1].customView as! UIButton).titleLabel?.text = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
         selectedSubject = NSLocalizedString("All subjects", comment: "All subjects in the database")
-        navigationItem.rightBarButtonItems![0].title = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
+        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
     }
     @objc func addTapped() {
         activePickerType = 0
@@ -213,9 +243,9 @@ class ResultsTargetRepresentationViewController: UIViewController {
     
     func OKButtonPressed() {
         updateTargetRepresentation(subject: selectedSubject, testID: 0)
-        navigationItem.rightBarButtonItems![0].title = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
+        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
         selectedTest = NSLocalizedString("All tests", comment: "All tests in the database")
-        navigationItem.rightBarButtonItems![1].title = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
+        (navigationItem.rightBarButtonItems![1].customView as! UIButton).titleLabel?.text = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
     }
     
     override func didReceiveMemoryWarning() {
