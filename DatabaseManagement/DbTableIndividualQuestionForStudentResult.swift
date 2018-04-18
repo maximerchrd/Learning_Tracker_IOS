@@ -94,7 +94,7 @@ class DbTableIndividualQuestionForResult {
         try dbQueue.inDatabase { db in
             var request = "SELECT * FROM " + TABLE_NAME
             if subject != "All" {
-                request += " INNER JOIN \(relSubj) ON \(TABLE_NAME).\(KEY_ID_GLOBAL) = \(relSubj).\(questid) WHERE \(relSubj).\(subj) = \(subject)"
+                request += " INNER JOIN \(relSubj) ON \(TABLE_NAME).\(KEY_ID_GLOBAL) = \(relSubj).\(questid) WHERE \(relSubj).\(subj) = '\(subject)'"
             }
             var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request)
             for i in 0..<resultRecord.count {

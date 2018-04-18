@@ -71,6 +71,12 @@ class DbTableQuestionMultipleChoice {
         try dbQueue.inDatabase { db in
             let questionMultChoice = QuestionMultipleChoiceRecord(questionMultipleChoiceArg: Question)
             try questionMultChoice.insert(db)
+            
+            //if id attributed to a short answer question, delete this one
+            let questionShortAnswer = try QuestionShortAnswerRecord.fetchOne(db, "SELECT * FROM \(DbTableQuestionShortAnswer.TABLE_QUESTIONSHORTANSWER_NAME) WHERE \(DbTableQuestionShortAnswer.KEY_ID_GLOBAL) = \(Question.ID)")
+            if try questionShortAnswer?.exists(db) ?? false {
+                try questionShortAnswer?.delete(db)
+            }
         }
     }
     

@@ -46,6 +46,12 @@ class DbTableQuestionShortAnswer {
             for option in Question.Options {
                 try DbTableAnswerOptions.insertAnswerOption(questionID: Question.ID, option: option)
             }
+            
+            //if id attributed to a multiple choice question, delete this one
+            let questionMultipleChoice = try QuestionMultipleChoiceRecord.fetchOne(db, "SELECT * FROM \(DbTableQuestionMultipleChoice.TABLE_QUESTIONMULTIPLECHOICE_NAME) WHERE \(DbTableQuestionMultipleChoice.KEY_ID_GLOBAL) = \(Question.ID)")
+            if try questionMultipleChoice?.exists(db) ?? false {
+                try questionMultipleChoice?.delete(db)
+            }
         }
     }
     
