@@ -100,7 +100,7 @@ class DbTableIndividualQuestionForResult {
             for i in 0..<resultRecord.count {
                 results.append([String]())
                 let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: resultRecord[i].idGlobal)
-                if questionMultipleChoice.Question.count > 0 {
+                if questionMultipleChoice.Question != "none" {
                     results[i].append(questionMultipleChoice.Question)
                 } else {
                     let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: resultRecord[i].idGlobal)

@@ -64,7 +64,11 @@ class ResultsTableController: UITableViewController {
     
     func reloadTable(subject: String) {
         do {
-            results = try DbTableIndividualQuestionForResult.getResultsForSubject(subject: subject)
+            if subject == NSLocalizedString("All subjects", comment: "All subjects in the database") {
+                results = try DbTableIndividualQuestionForResult.getResultsForSubject(subject: "All")
+            } else {
+                results = try DbTableIndividualQuestionForResult.getResultsForSubject(subject: subject)
+            }
         } catch let error {
             print(error)
         }
