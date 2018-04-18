@@ -22,6 +22,35 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         self.navigationController?.popViewController(animated: true)
     }
     
+   
+    @IBAction func DeleteQuestionsImages(_ sender: Any) {
+        if deleteImages() {
+            var message = NSLocalizedString("You successfully deleted the images!", comment: "pop up message when deleting app images")
+            let alert = UIAlertController(title: NSLocalizedString("Deleting Images", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+        } else {
+            
+        }
+    }
+    
+    func deleteImages() -> Bool {
+        guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else {
+            print("error trying to delete images: problem with directory")
+            return false
+        }
+        let fileManager = FileManager.default
+        let fileUrls = fileManager.enumerator(at: directory as URL, includingPropertiesForKeys: nil)
+        while let fileUrl = fileUrls?.nextObject() {
+            do {
+                try fileManager.removeItem(at: fileUrl as! URL)
+            } catch {
+                print(error)
+                return false
+            }
+        }
+        return true
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.

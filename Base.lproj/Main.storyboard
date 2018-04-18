@@ -323,17 +323,30 @@
                                     <action selector="SaveAndGoBackButtonPressed:" destination="k5m-AQ-z66" eventType="touchUpInside" id="IHB-9N-Wh7"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5bq-BO-Mwf">
-                                <rect key="frame" x="70" y="336" width="181" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8us-Xi-DIW">
+                                <rect key="frame" x="44" y="430" width="233" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.0" green="0.80000000000000004" blue="0.79607843140000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <viewLayoutGuide key="safeArea" id="3Hi-vy-bxB"/>
+                                <color key="backgroundColor" red="0.37570807337760925" green="0.79154056310653687" blue="0.38801717758178711" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <viewLayoutGuide key="safeArea" id="wng-Ge-CZ0"/>
                                 <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
                                 <state key="normal" title="Send Logs per Mail">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="sendMail:" destination="k5m-AQ-z66" eventType="touchUpInside" id="ENI-Xa-1GD"/>
+                                    <action selector="sendMail:" destination="k5m-AQ-z66" eventType="touchUpInside" id="KIN-k2-U2c"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5bq-BO-Mwf">
+                                <rect key="frame" x="44" y="385" width="233" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.78636091947555542" green="0.32966840267181396" blue="0.1504768431186676" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <viewLayoutGuide key="safeArea" id="3Hi-vy-bxB"/>
+                                <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="10" maxY="0.0"/>
+                                <state key="normal" title="Free Space Deleting All Images">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="DeleteQuestionsImages:" destination="k5m-AQ-z66" eventType="touchUpInside" id="TAs-0N-FTQ"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -348,7 +361,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Jg-pn-rQV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="533" y="1303"/>
+            <point key="canvasLocation" x="532.5" y="1302.5"/>
         </scene>
         <!--Free Practice View Controller-->
         <scene sceneID="EF9-C0-aIt">
