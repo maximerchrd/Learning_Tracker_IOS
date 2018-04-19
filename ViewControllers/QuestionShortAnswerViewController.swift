@@ -23,7 +23,6 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     var newImageWidth:Float = 0
     var newImageHeight:Float = 0
     var newImageX:Float = 0
-    var wifiCommunication: WifiCommunication?
     var directCorrection = 0
     var isBackButton = true
     
@@ -134,7 +133,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
         //first send answer to server
         if !isCorrection {
-            wifiCommunication?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
         }
         
         //show correct/incorrect message if direct correction mode activated

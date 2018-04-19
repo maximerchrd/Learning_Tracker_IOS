@@ -21,7 +21,6 @@ class PracticeQuestionShortAnswerViewController: UIViewController, UITextFieldDe
     var newImageWidth:Float = 0
     var newImageHeight:Float = 0
     var newImageX:Float = 0
-    var wifiCommunication: WifiCommunication?
     
     @IBOutlet weak var SubmitButton: UIButton!
     @IBOutlet weak var AnswerTextField: UITextField!

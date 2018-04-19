@@ -12,7 +12,7 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var wifiCommunicationAppDelegate: WifiCommunication?
+    static var wifiCommunicationSingleton: WifiCommunication?
     var disconnectionDetection = 0
 
 
@@ -27,8 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-        if wifiCommunicationAppDelegate != nil && disconnectionDetection < 1 {
-            wifiCommunicationAppDelegate?.sendDisconnectionSignal()
+        if AppDelegate.wifiCommunicationSingleton != nil && disconnectionDetection < 1 {
+            AppDelegate.wifiCommunicationSingleton?.sendDisconnectionSignal()
         }
     }
 
@@ -86,7 +86,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             //print("LOCK STATUS CHANGED")
             disconnectionDetection = disconnectionDetection - 1
             if disconnectionDetection < 1 {
-                wifiCommunicationAppDelegate?.connectToServer()
+                AppDelegate.wifiCommunicationSingleton?.connectToServer() //we need it because we lose the connection when locking the device. Once this problem solved, we can probably get rid of it
             }
         }
     }

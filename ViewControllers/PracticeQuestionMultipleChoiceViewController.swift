@@ -21,7 +21,6 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
     var newImageWidth:Float = 0
     var newImageHeight:Float = 0
     var newImageX:Float = 0
-    var wifiCommunication: WifiCommunication?
     var checkBoxArray: [CheckBox]
     var stackView: UIStackView!
     var scrollViewWidth: CGFloat

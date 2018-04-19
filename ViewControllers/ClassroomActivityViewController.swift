@@ -11,7 +11,6 @@ import UIKit
 
 class ClassroomActivityViewController: UIViewController {
     
-    var wifiCommunication: WifiCommunication?
     static var navQuestionMultipleChoiceViewController: QuestionMultipleChoiceViewController?
     static var navQuestionShortAnswerViewController: QuestionShortAnswerViewController?
     
@@ -22,7 +21,6 @@ class ClassroomActivityViewController: UIViewController {
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as? QuestionMultipleChoiceViewController {
             if let navigator = navigationController {
                 newViewController.questionMultipleChoice = question
-                newViewController.wifiCommunication = wifiCommunication
                 newViewController.isCorrection = isCorr
                 newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
@@ -35,7 +33,6 @@ class ClassroomActivityViewController: UIViewController {
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionShortAnswerViewController") as? QuestionShortAnswerViewController {
             if let navigator = navigationController {
                 newViewController.questionShortAnswer = question
-                newViewController.wifiCommunication = wifiCommunication
                 newViewController.isCorrection = isCorr
                 newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
@@ -57,7 +54,6 @@ class ClassroomActivityViewController: UIViewController {
                                 newViewController.questionsMultipleChoice.append(questionMC)
                             }
                         }
-                        newViewController.wifiCommunication = wifiCommunication!
                         newViewController.directCorrection = directCorrection
                         navigator.pushViewController(newViewController, animated: true)
                     } catch let error {
@@ -92,10 +88,8 @@ class ClassroomActivityViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        //showMultipleChoiceQuestion(strin: "from view did load")
-        wifiCommunication = WifiCommunication(classroomActivityViewControllerArg: self)
-        if (wifiCommunication!.connectToServer()) {
+        AppDelegate.wifiCommunicationSingleton = WifiCommunication(classroomActivityViewControllerArg: self)
+        if (AppDelegate.wifiCommunicationSingleton!.connectToServer()) {
             InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
         } else {
             InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")

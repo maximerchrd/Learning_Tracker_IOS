@@ -32,7 +32,7 @@ class WifiCommunication {
         case .success:
             switch client!.send(data: dataConverter.connection()) {
                 case .success:
-                    (UIApplication.shared.delegate as! AppDelegate).wifiCommunicationAppDelegate = self
+                    //AppDelegate.wifiCommunicationSingleton = self
                     listenToServer()
                     return true
                 case .failure(let error):

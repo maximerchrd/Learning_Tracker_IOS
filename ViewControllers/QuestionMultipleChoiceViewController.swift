@@ -23,7 +23,6 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var newImageWidth:Float = 0
     var newImageHeight:Float = 0
     var newImageX:Float = 0
-    var wifiCommunication: WifiCommunication?
     var checkBoxArray: [CheckBox]
     var stackView: UIStackView!
     var scrollViewWidth: CGFloat
@@ -223,7 +222,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
                 }
             }
             
-            wifiCommunication?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
         }
         
         //show correct/incorrect message if direct correction mode activated
