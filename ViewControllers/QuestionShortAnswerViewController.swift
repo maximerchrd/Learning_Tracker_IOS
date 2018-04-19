@@ -25,6 +25,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     var newImageX:Float = 0
     var wifiCommunication: WifiCommunication?
     var directCorrection = 0
+    var isBackButton = true
     
     @IBOutlet weak var AnswerTextField: UITextField!
     @IBOutlet weak var QuestionTextView: UITextView!
@@ -41,6 +42,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // Do any additional setup after loading the view, typically from a nib.
         let screenSize = UIScreen.main.bounds
         screenWidth = Float(screenSize.width)
@@ -90,6 +92,18 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
             if self.view.frame.origin.y == 0{
                 self.view.frame.origin.y -= keyboardSize.height
             }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        //dismiss keyboard if we are coming back to question
+        self.view.endEditing(true)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        if isBackButton {
+            ClassroomActivityViewController.navQuestionShortAnswerViewController = self
+            ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
         }
     }
     
@@ -151,6 +165,10 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         } else {
             if !isSyncTest {
                 if let navController = self.navigationController {
+                    //set cached view controller to nil to prevent students answering several times to same question
+                    isBackButton = false
+                    ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
+                    
                     navController.popViewController(animated: true)
                 }
             } else {
@@ -163,6 +181,10 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     func handleNavigation(alert: UIAlertAction!) {
         if !isSyncTest {
             if let navController = self.navigationController {
+                //set cached view controller to nil to prevent students answering several times to same question
+                isBackButton = false
+                ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
+                
                 navController.popViewController(animated: true)
             }
         } else {

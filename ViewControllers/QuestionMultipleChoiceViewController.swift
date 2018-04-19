@@ -32,6 +32,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var scrollViewY: CGFloat
     var scrollPosition: CGFloat
     var directCorrection = 0
+    var isBackButton = true
     
     @IBOutlet weak var QuestionTextView: UITextView!
     @IBOutlet weak var PictureView: UIImageView!
@@ -178,6 +179,12 @@ class QuestionMultipleChoiceViewController: UIViewController {
         OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)
         OptionsScrollView.contentOffset.y = scrollPosition
     }
+    override func viewWillDisappear(_ animated: Bool) {
+        if isBackButton {
+            ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
+            ClassroomActivityViewController.navQuestionMultipleChoiceViewController = self
+        }
+    }
     
     func shuffle(arrayArg: [String]) -> [String] {
         var array = arrayArg
@@ -250,6 +257,11 @@ class QuestionMultipleChoiceViewController: UIViewController {
         } else {
             if !isSyncTest {
                 if let navController = self.navigationController {
+                    //set cached view controller to nil to prevent students answering several times to same question
+                    isBackButton = false
+                    ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
+                    print( ClassroomActivityViewController.navQuestionMultipleChoiceViewController as Any )
+                    
                     navController.popViewController(animated: true)
                 }
             } else {
@@ -262,6 +274,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
     func handleNavigation(alert: UIAlertAction!) {
         if !isSyncTest {
             if let navController = self.navigationController {
+                //set cached view controller to nil to prevent students answering several times to same question
+                isBackButton = false
+                ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
+                
                 navController.popViewController(animated: true)
             }
         } else {

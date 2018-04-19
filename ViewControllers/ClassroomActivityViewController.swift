@@ -12,6 +12,8 @@ import UIKit
 class ClassroomActivityViewController: UIViewController {
     
     var wifiCommunication: WifiCommunication?
+    static var navQuestionMultipleChoiceViewController: QuestionMultipleChoiceViewController?
+    static var navQuestionShortAnswerViewController: QuestionShortAnswerViewController?
     
     @IBOutlet weak var InstructionsLabel: UILabel!
     
@@ -69,6 +71,25 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     
+    @objc func goBackToQuestionMultChoice() {
+        if let navigator = navigationController {
+            if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
+                navigator.pushViewController(ClassroomActivityViewController.navQuestionMultipleChoiceViewController!, animated: true)
+            } else {
+                print("Problem going back to question MC: View Controller is unexpectedly nil")
+            }
+        }
+    }
+    @objc func goBackToQuestionShortAnswer() {
+        if let navigator = navigationController {
+            if ClassroomActivityViewController.navQuestionShortAnswerViewController != nil {
+                navigator.pushViewController(ClassroomActivityViewController.navQuestionShortAnswerViewController!, animated: true)
+            } else {
+                print("Problem going back to SHRTAQ: View Controller is unexpectedly nil")
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -78,6 +99,16 @@ class ClassroomActivityViewController: UIViewController {
             InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
         } else {
             InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Question >", style: .plain, target: self, action: #selector(goBackToQuestionMultChoice))
+        } else if ClassroomActivityViewController.navQuestionShortAnswerViewController != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Question >", style: .plain, target: self, action: #selector(goBackToQuestionShortAnswer))
+        } else {
+            navigationItem.rightBarButtonItem = nil
         }
     }
     
