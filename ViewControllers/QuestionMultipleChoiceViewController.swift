@@ -124,6 +124,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
             checkBox.setTitleColor(.black, for: .normal)
             checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
             checkBox.widthAnchor.constraint(equalToConstant: scrollViewWidth - checkBox.checkedImage.size.width * 1.3).isActive = true
+            checkBox.contentEdgeInsets = UIEdgeInsetsMake(0,10,0,0)
             
             //make some tweaks to put more space above and below longer answer options
             var factorAccordingTextLength = 1
