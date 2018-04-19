@@ -46,7 +46,9 @@ class DbTableTests {
                     }
                 }
             } else {
-                print("Problem inserting test: the objectives array is not the same size as the corresponding IDs")
+                let error = "Problem inserting test: the objectives array is not the same size as the corresponding IDs"
+                print(error)
+                DbTableLogs.insertLog(log: error)
             }
             //try DbTableRelationQuestionTest.insertRelationQuestionTest(questionID: testID, test: test)
         }

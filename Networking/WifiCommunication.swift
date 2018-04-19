@@ -28,17 +28,19 @@ class WifiCommunication {
         client = TCPClient(address: host, port: Int32(PORT_NUMBER))
         let dataConverter = DataConverstion()
         
-        switch client!.connect(timeout: 10) {
+        switch client!.connect(timeout: 4) {
         case .success:
             switch client!.send(data: dataConverter.connection()) {
-                case .success:
-                    //AppDelegate.wifiCommunicationSingleton = self
-                    listenToServer()
-                    return true
-                case .failure(let error):
-                    DbTableLogs.insertLog(log: error.localizedDescription)
-                    print(error)
-                    return false
+            case .success:
+                //AppDelegate.wifiCommunicationSingleton = self
+                DispatchQueue.global(qos: .utility).async {
+                    self.listenToServer()
+                }
+                return true
+            case .failure(let error):
+                DbTableLogs.insertLog(log: error.localizedDescription)
+                print(error)
+                return false
             }
         case .failure(let error):
             if error.localizedDescription.contains("3") {
@@ -51,80 +53,127 @@ class WifiCommunication {
         }
     }
     
-    private func listenToServer() {
+    public func listenToServer() {
         var prefix = "not initialized"
-        DispatchQueue.global(qos: .background).async {
-            var ableToRead = true
-            while (self.client != nil && ableToRead) {
-                let data = self.client!.read(40, timeout: 5400)
-                if data != nil {
-                    prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
-                    if prefix.contains("oops") {
-                        DbTableLogs.insertLog(log: prefix)
-                        print(prefix)
-                        fatalError()
-                    }
+        
+        /*while (true) {
+            print("listening To Server")
+            Thread.sleep(forTimeInterval: 1)
+        }*/
+        var ableToRead = true
+        while (self.client != nil && ableToRead) {
+            let data = self.client!.read(40, timeout: 5400)
+            if data != nil {
+                prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
+                if prefix.contains("oops") {
+                    DbTableLogs.insertLog(log: prefix)
                     print(prefix)
-                    let typeID = prefix.components(separatedBy: ":")[0]
-                    
-                    if typeID.range(of:"MULTQ") != nil {
-                        self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID)
-                    } else if typeID.range(of:"SHRTA") != nil {
-                        self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID)
-                    } else if typeID.range(of:"QID") != nil {
-                        DispatchQueue.main.async {
-                            var questionMultipleChoice = QuestionMultipleChoice()
-                            var questionShortAnswer = QuestionShortAnswer()
-                            if (prefix.components(separatedBy: ":")[1].contains("MLT")) {
-                                let id_global = Int(prefix.components(separatedBy: "///")[1])
-                                let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
-                                do {
-                                    questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
-                                    
-                                    if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
-                                        self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
-                                    } else {
-                                        questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
-                                        self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false, directCorrection: directCorrection)
-                                    }
-                                } catch let error {
-                                    print(error)
-                                }
-                            }
-                        }
-                    } else if typeID.range(of:"EVAL") != nil {
-                        do {
-                            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, answer: self.pendingAnswer, quantitativeEval: prefix.components(separatedBy: "///")[1])
-                        } catch let error {
-                            print(error)
-                        }
-                    } else if typeID.range(of:"UPDEV") != nil {
-                        do {
-                        try DbTableIndividualQuestionForResult.setEvalForQuestionAndStudentIDs(eval: prefix.components(separatedBy: "///")[1], idQuestion: prefix.components(separatedBy: "///")[2])
-                        } catch let error {
-                            print(error)
-                        }
-                    } else if typeID.range(of:"CORR") != nil {
-                        DispatchQueue.main.async {
-                            var questionMultipleChoice = QuestionMultipleChoice()
-                            var questionShortAnswer = QuestionShortAnswer()
+                    fatalError()
+                }
+                print(prefix)
+                let typeID = prefix.components(separatedBy: ":")[0]
+                
+                if typeID.range(of:"MULTQ") != nil {
+                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID)
+                } else if typeID.range(of:"SHRTA") != nil {
+                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID)
+                } else if typeID.range(of:"QID") != nil {
+                    DispatchQueue.main.async {
+                        var questionMultipleChoice = QuestionMultipleChoice()
+                        var questionShortAnswer = QuestionShortAnswer()
+                        if (prefix.components(separatedBy: ":")[1].contains("MLT")) {
                             let id_global = Int(prefix.components(separatedBy: "///")[1])
+                            let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
                             do {
                                 questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
                                 
                                 if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
-                                    self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: true)
+                                    self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
                                 } else {
                                     questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
-                                    self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: true)
+                                    self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false, directCorrection: directCorrection)
                                 }
                             } catch let error {
                                 print(error)
                             }
                         }
-                    } else if typeID.range(of:"TEST") != nil {
-                        if prefix.components(separatedBy: ":").count > 1 {
+                    }
+                } else if typeID.range(of:"EVAL") != nil {
+                    do {
+                        try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, answer: self.pendingAnswer, quantitativeEval: prefix.components(separatedBy: "///")[1])
+                    } catch let error {
+                        print(error)
+                    }
+                } else if typeID.range(of:"UPDEV") != nil {
+                    do {
+                        try DbTableIndividualQuestionForResult.setEvalForQuestionAndStudentIDs(eval: prefix.components(separatedBy: "///")[1], idQuestion: prefix.components(separatedBy: "///")[2])
+                    } catch let error {
+                        print(error)
+                    }
+                } else if typeID.range(of:"CORR") != nil {
+                    DispatchQueue.main.async {
+                        var questionMultipleChoice = QuestionMultipleChoice()
+                        var questionShortAnswer = QuestionShortAnswer()
+                        let id_global = Int(prefix.components(separatedBy: "///")[1])
+                        do {
+                            questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
+                            
+                            if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
+                                self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: true)
+                            } else {
+                                questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
+                                self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: true)
+                            }
+                        } catch let error {
+                            print(error)
+                        }
+                    }
+                } else if typeID.range(of:"TEST") != nil {
+                    if prefix.components(separatedBy: ":").count > 1 {
+                        let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+                        var dataText = [UInt8]()
+                        while dataText.count < textSize {
+                            dataText += self.client!.read(textSize) ?? [UInt8]()
+                        }
+                        let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: dataText to string yields nil"
+                        if dataTextString.contains("oops") {
+                            DbTableLogs.insertLog(log: dataTextString)
+                        }
+                        do {
+                            if dataTextString.components(separatedBy: "///").count > 3 {
+                                let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
+                                let test = dataTextString.components(separatedBy: "///")[1]
+                                let objectivesArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
+                                var objectiveIDS = [Int]()
+                                var objectives = [String]()
+                                for objectiveANDid in objectivesArray {
+                                    if objectiveANDid.count > 0 {
+                                        objectiveIDS.append(Int(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
+                                        if objectiveANDid.components(separatedBy: "/|/").count > 1 {
+                                            objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
+                                        } else {
+                                            let error = "problem reading objectives for test: objective - ID pair not complete"
+                                            print(error)
+                                            DbTableLogs.insertLog(log: error)
+                                        }
+                                    }
+                                }
+                                try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
+                                self.receivedQuestion(questionID: String(testID))
+                            } else {
+                                let error = "problem reading test: text array to short"
+                                print(error)
+                                DbTableLogs.insertLog(log: error)
+                            }
+                        } catch let error {
+                            print(error)
+                        }
+                    }
+                } else if typeID.range(of:"TESYN") != nil {
+                    DispatchQueue.main.async {
+                        if prefix.components(separatedBy: ":").count > 2 {
                             let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+                            let directCorrection = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
                             var dataText = [UInt8]()
                             while dataText.count < textSize {
                                 dataText += self.client!.read(textSize) ?? [UInt8]()
@@ -133,69 +182,32 @@ class WifiCommunication {
                             if dataTextString.contains("oops") {
                                 DbTableLogs.insertLog(log: dataTextString)
                             }
-                            do {
-                                if dataTextString.components(separatedBy: "///").count > 3 {
-                                    let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
-                                    let test = dataTextString.components(separatedBy: "///")[1]
-                                    let objectivesArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
-                                    var objectiveIDS = [Int]()
-                                    var objectives = [String]()
-                                    for objectiveANDid in objectivesArray {
-                                        if objectiveANDid.count > 0 {
-                                            objectiveIDS.append(Int(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
-                                            if objectiveANDid.components(separatedBy: "/|/").count > 1 {
-                                                objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
-                                            } else {
-                                                print("problem reading objectives for test: objective - ID pair not complete")
-                                            }
-                                        }
+                            if dataTextString.components(separatedBy: "///").count > 2 {
+                                let questionIDs = dataTextString.components(separatedBy: "///")
+                                var IDs = [Int]()
+                                for questionID in questionIDs {
+                                    let ID = Int(questionID) ?? -1
+                                    if ID != -1 {
+                                        IDs.append(ID)
                                     }
-                                    try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
-                                    self.receivedQuestion(questionID: String(testID))
-                                } else {
-                                    print("problem reading test: text array to short")
                                 }
-                            } catch let error {
+                                self.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection)
+                            } else {
+                                let error = "problem reading test: no question ID"
                                 print(error)
+                                DbTableLogs.insertLog(log: error)
                             }
                         }
-                    } else if typeID.range(of:"TESYN") != nil {
-                        DispatchQueue.main.async {
-                            if prefix.components(separatedBy: ":").count > 2 {
-                                let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-                                let directCorrection = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-                                var dataText = [UInt8]()
-                                while dataText.count < textSize {
-                                    dataText += self.client!.read(textSize) ?? [UInt8]()
-                                }
-                                let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: dataText to string yields nil"
-                                if dataTextString.contains("oops") {
-                                    DbTableLogs.insertLog(log: dataTextString)
-                                }
-                                if dataTextString.components(separatedBy: "///").count > 2 {
-                                    let questionIDs = dataTextString.components(separatedBy: "///")
-                                    var IDs = [Int]()
-                                    for questionID in questionIDs {
-                                        let ID = Int(questionID) ?? -1
-                                        if ID != -1 {
-                                            IDs.append(ID)
-                                        }
-                                    }
-                                    self.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection)
-                                } else {
-                                    print("problem reading test: no question ID")
-                                }
-                            }
-                        }
-                    } else {
-                        DbTableLogs.insertLog(log: "message received but prefix not supported: " + prefix)
-                        print("message received but prefix not supported")
                     }
                 } else {
-                    ableToRead = false
+                    DbTableLogs.insertLog(log: "message received but prefix not supported: " + prefix)
+                    print("message received but prefix not supported")
                 }
+            } else {
+                ableToRead = false
             }
         }
+        
     }
     
     public func sendAnswerToServer(answer: String, globalID: Int, questionType: String) {
@@ -249,7 +261,7 @@ class WifiCommunication {
                 dataText += self.client!.read(textSize! - dataText.count) ?? [UInt8]()
             }
             print(imageSize!)
-
+            
             var dataImage = [UInt8]()
             while dataImage.count < imageSize ?? 0 {
                 dataImage += self.client!.read(imageSize! - dataImage.count) ?? [UInt8]()

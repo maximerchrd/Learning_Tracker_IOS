@@ -20,7 +20,10 @@ class DataConverstion {
                 + UIDevice.current.identifierForVendor!.uuidString + "///"
                 + DbTableSettings.retrieveName() + "///"
                 + MCQIDsList + "|" + SHRTAQIDsList
-        } catch {}
+        } catch let error {
+            print(error)
+            DbTableLogs.insertLog(log: error.localizedDescription)
+        }
         let dataUTF8 = input.data(using: .utf8)!
         return dataUTF8
     }
@@ -28,6 +31,10 @@ class DataConverstion {
     static public func bytesToMultq(textData: [UInt8]?, imageData: [UInt8]?) -> QuestionMultipleChoice {
         let questionMultipleChoice = QuestionMultipleChoice()
         let wholeText = String(bytes: textData!, encoding: .utf8) ?? "oops, problem converting the question text"
+        if wholeText.contains("oops") {
+            print(wholeText)
+            DbTableLogs.insertLog(log: wholeText)
+        }
         
         //prepares the question
         questionMultipleChoice.Question = wholeText.components(separatedBy: "///")[0]
@@ -72,6 +79,10 @@ class DataConverstion {
     static public func bytesToShrtaq(textData: [UInt8]?, imageData: [UInt8]?) -> QuestionShortAnswer {
         let questionShortAnswer = QuestionShortAnswer()
         let wholeText = String(bytes: textData!, encoding: .utf8) ?? "oops, problem converting the question text"
+        if wholeText.contains("oops") {
+            print(wholeText)
+            DbTableLogs.insertLog(log: wholeText)
+        }
         
         //prepares the question
         questionShortAnswer.Question = wholeText.components(separatedBy: "///")[0]

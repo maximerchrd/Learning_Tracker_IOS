@@ -36,7 +36,9 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     
     func deleteImages() -> Bool {
         guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else {
-            print("error trying to delete images: problem with directory")
+            let error = "error trying to delete images: problem with directory"
+            print(error)
+            DbTableLogs.insertLog(log: error)
             return false
         }
         let fileManager = FileManager.default

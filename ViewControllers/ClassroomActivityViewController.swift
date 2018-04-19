@@ -63,7 +63,9 @@ class ClassroomActivityViewController: UIViewController {
             }
             
         } else {
-            print("Problem trying to display test: no question ID received")
+            let error = "Problem trying to display test: no question ID received"
+            print(error)
+            DbTableLogs.insertLog(log: error)
         }
     }
     
@@ -72,7 +74,9 @@ class ClassroomActivityViewController: UIViewController {
             if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
                 navigator.pushViewController(ClassroomActivityViewController.navQuestionMultipleChoiceViewController!, animated: true)
             } else {
-                print("Problem going back to question MC: View Controller is unexpectedly nil")
+                let error = "Problem going back to question MC: View Controller is unexpectedly nil"
+                print(error)
+                DbTableLogs.insertLog(log: error)
             }
         }
     }
@@ -81,7 +85,9 @@ class ClassroomActivityViewController: UIViewController {
             if ClassroomActivityViewController.navQuestionShortAnswerViewController != nil {
                 navigator.pushViewController(ClassroomActivityViewController.navQuestionShortAnswerViewController!, animated: true)
             } else {
-                print("Problem going back to SHRTAQ: View Controller is unexpectedly nil")
+                let error = "Problem going back to SHRTAQ: View Controller is unexpectedly nil"
+                print(error)
+                DbTableLogs.insertLog(log: error)
             }
         }
     }
