@@ -352,6 +352,20 @@
                                     <action selector="DeleteQuestionsImages:" destination="k5m-AQ-z66" eventType="touchUpInside" id="TAs-0N-FTQ"/>
                                 </connections>
                             </button>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cXi-OY-kGA">
+                                <rect key="frame" x="228" y="333" width="49" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="SwitchMultipeerConnectivity:" destination="k5m-AQ-z66" eventType="valueChanged" id="bh5-hr-gKz"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Enable Multipeer Connec. :" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gg5-kU-J1o">
+                                <rect key="frame" x="10" y="338" width="206" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="d7c-GT-Fhy"/>
@@ -359,6 +373,7 @@
                     <navigationItem key="navigationItem" id="Cj8-rt-ySJ"/>
                     <connections>
                         <outlet property="IpAddressTextField" destination="41S-lq-ZZq" id="K7k-KR-pRM"/>
+                        <outlet property="MultipeerConnectivitySwitch" destination="cXi-OY-kGA" id="HmS-gN-4tK"/>
                         <outlet property="NameTextField" destination="Wcp-me-b1a" id="Q0O-uN-LKB"/>
                     </connections>
                 </viewController>

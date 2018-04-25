@@ -16,7 +16,15 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     
     @IBOutlet weak var NameTextField: UITextField!
     @IBOutlet weak var IpAddressTextField: UITextField!
+    @IBOutlet weak var MultipeerConnectivitySwitch: UISwitch!
     
+    @IBAction func SwitchMultipeerConnectivity(_ sender: Any) {
+        if MultipeerConnectivitySwitch.isOn {
+            DbTableSettings.setMultipeer(multipeer: true)
+        } else {
+            DbTableSettings.setMultipeer(multipeer: false)
+        }
+    }
     @IBAction func SaveAndGoBackButtonPressed(_ sender: Any) {
         DbTableSettings.setNameAndMaster(name: NameTextField.text!, master: IpAddressTextField.text!)
         self.navigationController?.popViewController(animated: true)
@@ -55,12 +63,13 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
         do {
-            NameTextField.text = try DbTableSettings.retrieveName();
-            IpAddressTextField.text = try DbTableSettings.retrieveMaster();
-        } catch {
-            
+            NameTextField.text = try DbTableSettings.retrieveName()
+            IpAddressTextField.text = try DbTableSettings.retrieveMaster()
+            MultipeerConnectivitySwitch.isOn = try DbTableSettings.retrieveMultipeer()
+        } catch let error {
+            print(error)
         }
     }
     

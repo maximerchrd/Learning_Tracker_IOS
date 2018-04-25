@@ -44,9 +44,26 @@ class GlobalDBManager {
                 print("migration to v1")
             }
             
+            // v2 database
+            migrator.registerMigration("v2") { db in
+                // ALTER TABLE players ADD COLUMN url TEXT
+                try db.drop(table: DbTableSettings.TABLE_NAME)
+                try db.create(table: DbTableSettings.TABLE_NAME, ifNotExists: true) { t in
+                    t.column(DbTableSettings.KEY_IDsettings, .integer).primaryKey()
+                    t.column(DbTableSettings.KEY_NAME, .text).notNull()
+                    t.column(DbTableSettings.KEY_MASTER, .text).notNull()
+                    t.column(DbTableSettings.KEY_MULTIPEER, .boolean).notNull()
+                }
+                print("migration to v2")
+            }
+            
             //Do migrations
             let dbQueue = try DatabaseQueue(path: databaseURL.path)
             try migrator.migrate(dbQueue)
+            
+            
+            //initialize settings table
+            try DbTableSettings.initializeSettings()
         } catch let error {
             print(error)
             print(error.localizedDescription)
