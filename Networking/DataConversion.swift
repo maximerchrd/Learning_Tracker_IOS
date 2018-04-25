@@ -141,6 +141,30 @@ class DataConverstion {
             return false
         }
     }
-    
+    static public func storeQuestionFromData(typeOfQuest: String, questionData: Data, prefix: String) {
+        if prefix.components(separatedBy: ":").count > 1 {
+            let imageSize:Int? = Int(prefix.components(separatedBy: ":")[1]) ?? 0
+            let textSize:Int? = Int(prefix.components(separatedBy: ":")[2]) ?? 0
+            let dataText = questionData.subdata(in: 40..<(40+textSize!))
+            if questionData.count >= 40 + textSize! + imageSize! {
+                let dataImage = questionData.subdata(in: (40+textSize!)..<questionData.count)
+                do {
+                    if typeOfQuest.range(of: "MULTQ") != nil {
+                        let questionMult = DataConverstion.bytesToMultq(textData: [UInt8](dataText), imageData: [UInt8](dataImage))
+                        try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
+                    } else if typeOfQuest.range(of: "SHRTA") != nil {
+                        let questionShrt = DataConverstion.bytesToShrtaq(textData: [UInt8](dataText), imageData: [UInt8](dataImage))
+                        try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
+                    }
+                } catch let error {
+                    print(error)
+                }
+            } else {
+                NSLog("%@", "problem storing question from peer: buffer too short")
+            }
+        } else {
+            NSLog("%@", "problem storing question from peer: prefix not in correct format or buffer truncated")
+        }
+    }
     
 }

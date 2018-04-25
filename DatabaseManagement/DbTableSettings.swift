@@ -76,7 +76,7 @@ class DbTableSettings {
         }
         return master
     }
-    static func retrieveMultipeer () throws -> Bool {
+    static func retrieveMultipeer () -> Bool {
         var multipeer = false
         do {
             let dbQueue = try DatabaseQueue(path: DBName)

@@ -16,14 +16,18 @@ class WifiCommunication {
     var client: TCPClient?
     var classroomActivityViewController: ClassroomActivityViewController?
     var pendingAnswer = "none"
+    let multipeerCommunication = MultipeerCommunication()
     
     init(classroomActivityViewControllerArg: ClassroomActivityViewController) {
         classroomActivityViewController = classroomActivityViewControllerArg
     }
-    init() {
-    }
     
     public func connectToServer() -> Bool {
+        //first connect to peers if Multipeer enabled
+        if (DbTableSettings.retrieveMultipeer()) {
+            multipeerCommunication.connectToPeers()
+        }
+        
         do { try host = DbTableSettings.retrieveMaster() } catch {}
         client = TCPClient(address: host, port: Int32(PORT_NUMBER))
         let dataConverter = DataConverstion()
@@ -56,10 +60,6 @@ class WifiCommunication {
     public func listenToServer() {
         var prefix = "not initialized"
         
-        /*while (true) {
-            print("listening To Server")
-            Thread.sleep(forTimeInterval: 1)
-        }*/
         var ableToRead = true
         while (self.client != nil && ableToRead) {
             let data = self.client!.read(40, timeout: 5400)
@@ -74,9 +74,9 @@ class WifiCommunication {
                 let typeID = prefix.components(separatedBy: ":")[0]
                 
                 if typeID.range(of:"MULTQ") != nil {
-                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID)
+                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data!)
                 } else if typeID.range(of:"SHRTA") != nil {
-                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID)
+                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data!)
                 } else if typeID.range(of:"QID") != nil {
                     DispatchQueue.main.async {
                         var questionMultipleChoice = QuestionMultipleChoice()
@@ -98,6 +98,12 @@ class WifiCommunication {
                             }
                         }
                     }
+                    //forward if Multipeer activated
+                    if DbTableSettings.retrieveMultipeer() {
+                        let wholeData = Data(bytes: data!)
+                        multipeerCommunication.send(data: wholeData)
+                    }
+
                 } else if typeID.range(of:"EVAL") != nil {
                     do {
                         try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, answer: self.pendingAnswer, quantitativeEval: prefix.components(separatedBy: "///")[1])
@@ -240,16 +246,12 @@ class WifiCommunication {
     }
     
     public func receivedQuestion(questionID: String) {
-        do {
-            let message = "GOTIT///" + questionID + "///"
-            print(message)
-            client!.send(string: message)
-        } catch let error {
-            print(error)
-        }
+        let message = "GOTIT///" + questionID + "///"
+        print(message)
+        client!.send(string: message)
     }
     
-    fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String) {
+    fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String, prefixData: [UInt8]) {
         if prefix.components(separatedBy: ":").count > 1 {
             let imageSize:Int? = Int(prefix.components(separatedBy: ":")[1])
             var textSizeString = prefix.components(separatedBy: ":")[2]
@@ -287,6 +289,13 @@ class WifiCommunication {
                 print(error)
             }
             receivedQuestion(questionID: String(questionID))
+            
+            //forward if Multipeer activated
+            if DbTableSettings.retrieveMultipeer() {
+                let wholeBytesData = prefixData + dataText + dataImage
+                let wholeData = Data(bytes: wholeBytesData)
+                multipeerCommunication.send(data: wholeData)
+            }
         } else {
             DbTableLogs.insertLog(log: "error reading questions: prefix not in correct format or buffer truncated")
             print("error reading questions: prefix not in correct format or buffer truncated")

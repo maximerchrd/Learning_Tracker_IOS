@@ -16,6 +16,7 @@ class ClassroomActivityViewController: UIViewController {
     
     @IBOutlet weak var InstructionsLabel: UILabel!
     
+    
     public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool, directCorrection: Int = 0) {
         // Safe Push VC
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as? QuestionMultipleChoiceViewController {
@@ -102,6 +103,16 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     
+    func change() {
+        UIView.animate(withDuration: 0.2) {
+            if self.view.backgroundColor == .red {
+                self.view.backgroundColor = .yellow
+            } else {
+                self.view.backgroundColor = .red
+            }
+        }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Question >", style: .plain, target: self, action: #selector(goBackToQuestionMultChoice))
@@ -116,6 +127,21 @@ class ClassroomActivityViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+}
+
+extension ClassroomActivityViewController : MultipeerCommunicationDelegate {
     
+    func connectedDevicesChanged(manager: MultipeerCommunication, connectedDevices: [String]) {
+        OperationQueue.main.addOperation {
+            self.InstructionsLabel.text = "Connections: \(connectedDevices)"
+        }
+    }
+    
+    func colorChanged(manager: MultipeerCommunication, colorString: String) {
+        OperationQueue.main.addOperation {
+            self.change()
+            print("Message received: \(colorString)")
+        }
+    }
     
 }
