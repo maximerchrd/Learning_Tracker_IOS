@@ -186,17 +186,6 @@ extension MultipeerCommunication : MCNearbyServiceAdvertiserDelegate {
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         NSLog("%@", "didReceiveInvitationFromPeer \(peerID)")
         invitationHandler(true, self.session)
-        if AppDelegate.isFirstLayer {
-            DispatchQueue.global(qos: .utility).async {
-                Thread.sleep(forTimeInterval: 1)            //wait for peer to do some stuffs (find a better solution later)
-                if self.numberOfPeers <= self.maxPeers {
-                    print("sending accepted to peer")
-                    self.sendToPeer(data: "ACCEPTED///".data(using: .utf8)!, peerID: peerID)
-                } else {
-                    self.sendToPeer(data: "NOTACCEPTED///".data(using: .utf8)!, peerID: peerID)
-                }
-            }
-        }
     }
 }
 
@@ -226,6 +215,18 @@ extension MultipeerCommunication : MCSessionDelegate {
         if peerID == masterPeer && state == MCSessionState.notConnected {
             currentServiceIndex = 0
             self.connectToPeers()
+        }
+        
+        if AppDelegate.isFirstLayer && state == MCSessionState.connected {
+            DispatchQueue.global(qos: .utility).async {
+                //Thread.sleep(forTimeInterval: 1)            //wait for peer to do some stuffs (find a better solution later)
+                if self.numberOfPeers <= self.maxPeers {
+                    print("sending accepted to peer")
+                    self.sendToPeer(data: "ACCEPTED///".data(using: .utf8)!, peerID: peerID)
+                } else {
+                    self.sendToPeer(data: "NOTACCEPTED///".data(using: .utf8)!, peerID: peerID)
+                }
+            }
         }
         
         self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:

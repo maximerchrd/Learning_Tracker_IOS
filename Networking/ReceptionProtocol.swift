@@ -52,6 +52,9 @@ class ReceptionProtocol {
     
     static func receivedCORR(prefix: String) {
         DispatchQueue.main.async {
+            if AppDelegate.isFirstLayer {
+                AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToAll(data: prefix.data(using: .utf8)!)
+            }
             var questionMultipleChoice = QuestionMultipleChoice()
             var questionShortAnswer = QuestionShortAnswer()
             let id_global = Int(prefix.components(separatedBy: "///")[1])

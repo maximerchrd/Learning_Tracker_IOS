@@ -37,41 +37,45 @@ class DataConversion {
         }
         
         //prepares the question
-        questionMultipleChoice.Question = wholeText.components(separatedBy: "///")[0]
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[1])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[2])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[3])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[4])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[5])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[6])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[7])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[8])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[9])
-        questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[10])
-        questionMultipleChoice.ID = Int(wholeText.components(separatedBy: "///")[11])!
-        questionMultipleChoice.NbCorrectAnswers = Int(wholeText.components(separatedBy: "///")[12])!
-        questionMultipleChoice.Image = wholeText.components(separatedBy: "///")[15]
-        
-        //save the picture
-        let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
-        let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
-        saveImage(image: uiImage, fileName: questionMultipleChoice.Image)
-        
-        do {
-            //deal with subjects
-            let subjectsArray = wholeText.components(separatedBy: "///")[13].components(separatedBy: "|||")
-            for subject in subjectsArray {
-                questionMultipleChoice.Subjects.append(subject)
-                try DbTableSubject.insertSubject(questionID: questionMultipleChoice.ID, subject: subject)
+        if wholeText.components(separatedBy: "///").count > 15 {
+            questionMultipleChoice.Question = wholeText.components(separatedBy: "///")[0]
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[1])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[2])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[3])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[4])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[5])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[6])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[7])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[8])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[9])
+            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[10])
+            questionMultipleChoice.ID = Int(wholeText.components(separatedBy: "///")[11])!
+            questionMultipleChoice.NbCorrectAnswers = Int(wholeText.components(separatedBy: "///")[12])!
+            questionMultipleChoice.Image = wholeText.components(separatedBy: "///")[15]
+            
+            //save the picture
+            let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
+            let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
+            saveImage(image: uiImage, fileName: questionMultipleChoice.Image)
+            
+            do {
+                //deal with subjects
+                let subjectsArray = wholeText.components(separatedBy: "///")[13].components(separatedBy: "|||")
+                for subject in subjectsArray {
+                    questionMultipleChoice.Subjects.append(subject)
+                    try DbTableSubject.insertSubject(questionID: questionMultipleChoice.ID, subject: subject)
+                }
+                //deal with objectives
+                let objectivesArray = wholeText.components(separatedBy: "///")[14].components(separatedBy: "|||")
+                for objective in objectivesArray {
+                    questionMultipleChoice.Objectives.append(objective)
+                    try DbTableLearningObjective.insertLearningObjective(questionID: questionMultipleChoice.ID, objective: objective, levelCognitiveAbility: 0)
+                }
+            } catch let error {
+                print(error)
             }
-            //deal with objectives
-            let objectivesArray = wholeText.components(separatedBy: "///")[14].components(separatedBy: "|||")
-            for objective in objectivesArray {
-                questionMultipleChoice.Objectives.append(objective)
-                try DbTableLearningObjective.insertLearningObjective(questionID: questionMultipleChoice.ID, objective: objective, levelCognitiveAbility: 0)
-            }
-        } catch let error {
-            print(error)
+        } else {
+            NSLog("%@", "Problem converting bytes to question multiple choice: parsed array too short")
         }
         return questionMultipleChoice
     }
@@ -85,43 +89,47 @@ class DataConversion {
         }
         
         //prepares the question
-        questionShortAnswer.Question = wholeText.components(separatedBy: "///")[0]
-        questionShortAnswer.ID = Int(wholeText.components(separatedBy: "///")[1])!
-        questionShortAnswer.Options = wholeText.components(separatedBy: "///")[2].components(separatedBy: "|||")
-        let indexOfEmptyOption = questionShortAnswer.Options.index(of: "")
-        if indexOfEmptyOption != nil {
-            questionShortAnswer.Options.remove(at: indexOfEmptyOption!)
-        }
-        questionShortAnswer.Image = wholeText.components(separatedBy: "///")[5]
+        if wholeText.components(separatedBy: "///").count > 5 {
+            questionShortAnswer.Question = wholeText.components(separatedBy: "///")[0]
+            questionShortAnswer.ID = Int(wholeText.components(separatedBy: "///")[1])!
+            questionShortAnswer.Options = wholeText.components(separatedBy: "///")[2].components(separatedBy: "|||")
+            let indexOfEmptyOption = questionShortAnswer.Options.index(of: "")
+            if indexOfEmptyOption != nil {
+                questionShortAnswer.Options.remove(at: indexOfEmptyOption!)
+            }
+            questionShortAnswer.Image = wholeText.components(separatedBy: "///")[5]
         
-        //save the picture
-        let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
-        let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
-        saveImage(image: uiImage, fileName: questionShortAnswer.Image)
+            //save the picture
+            let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
+            let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
+            saveImage(image: uiImage, fileName: questionShortAnswer.Image)
         
-        do {
-            //deal with subjects
-            var subjectsArray = wholeText.components(separatedBy: "///")[3].components(separatedBy: "|||")
-            let indexOfEmptySubject = subjectsArray.index(of: "")
-            if indexOfEmptySubject != nil {
-                subjectsArray.remove(at: indexOfEmptySubject!)
+            do {
+                //deal with subjects
+                var subjectsArray = wholeText.components(separatedBy: "///")[3].components(separatedBy: "|||")
+                let indexOfEmptySubject = subjectsArray.index(of: "")
+                if indexOfEmptySubject != nil {
+                    subjectsArray.remove(at: indexOfEmptySubject!)
+                }
+                for subject in subjectsArray {
+                    questionShortAnswer.Subjects.append(subject)
+                    try DbTableSubject.insertSubject(questionID: questionShortAnswer.ID, subject: subject)
+                }
+                //deal with objectives
+                var objectivesArray = wholeText.components(separatedBy: "///")[4].components(separatedBy: "|||")
+                let indexOfEmptyObjective = objectivesArray.index(of: "")
+                if indexOfEmptyObjective != nil {
+                    objectivesArray.remove(at: indexOfEmptyObjective!)
+                }
+                for objective in objectivesArray {
+                    questionShortAnswer.Objectives.append(objective)
+                    try DbTableLearningObjective.insertLearningObjective(questionID: questionShortAnswer.ID, objective: objective, levelCognitiveAbility: 0)
+                }
+            } catch let error {
+                print(error)
             }
-            for subject in subjectsArray {
-                questionShortAnswer.Subjects.append(subject)
-                try DbTableSubject.insertSubject(questionID: questionShortAnswer.ID, subject: subject)
-            }
-            //deal with objectives
-            var objectivesArray = wholeText.components(separatedBy: "///")[4].components(separatedBy: "|||")
-            let indexOfEmptyObjective = objectivesArray.index(of: "")
-            if indexOfEmptyObjective != nil {
-                objectivesArray.remove(at: indexOfEmptyObjective!)
-            }
-            for objective in objectivesArray {
-                questionShortAnswer.Objectives.append(objective)
-                try DbTableLearningObjective.insertLearningObjective(questionID: questionShortAnswer.ID, objective: objective, levelCognitiveAbility: 0)
-            }
-        } catch let error {
-            print(error)
+        } else {
+        NSLog("%@", "Problem converting bytes to question multiple choice: parsed array too short")
         }
         return questionShortAnswer
     }

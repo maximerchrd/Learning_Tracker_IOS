@@ -111,7 +111,8 @@ class WifiCommunication {
                 } else if typeID.range(of:"TESYN") != nil {
                     ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
                 } else if typeID.range(of:"FRWTOPEER") != nil {
-                    let receptionString = "GOTIT///" + prefix.components(separatedBy: "///")[4]
+                    let substrings = prefix.components(separatedBy: "///")
+                    let receptionString = "GOTIT///" + substrings[substrings.count - 1]
                     self.sendData(data: receptionString.data(using: .utf8)!)
                     ReceptionProtocol.receivedFRWTOPEERFromServer(prefix: prefix)
                 } else {
