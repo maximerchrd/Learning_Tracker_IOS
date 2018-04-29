@@ -9,7 +9,7 @@
  
  protocol used for communication with MultipeerConnectivity:
  
- 1. After device connects to wifi network, search for service "koeko-app_1", if not found: start service, else: search for "koeko-app_2" etc
+ 1. Select the channel on which you want to communicate. This corresponds to the index in the services array.
  2. When device connected to wifi network (master) connects with new peer(slave): send ACCEPTED/// if max number of devices not reached
     or NOTACCEPTED/// if max number reached.
  3. IF master accepted slave: slave sends: connection string (CONN///etcetera) with personal prefix (FORWARD///PERSONALID///CONN///ETC)
@@ -147,105 +147,18 @@ class MultipeerCommunication : NSObject {
         super.init()
     }
     
-    fileprivate func findServiceNames() {
-        var serviceNumber = 0
-        for i in 0..<10 {
-            self.serviceBrowser = MCNearbyServiceBrowser(peer: self.MPComPeerId, serviceType: MPComServiceType[i])
-            self.serviceBrowser.delegate = self
-            self.serviceBrowser.startBrowsingForPeers()
-            Thread.sleep(forTimeInterval: 1)
-            if !self.peerFound {
-                self.serviceBrowser.stopBrowsingForPeers()
-                serviceNumber = serviceNumber + 1
-            } else {
-                self.serviceNamesArray.append(MPComServiceType[serviceNumber])
-                self.peerFound = false
-            }
-        }
-    }
-    
-    fileprivate func connectToService() {
-        if self.serviceNamesArray.count > 0 {
-            self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: self.MPComPeerId, discoveryInfo: nil, serviceType: self.MPComServiceType[self.currentServiceIndex])
-            self.serviceBrowser = MCNearbyServiceBrowser(peer: self.MPComPeerId, serviceType: self.MPComServiceType[self.currentServiceIndex])
-            
-            self.serviceAdvertiser.delegate = self
-            self.serviceAdvertiser.startAdvertisingPeer()
-            
-            self.serviceBrowser.delegate = self
-            self.serviceBrowser.startBrowsingForPeers()
-        } else {
-            NSLog("%@", "No service found. Try to connect directly to the server")
-        }
-    }
-    
-    func secondLayerConnectToPeers() {
-        DispatchQueue.global(qos: .utility).async {
-            var serviceNumber = 0
-            for i in self.currentServiceIndex..<10 {
-                self.serviceBrowser = MCNearbyServiceBrowser(peer: self.MPComPeerId, serviceType: self.MPComServiceType[i])
-                self.serviceBrowser.delegate = self
-                self.serviceBrowser.startBrowsingForPeers()
-                Thread.sleep(forTimeInterval: 1)
-                if !self.peerFound {
-                    break
-                } else {
-                    self.serviceBrowser.stopBrowsingForPeers()
-                    serviceNumber = serviceNumber + 1
-                }
-            }
-        }
-    }
-    
-    func firstLayerConnectToPeers() {
-        DispatchQueue.global(qos: .utility).async {
-            var serviceNumber = 0
-            for i in 0..<10 {
-                self.serviceBrowser = MCNearbyServiceBrowser(peer: self.MPComPeerId, serviceType: self.MPComServiceType[i])
-                self.serviceBrowser.delegate = self
-                self.serviceBrowser.startBrowsingForPeers()
-                Thread.sleep(forTimeInterval: 1)
-                if !self.peerFound {
-                    self.serviceBrowser.stopBrowsingForPeers()
-                } else {
-                    self.serviceBrowser.stopBrowsingForPeers()
-                    serviceNumber = serviceNumber + 1
-                    break
-                }
-            }
-            let serviceName = self.MPComServiceType[serviceNumber]
+    func connectToPeers() {
+        let serviceName = self.MPComServiceType[DbTableSettings.retrieveServiceIndex()]
 
-            self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: self.MPComPeerId, discoveryInfo: nil, serviceType: serviceName)
-            self.serviceBrowser = MCNearbyServiceBrowser(peer: self.MPComPeerId, serviceType: serviceName)
-            
-            self.serviceAdvertiser.delegate = self
-            self.serviceAdvertiser.startAdvertisingPeer()
-            
-            self.serviceBrowser.delegate = self
-            self.serviceBrowser.startBrowsingForPeers()
-        }
+        self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: self.MPComPeerId, discoveryInfo: nil, serviceType: serviceName)
+        self.serviceBrowser = MCNearbyServiceBrowser(peer: self.MPComPeerId, serviceType: serviceName)
+        
+        self.serviceAdvertiser.delegate = self
+        self.serviceAdvertiser.startAdvertisingPeer()
+        
+        self.serviceBrowser.delegate = self
+        self.serviceBrowser.startBrowsingForPeers()
     }
-    
-    /*func firstLayerConnectToPeers() {
-        DispatchQueue.global(qos: .utility).async {
-            self.findServiceNames()
-            var serviceName = self.MPComServiceType[0]
-            for i in 0..<10 {
-                if !self.serviceNamesArray.contains(self.MPComServiceType[i]) {
-                    serviceName = self.MPComServiceType[i]
-                    break
-                }
-            }
-            self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: self.MPComPeerId, discoveryInfo: nil, serviceType: serviceName)
-            self.serviceBrowser = MCNearbyServiceBrowser(peer: self.MPComPeerId, serviceType: serviceName)
-            
-            self.serviceAdvertiser.delegate = self
-            self.serviceAdvertiser.startAdvertisingPeer()
-            
-            self.serviceBrowser.delegate = self
-            self.serviceBrowser.startBrowsingForPeers()
-        }
-    }*/
     
     func stopAdvertisingAndBrowsing() {
         self.serviceAdvertiser.stopAdvertisingPeer()
@@ -312,7 +225,7 @@ extension MultipeerCommunication : MCSessionDelegate {
         //if we are disconnected from master, try to find new master
         if peerID == masterPeer && state == MCSessionState.notConnected {
             currentServiceIndex = 0
-            self.secondLayerConnectToPeers()
+            self.connectToPeers()
         }
         
         self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
@@ -350,7 +263,7 @@ extension MultipeerCommunication : MCSessionDelegate {
             self.serviceAdvertiser.stopAdvertisingPeer()
             self.serviceBrowser.stopBrowsingForPeers()
             currentServiceIndex = (currentServiceIndex + 1) % 10
-            secondLayerConnectToPeers()
+            connectToPeers()
         } else if typeID.range(of:"ACCEPTED") != nil {
             masterPeer = peerID
             var connectionString = "problem retrieving name from DB"

@@ -17,6 +17,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     @IBOutlet weak var NameTextField: UITextField!
     @IBOutlet weak var IpAddressTextField: UITextField!
     @IBOutlet weak var MultipeerConnectivitySwitch: UISwitch!
+    @IBOutlet weak var ServiceIndexSegmentedControl: UISegmentedControl!
     
     @IBAction func SwitchMultipeerConnectivity(_ sender: Any) {
         if MultipeerConnectivitySwitch.isOn {
@@ -25,15 +26,17 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             DbTableSettings.setMultipeer(multipeer: false)
         }
     }
+    
     @IBAction func SaveAndGoBackButtonPressed(_ sender: Any) {
         DbTableSettings.setNameAndMaster(name: NameTextField.text!, master: IpAddressTextField.text!)
+        DbTableSettings.setServiceIndex(serviceIndex: ServiceIndexSegmentedControl.selectedSegmentIndex)
         self.navigationController?.popViewController(animated: true)
     }
     
    
     @IBAction func DeleteQuestionsImages(_ sender: Any) {
         if deleteImages() {
-            var message = NSLocalizedString("You successfully deleted the images!", comment: "pop up message when deleting app images")
+            let message = NSLocalizedString("You successfully deleted the images!", comment: "pop up message when deleting app images")
             let alert = UIAlertController(title: NSLocalizedString("Deleting Images", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true)
@@ -61,13 +64,15 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         }
         return true
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         do {
             NameTextField.text = try DbTableSettings.retrieveName()
             IpAddressTextField.text = try DbTableSettings.retrieveMaster()
-            MultipeerConnectivitySwitch.isOn = try DbTableSettings.retrieveMultipeer()
+            MultipeerConnectivitySwitch.isOn = DbTableSettings.retrieveMultipeer()
+            ServiceIndexSegmentedControl.selectedSegmentIndex = DbTableSettings.retrieveServiceIndex()
         } catch let error {
             print(error)
         }

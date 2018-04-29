@@ -26,11 +26,13 @@ class WifiCommunication {
     }
     
     public func connectToServer() -> Bool {
+        //first stop advertising and browsing if we are trying to reinitialize connection
+        multipeerCommunication.stopAdvertisingAndBrowsing()
         if currentSSIDs().count == 0 {
             //first connect to peers if Multipeer enabled
             if (DbTableSettings.retrieveMultipeer()) {
                 AppDelegate.isFirstLayer = false
-                multipeerCommunication.secondLayerConnectToPeers()
+                multipeerCommunication.connectToPeers()
             }
             return true
         } else {
@@ -46,7 +48,9 @@ class WifiCommunication {
                     DispatchQueue.global(qos: .utility).async {
                         self.listenToServer()
                     }
-                    multipeerCommunication.firstLayerConnectToPeers()
+                    if (DbTableSettings.retrieveMultipeer()) {
+                        multipeerCommunication.connectToPeers()
+                    }
                     return true
                 case .failure(let error):
                     AppDelegate.isFirstLayer = false

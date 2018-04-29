@@ -15,6 +15,7 @@ class DbTableSettings {
     static let KEY_NAME = "name"
     static let KEY_MASTER = "master"
     static let KEY_MULTIPEER = "multipeer"
+    static let KEY_SERVICEINDEX = "serviceindex"
     static var DBName = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -36,7 +37,7 @@ class DbTableSettings {
             try dbQueue.inDatabase { db in
                 let settings = try Setting.fetchAll(db)
                 if (settings.count == 0) {
-                    let setting = Setting(name:"Anonymous", master:"192.168.1.100", MultipeerConnectivity:false)
+                    let setting = Setting(name:"Anonymous", master:"192.168.1.100", MultipeerConnectivity:false, ServiceIndex:0)
                     try setting.insert(db)
                 }
             }
@@ -90,6 +91,20 @@ class DbTableSettings {
         }
         return multipeer
     }
+    static func retrieveServiceIndex () -> Int {
+        var serviceIndex = 1
+        do {
+            let dbQueue = try DatabaseQueue(path: DBName)
+            try dbQueue.inDatabase { db in
+                let setting = try Setting.fetchOne(db)
+                serviceIndex = setting!.ServiceIndex
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+        return serviceIndex
+    }
     
     static func setNameAndMaster(name: String, master: String) {
         do {
@@ -124,6 +139,23 @@ class DbTableSettings {
             print(error.localizedDescription)
         }
     }
+    
+    static func setServiceIndex(serviceIndex: Int) {
+        do {
+            let dbQueue = try DatabaseQueue(path: DBName)
+            try dbQueue.inDatabase { db in
+                let setting = try Setting.fetchOne(db)
+                let old_name = setting!.name
+                let old_master = setting!.master
+                try db.execute(
+                    "UPDATE " + TABLE_NAME + " SET " + KEY_SERVICEINDEX + " = ? WHERE name = ? AND master = ?",
+                    arguments: [serviceIndex, old_name, old_master])
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+    }
 }
 
 class Setting : Record {
@@ -131,11 +163,13 @@ class Setting : Record {
     var name: String
     var master: String
     var MultipeerConnectivity: Bool
+    var ServiceIndex: Int
     
-    init(name: String, master: String, MultipeerConnectivity:Bool) {
+    init(name: String, master: String, MultipeerConnectivity:Bool, ServiceIndex: Int) {
         self.name = name
         self.master = master
         self.MultipeerConnectivity = MultipeerConnectivity
+        self.ServiceIndex = ServiceIndex
         super.init()
     }
     
@@ -144,6 +178,7 @@ class Setting : Record {
         name = row[DbTableSettings.KEY_NAME]
         master = row[DbTableSettings.KEY_MASTER]
         MultipeerConnectivity = row[DbTableSettings.KEY_MULTIPEER]
+        ServiceIndex = row[DbTableSettings.KEY_SERVICEINDEX]
         super.init()
     }
     
@@ -156,6 +191,7 @@ class Setting : Record {
         container[DbTableSettings.KEY_NAME] = name
         container[DbTableSettings.KEY_MASTER] = master
         container[DbTableSettings.KEY_MULTIPEER] = MultipeerConnectivity
+        container[DbTableSettings.KEY_SERVICEINDEX] = ServiceIndex
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

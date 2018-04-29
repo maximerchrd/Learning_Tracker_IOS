@@ -53,6 +53,7 @@ class GlobalDBManager {
                     t.column(DbTableSettings.KEY_NAME, .text).notNull()
                     t.column(DbTableSettings.KEY_MASTER, .text).notNull()
                     t.column(DbTableSettings.KEY_MULTIPEER, .boolean).notNull()
+                    t.column(DbTableSettings.KEY_SERVICEINDEX, .integer).notNull()
                 }
                 print("migration to v2")
             }
