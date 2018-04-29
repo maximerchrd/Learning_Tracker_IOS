@@ -221,8 +221,11 @@ class QuestionMultipleChoiceViewController: UIViewController {
                     answersArray.append((singleCheckBox.titleLabel?.text)!)
                 }
             }
-            
-            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
+            if AppDelegate.isFirstLayer {
+                AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
+            } else {
+                AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
+            }
         }
         
         //show correct/incorrect message if direct correction mode activated

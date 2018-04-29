@@ -92,6 +92,24 @@ class DbTableQuestionShortAnswer {
         }
         return questionIDs
     }
+    
+    static func getArrayOfAllQuestionsShortAnswersIDs () throws -> [String] {
+        var questionShortAnswers = [QuestionShortAnswerRecord(questionShortAnswerArg: QuestionShortAnswer())]
+        do {
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            try dbQueue.inDatabase { db in
+                questionShortAnswers = try QuestionShortAnswerRecord.fetchAll(db)
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+        var questionIDs = [String]()
+        for singleRecord in questionShortAnswers {
+            questionIDs.append(String(singleRecord.questionShortAnswer.ID))
+        }
+        return questionIDs
+    }
 }
 
 class QuestionShortAnswerRecord : Record {

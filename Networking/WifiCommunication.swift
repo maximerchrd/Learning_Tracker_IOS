@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 import SwiftSocket
+import SystemConfiguration.CaptiveNetwork
+import MultipeerConnectivity
 
 class WifiCommunication {
     let PORT_NUMBER = 9090
@@ -17,52 +19,60 @@ class WifiCommunication {
     var classroomActivityViewController: ClassroomActivityViewController?
     var pendingAnswer = "none"
     let multipeerCommunication = MultipeerCommunication()
+    var peeridUidDictionary = [String:MCPeerID]()
     
     init(classroomActivityViewControllerArg: ClassroomActivityViewController) {
         classroomActivityViewController = classroomActivityViewControllerArg
     }
     
     public func connectToServer() -> Bool {
-        //first connect to peers if Multipeer enabled
-        if (DbTableSettings.retrieveMultipeer()) {
-            multipeerCommunication.connectToPeers()
-        }
-        
-        do { try host = DbTableSettings.retrieveMaster() } catch {}
-        client = TCPClient(address: host, port: Int32(PORT_NUMBER))
-        let dataConverter = DataConverstion()
-        
-        switch client!.connect(timeout: 4) {
-        case .success:
-            switch client!.send(data: dataConverter.connection()) {
+        if currentSSIDs().count == 0 {
+            //first connect to peers if Multipeer enabled
+            if (DbTableSettings.retrieveMultipeer()) {
+                AppDelegate.isFirstLayer = false
+                multipeerCommunication.secondLayerConnectToPeers()
+            }
+            return true
+        } else {
+            do { try host = DbTableSettings.retrieveMaster() } catch {}
+            client = TCPClient(address: host, port: Int32(PORT_NUMBER))
+            let dataConverter = DataConversion()
+            
+            switch client!.connect(timeout: 4) {
             case .success:
-                //AppDelegate.wifiCommunicationSingleton = self
-                DispatchQueue.global(qos: .utility).async {
-                    self.listenToServer()
+                switch client!.send(data: dataConverter.connection()) {
+                case .success:
+                    AppDelegate.isFirstLayer = true
+                    DispatchQueue.global(qos: .utility).async {
+                        self.listenToServer()
+                    }
+                    multipeerCommunication.firstLayerConnectToPeers()
+                    return true
+                case .failure(let error):
+                    AppDelegate.isFirstLayer = false
+                    DbTableLogs.insertLog(log: error.localizedDescription)
+                    print(error)
+                    return false
                 }
-                return true
             case .failure(let error):
-                DbTableLogs.insertLog(log: error.localizedDescription)
+                AppDelegate.isFirstLayer = false
+                if error.localizedDescription.contains("3") {
+                    DbTableLogs.insertLog(log: error.localizedDescription + "(could connect to ip but server not running?)")
+                } else {
+                    DbTableLogs.insertLog(log: error.localizedDescription + "(ip not valid?)")
+                }
                 print(error)
                 return false
             }
-        case .failure(let error):
-            if error.localizedDescription.contains("3") {
-                DbTableLogs.insertLog(log: error.localizedDescription + "(could connect to ip but server not running?)")
-            } else {
-                DbTableLogs.insertLog(log: error.localizedDescription + "(ip not valid?)")
-            }
-            print(error)
-            return false
         }
     }
     
     public func listenToServer() {
         var prefix = "not initialized"
-        
         var ableToRead = true
+        
         while (self.client != nil && ableToRead) {
-            let data = self.client!.read(40, timeout: 5400)
+            let data = self.client!.read(80, timeout: 5400)
             if data != nil {
                 prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
                 if prefix.contains("oops") {
@@ -71,140 +81,35 @@ class WifiCommunication {
                     fatalError()
                 }
                 print(prefix)
-                let typeID = prefix.components(separatedBy: ":")[0]
+                let typeID = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[0]
                 
                 if typeID.range(of:"MULTQ") != nil {
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data!)
                 } else if typeID.range(of:"SHRTA") != nil {
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data!)
                 } else if typeID.range(of:"QID") != nil {
-                    DispatchQueue.main.async {
-                        var questionMultipleChoice = QuestionMultipleChoice()
-                        var questionShortAnswer = QuestionShortAnswer()
-                        if (prefix.components(separatedBy: ":")[1].contains("MLT")) {
-                            let id_global = Int(prefix.components(separatedBy: "///")[1])
-                            let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
-                            do {
-                                questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
-                                
-                                if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
-                                    self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
-                                } else {
-                                    questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
-                                    self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false, directCorrection: directCorrection)
-                                }
-                            } catch let error {
-                                print(error)
-                            }
-                        }
-                    }
+                    let receptionString = "GOTIT///" + prefix.components(separatedBy: "///")[2]
+                    self.sendData(data: receptionString.data(using: .utf8)!)
+                    ReceptionProtocol.receivedQID(prefix: prefix)
                     //forward if Multipeer activated
-                    if DbTableSettings.retrieveMultipeer() {
+                    /*if DbTableSettings.retrieveMultipeer() {
                         let wholeData = Data(bytes: data!)
-                        multipeerCommunication.send(data: wholeData)
-                    }
-
+                        multipeerCommunication.sendToAll(data: wholeData)
+                    }*/
                 } else if typeID.range(of:"EVAL") != nil {
-                    do {
-                        try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, answer: self.pendingAnswer, quantitativeEval: prefix.components(separatedBy: "///")[1])
-                    } catch let error {
-                        print(error)
-                    }
+                    ReceptionProtocol.receivedEVAL(prefix: prefix)
                 } else if typeID.range(of:"UPDEV") != nil {
-                    do {
-                        try DbTableIndividualQuestionForResult.setEvalForQuestionAndStudentIDs(eval: prefix.components(separatedBy: "///")[1], idQuestion: prefix.components(separatedBy: "///")[2])
-                    } catch let error {
-                        print(error)
-                    }
+                    ReceptionProtocol.receivedUPDEV(prefix: prefix)
                 } else if typeID.range(of:"CORR") != nil {
-                    DispatchQueue.main.async {
-                        var questionMultipleChoice = QuestionMultipleChoice()
-                        var questionShortAnswer = QuestionShortAnswer()
-                        let id_global = Int(prefix.components(separatedBy: "///")[1])
-                        do {
-                            questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
-                            
-                            if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
-                                self.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: true)
-                            } else {
-                                questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
-                                self.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: true)
-                            }
-                        } catch let error {
-                            print(error)
-                        }
-                    }
+                    ReceptionProtocol.receivedCORR(prefix: prefix)
                 } else if typeID.range(of:"TEST") != nil {
-                    if prefix.components(separatedBy: ":").count > 1 {
-                        let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-                        var dataText = [UInt8]()
-                        while dataText.count < textSize {
-                            dataText += self.client!.read(textSize) ?? [UInt8]()
-                        }
-                        let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: dataText to string yields nil"
-                        if dataTextString.contains("oops") {
-                            DbTableLogs.insertLog(log: dataTextString)
-                        }
-                        do {
-                            if dataTextString.components(separatedBy: "///").count > 3 {
-                                let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
-                                let test = dataTextString.components(separatedBy: "///")[1]
-                                let objectivesArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
-                                var objectiveIDS = [Int]()
-                                var objectives = [String]()
-                                for objectiveANDid in objectivesArray {
-                                    if objectiveANDid.count > 0 {
-                                        objectiveIDS.append(Int(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
-                                        if objectiveANDid.components(separatedBy: "/|/").count > 1 {
-                                            objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
-                                        } else {
-                                            let error = "problem reading objectives for test: objective - ID pair not complete"
-                                            print(error)
-                                            DbTableLogs.insertLog(log: error)
-                                        }
-                                    }
-                                }
-                                try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
-                                self.receivedQuestion(questionID: String(testID))
-                            } else {
-                                let error = "problem reading test: text array to short"
-                                print(error)
-                                DbTableLogs.insertLog(log: error)
-                            }
-                        } catch let error {
-                            print(error)
-                        }
-                    }
+                    ReceptionProtocol.receivedTESTFromServer(prefix: prefix)
                 } else if typeID.range(of:"TESYN") != nil {
-                    DispatchQueue.main.async {
-                        if prefix.components(separatedBy: ":").count > 2 {
-                            let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-                            let directCorrection = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-                            var dataText = [UInt8]()
-                            while dataText.count < textSize {
-                                dataText += self.client!.read(textSize) ?? [UInt8]()
-                            }
-                            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: dataText to string yields nil"
-                            if dataTextString.contains("oops") {
-                                DbTableLogs.insertLog(log: dataTextString)
-                            }
-                            if dataTextString.components(separatedBy: "///").count > 2 {
-                                let questionIDs = dataTextString.components(separatedBy: "///")
-                                var IDs = [Int]()
-                                for questionID in questionIDs {
-                                    let ID = Int(questionID) ?? -1
-                                    if ID != -1 {
-                                        IDs.append(ID)
-                                    }
-                                }
-                                self.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection)
-                            } else {
-                                let error = "problem reading test: no question ID"
-                                print(error)
-                                DbTableLogs.insertLog(log: error)
-                            }
-                        }
-                    }
+                    ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
+                } else if typeID.range(of:"FRWTOPEER") != nil {
+                    let receptionString = "GOTIT///" + prefix.components(separatedBy: "///")[4]
+                    self.sendData(data: receptionString.data(using: .utf8)!)
+                    ReceptionProtocol.receivedFRWTOPEERFromServer(prefix: prefix)
                 } else {
                     DbTableLogs.insertLog(log: "message received but prefix not supported: " + prefix)
                     print("message received but prefix not supported")
@@ -231,8 +136,18 @@ class WifiCommunication {
             let name = try DbTableSettings.retrieveName()
             message = questionType + "///" + UIDevice.current.identifierForVendor!.uuidString + "///" + name + "///"
             message += (answer + "///" + question + "///" + String(globalID));
-            client!.send(string: message)
-        } catch {}
+            if client != nil {
+                client!.send(string: message)
+            } else {
+                print("client is nil when trying to send the answer")
+            }
+        } catch let error {
+            print(error)
+        }
+    }
+    
+    public func sendData(data: Data) {
+        client!.send(data: data)
     }
     
     public func sendDisconnectionSignal() {
@@ -277,11 +192,11 @@ class WifiCommunication {
             var questionID = -1
             do {
                 if typeOfQuest.range(of: "MULTQ") != nil {
-                    let questionMult = DataConverstion.bytesToMultq(textData: dataText, imageData: dataImage)
+                    let questionMult = DataConversion.bytesToMultq(textData: dataText, imageData: dataImage)
                     questionID = questionMult.ID
                     try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
                 } else if typeOfQuest.range(of: "SHRTA") != nil {
-                    let questionShrt = DataConverstion.bytesToShrtaq(textData: dataText, imageData: dataImage)
+                    let questionShrt = DataConversion.bytesToShrtaq(textData: dataText, imageData: dataImage)
                     questionID = questionShrt.ID
                     try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
                 }
@@ -294,11 +209,26 @@ class WifiCommunication {
             if DbTableSettings.retrieveMultipeer() {
                 let wholeBytesData = prefixData + dataText + dataImage
                 let wholeData = Data(bytes: wholeBytesData)
-                multipeerCommunication.send(data: wholeData)
+                multipeerCommunication.sendToAll(data: wholeData)
             }
         } else {
             DbTableLogs.insertLog(log: "error reading questions: prefix not in correct format or buffer truncated")
             print("error reading questions: prefix not in correct format or buffer truncated")
+        }
+    }
+    
+    fileprivate func currentSSIDs() -> [String] {
+        guard let interfaceNames = CNCopySupportedInterfaces() as? [String] else {
+            return []
+        }
+        return interfaceNames.flatMap { name in
+            guard let info = CNCopyCurrentNetworkInfo(name as CFString) as? [String:AnyObject] else {
+                return nil
+            }
+            guard let ssid = info[kCNNetworkInfoKeySSID as String] as? String else {
+                return nil
+            }
+            return ssid
         }
     }
 }
