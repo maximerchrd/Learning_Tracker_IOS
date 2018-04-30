@@ -76,6 +76,7 @@ class DataConversion {
             }
         } else {
             NSLog("%@", "Problem converting bytes to question multiple choice: parsed array too short")
+            questionMultipleChoice.Question = "error"
         }
         return questionMultipleChoice
     }
@@ -129,7 +130,8 @@ class DataConversion {
                 print(error)
             }
         } else {
-        NSLog("%@", "Problem converting bytes to question multiple choice: parsed array too short")
+            NSLog("%@", "Problem converting bytes to question multiple choice: parsed array too short")
+            questionShortAnswer.Question = "error"
         }
         return questionShortAnswer
     }

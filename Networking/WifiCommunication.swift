@@ -18,7 +18,7 @@ class WifiCommunication {
     var client: TCPClient?
     var classroomActivityViewController: ClassroomActivityViewController?
     var pendingAnswer = "none"
-    let multipeerCommunication = MultipeerCommunication()
+    var multipeerCommunication = MultipeerCommunication()
     var peeridUidDictionary = [String:MCPeerID]()
     
     init(classroomActivityViewControllerArg: ClassroomActivityViewController) {
@@ -26,11 +26,9 @@ class WifiCommunication {
     }
     
     public func connectToServer() -> Bool {
-        //first stop advertising and browsing if we are trying to reinitialize connection
-        multipeerCommunication.stopAdvertisingAndBrowsing()
         if currentSSIDs().count == 0 {
             //first connect to peers if Multipeer enabled
-            if (DbTableSettings.retrieveMultipeer()) {
+            if (DbTableSettings.retrieveMultipeer() && multipeerCommunication.sessionRunning == false) {
                 AppDelegate.isFirstLayer = false
                 multipeerCommunication.connectToPeers()
             }
@@ -48,7 +46,7 @@ class WifiCommunication {
                     DispatchQueue.global(qos: .utility).async {
                         self.listenToServer()
                     }
-                    if (DbTableSettings.retrieveMultipeer()) {
+                    if (DbTableSettings.retrieveMultipeer() && multipeerCommunication.sessionRunning == false) {
                         multipeerCommunication.connectToPeers()
                     }
                     return true
@@ -199,11 +197,15 @@ class WifiCommunication {
                 if typeOfQuest.range(of: "MULTQ") != nil {
                     let questionMult = DataConversion.bytesToMultq(textData: dataText, imageData: dataImage)
                     questionID = questionMult.ID
-                    try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
+                    if questionMult.Question != "error" {
+                        try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
+                    }
                 } else if typeOfQuest.range(of: "SHRTA") != nil {
                     let questionShrt = DataConversion.bytesToShrtaq(textData: dataText, imageData: dataImage)
                     questionID = questionShrt.ID
-                    try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
+                    if questionShrt.Question != "error" {
+                        try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
+                    }
                 }
             } catch let error {
                 print(error)
@@ -219,6 +221,15 @@ class WifiCommunication {
         } else {
             DbTableLogs.insertLog(log: "error reading questions: prefix not in correct format or buffer truncated")
             print("error reading questions: prefix not in correct format or buffer truncated")
+        }
+    }
+    
+    func restartConnection() {
+        DispatchQueue.global(qos: .utility).async {
+            self.client!.close()
+            self.multipeerCommunication.stopAdvertisingAndBrowsing()
+            Thread.sleep(forTimeInterval: 3)
+            self.connectToServer()
         }
     }
     

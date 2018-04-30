@@ -25,6 +25,8 @@ class ClassroomActivityViewController: UIViewController {
                 newViewController.isCorrection = isCorr
                 newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
+            } else {
+                NSLog("%@", "Error trying to show Multiple choice question: the view controller wasn't push on a navigation controller")
             }
         }
     }
@@ -37,6 +39,8 @@ class ClassroomActivityViewController: UIViewController {
                 newViewController.isCorrection = isCorr
                 newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
+            } else {
+                NSLog("%@", "Error trying to show Short answer question: the view controller wasn't push on a navigation controller")
             }
         }
     }
@@ -92,10 +96,15 @@ class ClassroomActivityViewController: UIViewController {
             }
         }
     }
+    @IBAction func restartConnection(_ sender: Any) {
+        AppDelegate.wifiCommunicationSingleton!.restartConnection()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        AppDelegate.wifiCommunicationSingleton = WifiCommunication(classroomActivityViewControllerArg: self)
+        if AppDelegate.wifiCommunicationSingleton == nil {
+            AppDelegate.wifiCommunicationSingleton = WifiCommunication(classroomActivityViewControllerArg: self)
+        }
         if (AppDelegate.wifiCommunicationSingleton!.connectToServer()) {
             InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
         } else {
@@ -127,21 +136,4 @@ class ClassroomActivityViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-}
-
-extension ClassroomActivityViewController : MultipeerCommunicationDelegate {
-    
-    func connectedDevicesChanged(manager: MultipeerCommunication, connectedDevices: [String]) {
-        OperationQueue.main.addOperation {
-            self.InstructionsLabel.text = "Connections: \(connectedDevices)"
-        }
-    }
-    
-    func colorChanged(manager: MultipeerCommunication, colorString: String) {
-        OperationQueue.main.addOperation {
-            self.change()
-            print("Message received: \(colorString)")
-        }
-    }
-    
 }

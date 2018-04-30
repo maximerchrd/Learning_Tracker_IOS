@@ -28,8 +28,6 @@ import MultipeerConnectivity
 protocol MultipeerCommunicationDelegate {
     
     func connectedDevicesChanged(manager : MultipeerCommunication, connectedDevices: [String])
-    func colorChanged(manager : MultipeerCommunication, colorString: String)
-    
 }
 
 
@@ -45,7 +43,7 @@ class MultipeerCommunication : NSObject {
     var delegate : MultipeerCommunicationDelegate?
     
     var peerFound = false
-    var serviceNamesArray = [String]()
+    var sessionRunning = false
     var currentServiceIndex = 0
     var numberOfPeers = 0
     let maxPeers = 5
@@ -148,6 +146,7 @@ class MultipeerCommunication : NSObject {
     }
     
     func connectToPeers() {
+        sessionRunning = true
         let serviceName = self.MPComServiceType[DbTableSettings.retrieveServiceIndex()]
 
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: self.MPComPeerId, discoveryInfo: nil, serviceType: serviceName)
@@ -161,8 +160,12 @@ class MultipeerCommunication : NSObject {
     }
     
     func stopAdvertisingAndBrowsing() {
+        sessionRunning = false
         self.serviceAdvertiser.stopAdvertisingPeer()
         self.serviceBrowser.stopBrowsingForPeers()
+        session.disconnect()
+        print("number of peers: " + String(session.connectedPeers.count))
+
     }
     
     lazy var session : MCSession = {
@@ -211,26 +214,30 @@ extension MultipeerCommunication : MCSessionDelegate {
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         NSLog("%@", "peer \(peerID) didChangeState: \(state)")
-        //if we are disconnected from master, try to find new master
+        //if master is disconnected, also disconnects
         if peerID == masterPeer && state == MCSessionState.notConnected {
-            currentServiceIndex = 0
-            self.connectToPeers()
-        }
-        
-        if AppDelegate.isFirstLayer && state == MCSessionState.connected {
-            DispatchQueue.global(qos: .utility).async {
-                //Thread.sleep(forTimeInterval: 1)            //wait for peer to do some stuffs (find a better solution later)
-                if self.numberOfPeers <= self.maxPeers {
-                    print("sending accepted to peer")
-                    self.sendToPeer(data: "ACCEPTED///".data(using: .utf8)!, peerID: peerID)
-                } else {
-                    self.sendToPeer(data: "NOTACCEPTED///".data(using: .utf8)!, peerID: peerID)
+            self.stopAdvertisingAndBrowsing()
+            DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 3) {
+                AppDelegate.wifiCommunicationSingleton?.connectToServer()
+            }
+        } else {
+            if state == MCSessionState.connected {
+                if AppDelegate.isFirstLayer {
+                    print("self id:" + self.MPComPeerId.displayName + " other id: " + peerID.displayName)
+                    if self.numberOfPeers <= self.maxPeers {
+                        print("sending accepted to peer")
+                        self.sendToPeer(data: "ACCEPTED///".data(using: .utf8)!, peerID: peerID)
+                    } else {
+                        self.sendToPeer(data: "NOTACCEPTED///".data(using: .utf8)!, peerID: peerID)
+                    }
                 }
+                self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
+                    session.connectedPeers.map{$0.displayName})
+            } else {
+                self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
+                    session.connectedPeers.map{$0.displayName})
             }
         }
-        
-        self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
-            session.connectedPeers.map{$0.displayName})
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
