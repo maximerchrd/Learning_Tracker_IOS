@@ -148,7 +148,6 @@ class MultipeerCommunication : NSObject {
     }
     
     func connectToPeers() {
-        connectingGraphicalRepresentation()
         sessionRunning = true
         let serviceName = self.MPComServiceType[DbTableSettings.retrieveServiceIndex()]
 
@@ -168,6 +167,8 @@ class MultipeerCommunication : NSObject {
         self.serviceAdvertiser.stopAdvertisingPeer()
         self.serviceBrowser.stopBrowsingForPeers()
         session.disconnect()
+        peersNamesArray.removeAll()
+        stopConnectingGraphicalRepresentation()
     }
     
     func connectingGraphicalRepresentation() {

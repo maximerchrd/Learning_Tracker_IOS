@@ -23,7 +23,7 @@ class ClassroomActivityViewController: UIViewController {
     public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool, directCorrection: Int = 0) {
         // Safe Push VC
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as? QuestionMultipleChoiceViewController {
-            if let navigator = navigationController {
+            if let navigator = self.navigationController {
                 newViewController.questionMultipleChoice = question
                 newViewController.isCorrection = isCorr
                 newViewController.directCorrection = directCorrection
@@ -115,6 +115,8 @@ class ClassroomActivityViewController: UIViewController {
         super.viewDidLoad()
         if AppDelegate.wifiCommunicationSingleton == nil {
             AppDelegate.wifiCommunicationSingleton = WifiCommunication(classroomActivityViewControllerArg: self)
+        } else {
+            AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController = self
         }
         if (AppDelegate.wifiCommunicationSingleton!.connectToServer()) {
             InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
