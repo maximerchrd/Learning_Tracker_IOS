@@ -50,6 +50,7 @@ class MultipeerCommunication : NSObject {
     var masterPeer = MCPeerID(displayName: UIDevice.current.name)
     var pendingAnswer = "none"
     var connected = false
+    var peersNamesArray = [String: Int]()
     
     public func sendAnswerToServer(answer: String, globalID: Int, questionType: String) {
         pendingAnswer = answer
@@ -147,6 +148,7 @@ class MultipeerCommunication : NSObject {
     }
     
     func connectToPeers() {
+        connectingGraphicalRepresentation()
         sessionRunning = true
         let serviceName = self.MPComServiceType[DbTableSettings.retrieveServiceIndex()]
 
@@ -169,13 +171,16 @@ class MultipeerCommunication : NSObject {
     }
     
     func connectingGraphicalRepresentation() {
-        DispatchQueue.global(qos: .utility).async {
-            
-            while !self.connected {
-                
-                DispatchQueue.main.async {
-                    
-                }
+        DispatchQueue.main.async {
+            if !(AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.CrownImageView.isAnimating)! {
+                AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.CrownImageView.startAnimating()
+            }
+        }
+    }
+    func stopConnectingGraphicalRepresentation() {
+        DispatchQueue.main.async {
+            if (AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.CrownImageView.isAnimating)! {
+                AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.CrownImageView.stopAnimating()
             }
         }
     }
@@ -226,16 +231,21 @@ extension MultipeerCommunication : MCSessionDelegate {
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         NSLog("%@", "peer \(peerID) didChangeState: \(state.rawValue)")
+        if peersNamesArray[peerID.displayName] != nil {
+            peersNamesArray[peerID.displayName] = state.rawValue
+        } else {
+            peersNamesArray[peerID.displayName] = state.rawValue
+        }
         self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
             session.connectedPeers.map{$0.displayName})
         //if master is disconnected, also disconnects
-        if peerID == masterPeer && state == MCSessionState.notConnected {
+        /*if peerID == masterPeer && state == MCSessionState.notConnected {
             NSLog("%@", "disconnected from master peer: trying to reconnect")
             self.stopAdvertisingAndBrowsing()
             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 3) {
                 AppDelegate.wifiCommunicationSingleton?.connectToServer()
             }
-        } else {
+        } else {*/
             if state == MCSessionState.connected {
                 if AppDelegate.isFirstLayer {
                     print("self id:" + self.MPComPeerId.displayName + " other id: " + peerID.displayName)
@@ -247,6 +257,17 @@ extension MultipeerCommunication : MCSessionDelegate {
                     }
                 }
             }
+        //}
+        var allPeersConnected = true
+        for peer in peersNamesArray {
+            if peer.value != 2 {
+                allPeersConnected = false
+            }
+        }
+        if allPeersConnected {
+            stopConnectingGraphicalRepresentation()
+        } else {
+            connectingGraphicalRepresentation()
         }
     }
     
