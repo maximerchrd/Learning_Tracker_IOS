@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import MessageUI
 
-class SettingsViewController: UIViewController, MFMailComposeViewControllerDelegate {
+class SettingsViewController: UIViewController, MFMailComposeViewControllerDelegate, UITextFieldDelegate {
     
     var logs = [String]()
     
@@ -73,6 +73,8 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             IpAddressTextField.text = try DbTableSettings.retrieveMaster()
             MultipeerConnectivitySwitch.isOn = DbTableSettings.retrieveMultipeer()
             ServiceIndexSegmentedControl.selectedSegmentIndex = DbTableSettings.retrieveServiceIndex()
+            self.NameTextField.delegate = self;
+            self.IpAddressTextField.delegate = self;
         } catch let error {
             print(error)
         }
@@ -136,5 +138,11 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
                 print(error)
             }
         }
+    }
+    
+    //function enabling dismissing of keyboard when return pressed
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return false
     }
 }

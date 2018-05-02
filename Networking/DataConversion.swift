@@ -161,9 +161,21 @@ class DataConversion {
                 do {
                     if typeOfQuest.range(of: "MULTQ") != nil {
                         let questionMult = DataConversion.bytesToMultq(textData: [UInt8](dataText), imageData: [UInt8](dataImage))
+                        
+                        //send reception proof
+                        var gotit = "GOTIT///" + String(questionMult.ID) + "///"
+                        gotit += UIDevice.current.identifierForVendor!.uuidString + "///"
+                        AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: gotit.data(using: .utf8)!, peerID: (AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.masterPeer)!)
+                        
                         try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
                     } else if typeOfQuest.range(of: "SHRTA") != nil {
                         let questionShrt = DataConversion.bytesToShrtaq(textData: [UInt8](dataText), imageData: [UInt8](dataImage))
+                        
+                        //send reception proof
+                        var gotit = "GOTIT///" + String(questionShrt.ID) + "///"
+                        gotit += UIDevice.current.identifierForVendor!.uuidString + "///"
+                        AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: gotit.data(using: .utf8)!, peerID: (AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.masterPeer)!)
+                        
                         try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
                     }
                 } catch let error {

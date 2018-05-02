@@ -15,6 +15,8 @@ class ClassroomActivityViewController: UIViewController {
     static var navQuestionShortAnswerViewController: QuestionShortAnswerViewController?
     
     @IBOutlet weak var InstructionsLabel: UILabel!
+    @IBOutlet weak var RestartConnectionButton: UIButton!
+    var stopConnectionButton = true
     
     
     public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool, directCorrection: Int = 0) {
@@ -26,7 +28,7 @@ class ClassroomActivityViewController: UIViewController {
                 newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
             } else {
-                NSLog("%@", "Error trying to show Multiple choice question: the view controller wasn't push on a navigation controller")
+                NSLog("%@", "Error trying to show Multiple choice question: the view controller wasn't pushed on a navigation controller")
             }
         }
     }
@@ -40,7 +42,7 @@ class ClassroomActivityViewController: UIViewController {
                 newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
             } else {
-                NSLog("%@", "Error trying to show Short answer question: the view controller wasn't push on a navigation controller")
+                NSLog("%@", "Error trying to show Short answer question: the view controller wasn't pushed on a navigation controller")
             }
         }
     }
@@ -97,7 +99,15 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     @IBAction func restartConnection(_ sender: Any) {
-        AppDelegate.wifiCommunicationSingleton!.restartConnection()
+        if stopConnectionButton {
+            AppDelegate.wifiCommunicationSingleton!.stopConnection()
+            stopConnectionButton = false
+            RestartConnectionButton.setTitle("Start Connection", for: .normal)
+        } else {
+            AppDelegate.wifiCommunicationSingleton!.startConnection()
+            stopConnectionButton = true
+            RestartConnectionButton.setTitle("Stop Connection", for: .normal)
+        }
     }
     
     override func viewDidLoad() {

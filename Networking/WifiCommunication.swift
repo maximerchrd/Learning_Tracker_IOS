@@ -164,7 +164,7 @@ class WifiCommunication {
     }
     
     public func receivedQuestion(questionID: String) {
-        let message = "GOTIT///" + questionID + "///"
+        let message = "GOTIT///" + questionID + "///" + UIDevice.current.identifierForVendor!.uuidString + "///"
         print(message)
         client!.send(string: message)
     }
@@ -224,13 +224,15 @@ class WifiCommunication {
         }
     }
     
-    func restartConnection() {
-        DispatchQueue.global(qos: .utility).async {
+    func stopConnection() {
+        if self.client != nil {
             self.client!.close()
-            self.multipeerCommunication.stopAdvertisingAndBrowsing()
-            Thread.sleep(forTimeInterval: 3)
-            self.connectToServer()
         }
+        self.multipeerCommunication.stopAdvertisingAndBrowsing()
+    }
+    
+    func startConnection() {
+        self.connectToServer()
     }
     
     fileprivate func currentSSIDs() -> [String] {

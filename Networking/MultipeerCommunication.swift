@@ -49,6 +49,7 @@ class MultipeerCommunication : NSObject {
     let maxPeers = 5
     var masterPeer = MCPeerID(displayName: UIDevice.current.name)
     var pendingAnswer = "none"
+    var connected = false
     
     public func sendAnswerToServer(answer: String, globalID: Int, questionType: String) {
         pendingAnswer = answer
@@ -157,6 +158,7 @@ class MultipeerCommunication : NSObject {
         
         self.serviceBrowser.delegate = self
         self.serviceBrowser.startBrowsingForPeers()
+        print("trying to connect to peers on service : " + serviceName)
     }
     
     func stopAdvertisingAndBrowsing() {
@@ -164,12 +166,22 @@ class MultipeerCommunication : NSObject {
         self.serviceAdvertiser.stopAdvertisingPeer()
         self.serviceBrowser.stopBrowsingForPeers()
         session.disconnect()
-        print("number of peers: " + String(session.connectedPeers.count))
-
+    }
+    
+    func connectingGraphicalRepresentation() {
+        DispatchQueue.global(qos: .utility).async {
+            
+            while !self.connected {
+                
+                DispatchQueue.main.async {
+                    
+                }
+            }
+        }
     }
     
     lazy var session : MCSession = {
-        let session = MCSession(peer: self.MPComPeerId, securityIdentity: nil, encryptionPreference: .required)
+        let session = MCSession(peer: self.MPComPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.none)
         session.delegate = self
         return session
     }()
@@ -213,9 +225,12 @@ extension MultipeerCommunication : MCNearbyServiceBrowserDelegate {
 extension MultipeerCommunication : MCSessionDelegate {
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        NSLog("%@", "peer \(peerID) didChangeState: \(state)")
+        NSLog("%@", "peer \(peerID) didChangeState: \(state.rawValue)")
+        self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
+            session.connectedPeers.map{$0.displayName})
         //if master is disconnected, also disconnects
         if peerID == masterPeer && state == MCSessionState.notConnected {
+            NSLog("%@", "disconnected from master peer: trying to reconnect")
             self.stopAdvertisingAndBrowsing()
             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 3) {
                 AppDelegate.wifiCommunicationSingleton?.connectToServer()
@@ -231,11 +246,6 @@ extension MultipeerCommunication : MCSessionDelegate {
                         self.sendToPeer(data: "NOTACCEPTED///".data(using: .utf8)!, peerID: peerID)
                     }
                 }
-                self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
-                    session.connectedPeers.map{$0.displayName})
-            } else {
-                self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
-                    session.connectedPeers.map{$0.displayName})
             }
         }
     }
@@ -268,10 +278,11 @@ extension MultipeerCommunication : MCSessionDelegate {
         } else if typeID.range(of:"TESYN") != nil {
             ReceptionProtocol.receivedTESYNFromPeer(data: data)
         } else if typeID.range(of:"NOTACCEPTED") != nil {
-            self.serviceAdvertiser.stopAdvertisingPeer()
+            print("received NOT ACCEPTED. Do smth here if we want to automatically change the channel")
+            /*self.serviceAdvertiser.stopAdvertisingPeer()
             self.serviceBrowser.stopBrowsingForPeers()
             currentServiceIndex = (currentServiceIndex + 1) % 10
-            connectToPeers()
+            connectToPeers()*/
         } else if typeID.range(of:"ACCEPTED") != nil {
             masterPeer = peerID
             var connectionString = "problem retrieving name from DB"
