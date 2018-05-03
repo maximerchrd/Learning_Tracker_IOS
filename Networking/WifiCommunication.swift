@@ -95,9 +95,9 @@ class WifiCommunication {
                     ReceptionProtocol.receivedQID(prefix: prefix)
                     //forward if Multipeer activated
                     /*if DbTableSettings.retrieveMultipeer() {
-                        let wholeData = Data(bytes: data!)
-                        multipeerCommunication.sendToAll(data: wholeData)
-                    }*/
+                     let wholeData = Data(bytes: data!)
+                     multipeerCommunication.sendToAll(data: wholeData)
+                     }*/
                 } else if typeID.range(of:"EVAL") != nil {
                     ReceptionProtocol.receivedEVAL(prefix: prefix)
                 } else if typeID.range(of:"UPDEV") != nil {
@@ -150,14 +150,18 @@ class WifiCommunication {
     }
     
     public func sendData(data: Data) {
-        client!.send(data: data)
+        if client != nil {
+            client!.send(data: data)
+        }
     }
     
     public func sendDisconnectionSignal() {
         print("student is leaving the task")
         do {
             let message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///"
-            client!.send(string: message)
+            if client != nil {
+                client!.send(string: message)
+            }
         } catch let error {
             print(error)
         }

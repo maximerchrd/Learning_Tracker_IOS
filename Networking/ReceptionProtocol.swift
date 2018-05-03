@@ -12,6 +12,31 @@ import UIKit
 
 class ReceptionProtocol {
     static func receivedQID(prefix: String) {
+        if prefix.components(separatedBy: ":").count > 1 {
+            prefix.replacingOccurrences(of: "\\O", with: "")
+            var textSizeString = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[2]
+            textSizeString = String(textSizeString.filter { "01234567890.".contains($0) })
+            let textSize = Int(textSizeString) ?? 0
+            
+            var dataText = [UInt8]()
+            if AppDelegate.wifiCommunicationSingleton?.client != nil {
+                while dataText.count < textSize ?? 0 {
+                    dataText += AppDelegate.wifiCommunicationSingleton?.client!.read(textSize - dataText.count) ?? [UInt8]()
+                }
+                let stringForForwarding = String(bytes: dataText, encoding: .utf8)
+                var peersUUIDs = stringForForwarding?.components(separatedBy: "///") ?? [String]()
+                peersUUIDs = peersUUIDs.filter(){$0 != "FRWTOPEER"}
+                peersUUIDs = peersUUIDs.filter(){$0 != ""}
+                
+                for uid in peersUUIDs {
+                    if AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid] != nil {
+                        AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: prefix.data(using: .utf8)!, peerID: (AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid])!)
+                    }
+                }
+            } else {
+                NSLog("%@", "We want to read from tcp client but it is nil")
+            }
+        }
         DispatchQueue.main.async {
             var questionMultipleChoice = QuestionMultipleChoice()
             var questionShortAnswer = QuestionShortAnswer()
@@ -209,7 +234,7 @@ class ReceptionProtocol {
     
     static func receivedFRWTOPEERFromServer(prefix: String) {
         if prefix.components(separatedBy: ":").count > 2 {
-            let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+            let textSize = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
             var dataText = [UInt8]()
             while dataText.count < textSize {
                 dataText += AppDelegate.wifiCommunicationSingleton?.client!.read(textSize) ?? [UInt8]()
@@ -237,7 +262,11 @@ class ReceptionProtocol {
             let index = prefix.index(prefix.startIndex, offsetBy: (substrings[0].count + substrings[1].count + 6))
             let stringToForward = prefix[index...]
             print("stringToForward: " + stringToForward)
-            AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: stringToForward.data(using: .utf8)!, peerID: (AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid])!)
+            if AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid] != nil && stringToForward.data(using: .utf8) != nil {
+                AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: stringToForward.data(using: .utf8)!, peerID: (AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid])!)
+            } else {
+                NSLog("%@", "Error forwarding \(prefix), data and/or peerID is nil.")
+            }
         }
     }
     
