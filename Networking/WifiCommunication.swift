@@ -18,53 +18,47 @@ class WifiCommunication {
     var client: TCPClient?
     var classroomActivityViewController: ClassroomActivityViewController?
     var pendingAnswer = "none"
-    var multipeerCommunication = MultipeerCommunication()
     var peeridUidDictionary = [String:MCPeerID]()
     
     init(classroomActivityViewControllerArg: ClassroomActivityViewController) {
         classroomActivityViewController = classroomActivityViewControllerArg
     }
     
-    public func connectToServer() -> Bool {
-        if currentSSIDs().count == 0 {
-            //first connect to peers if Multipeer enabled
-            if (DbTableSettings.retrieveMultipeer() && multipeerCommunication.sessionRunning == false) {
-                AppDelegate.isFirstLayer = false
-                multipeerCommunication.connectToPeers()
-            }
-            return true
-        } else {
-            do { try host = DbTableSettings.retrieveMaster() } catch {}
-            client = TCPClient(address: host, port: Int32(PORT_NUMBER))
-            let dataConverter = DataConversion()
-            
-            switch client!.connect(timeout: 4) {
-            case .success:
-                switch client!.send(data: dataConverter.connection()) {
+    public func connectToServer() {
+        DispatchQueue.global(qos: .utility).async {
+            //first check if we are connected to a wifi network
+            if self.currentSSIDs().count == 0 {
+                self.displayInstructions(instructionIndex: 0)
+            } else {
+                do { try self.host = DbTableSettings.retrieveMaster() } catch {}
+                self.client = TCPClient(address: self.host, port: Int32(self.PORT_NUMBER))
+                let dataConverter = DataConversion()
+                
+                switch self.client!.connect(timeout: 4) {
                 case .success:
-                    AppDelegate.isFirstLayer = true
-                    DispatchQueue.global(qos: .utility).async {
-                        self.listenToServer()
+                    switch self.client!.send(data: dataConverter.connection()) {
+                    case .success:
+                        self.displayInstructions(instructionIndex: 1)
+                        AppDelegate.isFirstLayer = true
+                        DispatchQueue.global(qos: .utility).async {
+                            self.listenToServer()
+                        }
+                    case .failure(let error):
+                        self.displayInstructions(instructionIndex: 2)
+                        AppDelegate.isFirstLayer = false
+                        DbTableLogs.insertLog(log: error.localizedDescription)
+                        print(error)
                     }
-                    if (DbTableSettings.retrieveMultipeer() && multipeerCommunication.sessionRunning == false) {
-                        multipeerCommunication.connectToPeers()
-                    }
-                    return true
                 case .failure(let error):
+                    self.displayInstructions(instructionIndex: 2)
                     AppDelegate.isFirstLayer = false
-                    DbTableLogs.insertLog(log: error.localizedDescription)
+                    if error.localizedDescription.contains("3") {
+                        DbTableLogs.insertLog(log: error.localizedDescription + "(could connect to ip but server not running?)")
+                    } else {
+                        DbTableLogs.insertLog(log: error.localizedDescription + "(ip not valid?)")
+                    }
                     print(error)
-                    return false
                 }
-            case .failure(let error):
-                AppDelegate.isFirstLayer = false
-                if error.localizedDescription.contains("3") {
-                    DbTableLogs.insertLog(log: error.localizedDescription + "(could connect to ip but server not running?)")
-                } else {
-                    DbTableLogs.insertLog(log: error.localizedDescription + "(ip not valid?)")
-                }
-                print(error)
-                return false
             }
         }
     }
@@ -108,11 +102,6 @@ class WifiCommunication {
                     ReceptionProtocol.receivedTESTFromServer(prefix: prefix)
                 } else if typeID.range(of:"TESYN") != nil {
                     ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
-                } else if typeID.range(of:"FRWTOPEER") != nil {
-                    let substrings = prefix.components(separatedBy: "///")
-                    let receptionString = "GOTIT///" + substrings[substrings.count - 1]
-                    self.sendData(data: receptionString.data(using: .utf8)!)
-                    ReceptionProtocol.receivedFRWTOPEERFromServer(prefix: prefix)
                 } else {
                     DbTableLogs.insertLog(log: "message received but prefix not supported: " + prefix)
                     print("message received but prefix not supported")
@@ -215,13 +204,6 @@ class WifiCommunication {
                 print(error)
             }
             receivedQuestion(questionID: String(questionID))
-            
-            //forward if Multipeer activated
-            if DbTableSettings.retrieveMultipeer() {
-                let wholeBytesData = prefixData + dataText + dataImage
-                let wholeData = Data(bytes: wholeBytesData)
-                multipeerCommunication.sendToAll(data: wholeData)
-            }
         } else {
             DbTableLogs.insertLog(log: "error reading questions: prefix not in correct format or buffer truncated")
             print("error reading questions: prefix not in correct format or buffer truncated")
@@ -232,11 +214,25 @@ class WifiCommunication {
         if self.client != nil {
             self.client!.close()
         }
-        self.multipeerCommunication.stopAdvertisingAndBrowsing()
     }
     
     func startConnection() {
-        self.connectToServer()
+        DispatchQueue.global(qos: .utility).async {
+            self.connectToServer()
+        }
+    }
+    
+    fileprivate func displayInstructions(instructionIndex: Int) {
+        DispatchQueue.main.async {
+            switch instructionIndex {
+            case 0:
+                self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND CONNECT TO THE RIGHT WIFI NETWORK", comment: "instruction NO NETWORK after the KEEP CALM")
+            case 1:
+                self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
+            default:
+                self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")
+            }
+        }
     }
     
     fileprivate func currentSSIDs() -> [String] {

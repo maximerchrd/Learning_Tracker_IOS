@@ -16,34 +16,16 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     
     @IBOutlet weak var NameTextField: UITextField!
     @IBOutlet weak var IpAddressTextField: UITextField!
-    @IBOutlet weak var MultipeerConnectivitySwitch: UISwitch!
-    @IBOutlet weak var ServiceIndexSegmentedControl: UISegmentedControl!
     
-    @IBAction func SwitchMultipeerConnectivity(_ sender: Any) {
-        if MultipeerConnectivitySwitch.isOn {
-            DbTableSettings.setMultipeer(multipeer: true)
-        } else {
-            DbTableSettings.setMultipeer(multipeer: false)
-        }
-    }
+
     
     @IBAction func SaveAndGoBackButtonPressed(_ sender: Any) {
         DbTableSettings.setNameAndMaster(name: NameTextField.text!, master: IpAddressTextField.text!)
-        DbTableSettings.setServiceIndex(serviceIndex: ServiceIndexSegmentedControl.selectedSegmentIndex)
         self.navigationController?.popViewController(animated: true)
     }
     
    
-    @IBAction func DeleteQuestionsImages(_ sender: Any) {
-        if deleteImages() {
-            let message = NSLocalizedString("You successfully deleted the images!", comment: "pop up message when deleting app images")
-            let alert = UIAlertController(title: NSLocalizedString("Deleting Images", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            self.present(alert, animated: true)
-        } else {
-            
-        }
-    }
+
     
     func deleteImages() -> Bool {
         guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else {
@@ -71,8 +53,6 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         do {
             NameTextField.text = try DbTableSettings.retrieveName()
             IpAddressTextField.text = try DbTableSettings.retrieveMaster()
-            MultipeerConnectivitySwitch.isOn = DbTableSettings.retrieveMultipeer()
-            ServiceIndexSegmentedControl.selectedSegmentIndex = DbTableSettings.retrieveServiceIndex()
             self.NameTextField.delegate = self;
             self.IpAddressTextField.delegate = self;
         } catch let error {

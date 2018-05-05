@@ -133,11 +133,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
         //first send answer to server
         if !isCorrection {
-            if AppDelegate.isFirstLayer {
-                AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
-            } else {
-                AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
-            }
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
         }
         
         //show correct/incorrect message if direct correction mode activated

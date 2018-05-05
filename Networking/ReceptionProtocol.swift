@@ -12,31 +12,6 @@ import UIKit
 
 class ReceptionProtocol {
     static func receivedQID(prefix: String) {
-        if prefix.components(separatedBy: ":").count > 1 {
-            prefix.replacingOccurrences(of: "\\O", with: "")
-            var textSizeString = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[2]
-            textSizeString = String(textSizeString.filter { "01234567890.".contains($0) })
-            let textSize = Int(textSizeString) ?? 0
-            
-            var dataText = [UInt8]()
-            if AppDelegate.wifiCommunicationSingleton?.client != nil {
-                while dataText.count < textSize ?? 0 {
-                    dataText += AppDelegate.wifiCommunicationSingleton?.client!.read(textSize - dataText.count) ?? [UInt8]()
-                }
-                let stringForForwarding = String(bytes: dataText, encoding: .utf8)
-                var peersUUIDs = stringForForwarding?.components(separatedBy: "///") ?? [String]()
-                peersUUIDs = peersUUIDs.filter(){$0 != "FRWTOPEER"}
-                peersUUIDs = peersUUIDs.filter(){$0 != ""}
-                
-                for uid in peersUUIDs {
-                    if AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid] != nil {
-                        AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: prefix.data(using: .utf8)!, peerID: (AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid])!)
-                    }
-                }
-            } else {
-                NSLog("%@", "We want to read from tcp client but it is nil")
-            }
-        }
         DispatchQueue.main.async {
             var questionMultipleChoice = QuestionMultipleChoice()
             var questionShortAnswer = QuestionShortAnswer()
@@ -77,9 +52,6 @@ class ReceptionProtocol {
     
     static func receivedCORR(prefix: String) {
         DispatchQueue.main.async {
-            if AppDelegate.isFirstLayer {
-                AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToAll(data: prefix.data(using: .utf8)!)
-            }
             var questionMultipleChoice = QuestionMultipleChoice()
             var questionShortAnswer = QuestionShortAnswer()
             let id_global = Int(prefix.components(separatedBy: "///")[1])
@@ -141,39 +113,6 @@ class ReceptionProtocol {
         }
     }
     
-    static func receivedTESTFromPeer(data: Data) {
-        do {
-            let dataTextString = String(data: data, encoding: .utf8)!
-            if dataTextString.components(separatedBy: "///").count > 3 {
-                let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
-                let test = dataTextString.components(separatedBy: "///")[1]
-                let objectivesArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
-                var objectiveIDS = [Int]()
-                var objectives = [String]()
-                for objectiveANDid in objectivesArray {
-                    if objectiveANDid.count > 0 {
-                        objectiveIDS.append(Int(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
-                        if objectiveANDid.components(separatedBy: "/|/").count > 1 {
-                            objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
-                        } else {
-                            let error = "problem reading objectives for test from peer: objective - ID pair not complete"
-                            print(error)
-                            DbTableLogs.insertLog(log: error)
-                        }
-                    }
-                }
-                try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
-                AppDelegate.wifiCommunicationSingleton?.receivedQuestion(questionID: String(testID))
-            } else {
-                let error = "problem reading test from peer: text array to short"
-                print(error)
-                DbTableLogs.insertLog(log: error)
-            }
-        } catch let error {
-            print(error)
-        }
-    }
-    
     static func receivedTESYNFromServer(prefix: String) {
         DispatchQueue.main.async {
             if prefix.components(separatedBy: ":").count > 2 {
@@ -204,90 +143,5 @@ class ReceptionProtocol {
                 }
             }
         }
-    }
-    
-    static func receivedTESYNFromPeer(data: Data) {
-        DispatchQueue.main.async {
-            let dataTextString = String(bytes: data, encoding: .utf8) ?? "oops, problem reading test from peer: data to string yields nil"
-            let prefix = dataTextString.components(separatedBy: "///")[0]
-            let directCorrection = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-            if dataTextString.contains("oops") {
-                DbTableLogs.insertLog(log: dataTextString)
-            }
-            if dataTextString.components(separatedBy: "///").count > 2 {
-                let questionIDs = dataTextString.components(separatedBy: "///")
-                var IDs = [Int]()
-                for questionID in questionIDs {
-                    let ID = Int(questionID) ?? -1
-                    if ID != -1 {
-                        IDs.append(ID)
-                    }
-                }
-                AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection)
-            } else {
-                let error = "problem reading test: no question ID"
-                print(error)
-                DbTableLogs.insertLog(log: error)
-            }
-        }
-    }
-    
-    static func receivedFRWTOPEERFromServer(prefix: String) {
-        if prefix.components(separatedBy: ":").count > 2 {
-            let textSize = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-            var dataText = [UInt8]()
-            while dataText.count < textSize {
-                dataText += AppDelegate.wifiCommunicationSingleton?.client!.read(textSize) ?? [UInt8]()
-            }
-            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: data to string yields nil"
-            if dataTextString.contains("oops") {
-                DbTableLogs.insertLog(log: dataTextString)
-            }
-            if dataTextString.components(separatedBy: "///").count > 2 {
-                let substrings = dataTextString.components(separatedBy: "///")
-                let uid = substrings[1]
-                var stringToForward = ""
-                for i in 2..<substrings.count {
-                    stringToForward.append(substrings[i] + "///")
-                }
-                AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: stringToForward.data(using: .utf8)!, peerID: (AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid])!)
-            } else {
-                let error = "problem reading test: no question ID"
-                print(error)
-                DbTableLogs.insertLog(log: error)
-            }
-        } else {
-            let substrings = prefix.components(separatedBy: "///")
-            let uid = substrings[1]
-            let index = prefix.index(prefix.startIndex, offsetBy: (substrings[0].count + substrings[1].count + 6))
-            let stringToForward = prefix[index...]
-            print("stringToForward: " + stringToForward)
-            if AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid] != nil && stringToForward.data(using: .utf8) != nil {
-                AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: stringToForward.data(using: .utf8)!, peerID: (AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[uid])!)
-            } else {
-                NSLog("%@", "Error forwarding \(prefix), data and/or peerID is nil.")
-            }
-        }
-    }
-    
-    static func receivedCONNFromPEER(prefix: String, data: Data, peerID: MCPeerID) {
-        AppDelegate.wifiCommunicationSingleton?.peeridUidDictionary[prefix.components(separatedBy: "///")[1]] = peerID
-        let forwardPrefix = "FORWARD///" + UIDevice.current.identifierForVendor!.uuidString + "///"
-        let dataToForward = forwardPrefix.data(using: .utf8)! + data
-        AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendToPeer(data: dataToForward, peerID: (AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.masterPeer)!)
-        
-        //take note of the questions present on the device
-        let text = String(data: dataToForward, encoding: .utf8)!
-        if text.components(separatedBy: "///").count > 2 {
-            let questionsIDs = text.components(separatedBy: "///")[2].components(separatedBy: "|")
-            AppDelegate.questionsOnDevices[text.components(separatedBy: "///")[1]] = questionsIDs
-        } else {
-            let error = "problem reading Connection string: data truncated"
-            print(error)
-            DbTableLogs.insertLog(log: error)
-        }
-        
-        //send the new questions to peer
-        AppDelegate.wifiCommunicationSingleton?.multipeerCommunication.sendQuestionsToPeer(uuid: text.components(separatedBy: "///")[1])
     }
 }

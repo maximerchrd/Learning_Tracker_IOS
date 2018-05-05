@@ -118,23 +118,10 @@ class ClassroomActivityViewController: UIViewController {
         } else {
             AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController = self
         }
-        if (AppDelegate.wifiCommunicationSingleton!.connectToServer()) {
-            InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
-        } else {
-            InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")
-        }
+        AppDelegate.wifiCommunicationSingleton!.connectToServer()
+        
         CrownImageView.animationImages = [#imageLiteral(resourceName: "crown_1"), #imageLiteral(resourceName: "crown_2"), #imageLiteral(resourceName: "crown_3"), #imageLiteral(resourceName: "crown_4"), #imageLiteral(resourceName: "crown_5"), #imageLiteral(resourceName: "crown_6"), #imageLiteral(resourceName: "crown_7")]
         CrownImageView.animationDuration = 1
-    }
-    
-    func change() {
-        UIView.animate(withDuration: 0.2) {
-            if self.view.backgroundColor == .red {
-                self.view.backgroundColor = .yellow
-            } else {
-                self.view.backgroundColor = .red
-            }
-        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
