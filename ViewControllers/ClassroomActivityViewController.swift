@@ -17,7 +17,6 @@ class ClassroomActivityViewController: UIViewController {
     @IBOutlet weak var InstructionsLabel: UILabel!
     @IBOutlet weak var RestartConnectionButton: UIButton!
     @IBOutlet weak var CrownImageView: UIImageView!
-    var stopConnectionButton = true
     
     
     public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool, directCorrection: Int = 0) {
@@ -100,14 +99,10 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     @IBAction func restartConnection(_ sender: Any) {
-        if stopConnectionButton {
+        if (RestartConnectionButton.titleLabel?.text?.contains("Stop"))! {
             AppDelegate.wifiCommunicationSingleton!.stopConnection()
-            stopConnectionButton = false
-            RestartConnectionButton.setTitle("Start Connection", for: .normal)
         } else {
             AppDelegate.wifiCommunicationSingleton!.startConnection()
-            stopConnectionButton = true
-            RestartConnectionButton.setTitle("Stop Connection", for: .normal)
         }
     }
     

@@ -175,6 +175,7 @@ class MultipeerCommunication : NSObject {
         DispatchQueue.main.async {
             if !(AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.CrownImageView.isAnimating)! {
                 AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.CrownImageView.startAnimating()
+                AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.RestartConnectionButton.setTitle("Stop Connection", for: .normal)
             }
         }
     }
@@ -182,6 +183,7 @@ class MultipeerCommunication : NSObject {
         DispatchQueue.main.async {
             if (AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.CrownImageView.isAnimating)! {
                 AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.CrownImageView.stopAnimating()
+                AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.RestartConnectionButton.setTitle("Start Connection", for: .normal)
             }
         }
     }
