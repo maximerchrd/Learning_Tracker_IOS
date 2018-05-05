@@ -84,14 +84,7 @@ class WifiCommunication {
                 } else if typeID.range(of:"SHRTA") != nil {
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data!)
                 } else if typeID.range(of:"QID") != nil {
-                    let receptionString = "GOTIT///" + prefix.components(separatedBy: "///")[2]
-                    self.sendData(data: receptionString.data(using: .utf8)!)
                     ReceptionProtocol.receivedQID(prefix: prefix)
-                    //forward if Multipeer activated
-                    /*if DbTableSettings.retrieveMultipeer() {
-                     let wholeData = Data(bytes: data!)
-                     multipeerCommunication.sendToAll(data: wholeData)
-                     }*/
                 } else if typeID.range(of:"EVAL") != nil {
                     ReceptionProtocol.receivedEVAL(prefix: prefix)
                 } else if typeID.range(of:"UPDEV") != nil {
@@ -156,12 +149,6 @@ class WifiCommunication {
         }
     }
     
-    public func receivedQuestion(questionID: String) {
-        let message = "GOTIT///" + questionID + "///" + UIDevice.current.identifierForVendor!.uuidString + "///"
-        print(message)
-        client!.send(string: message)
-    }
-    
     fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String, prefixData: [UInt8]) {
         if prefix.components(separatedBy: ":").count > 1 {
             let imageSize:Int? = Int(prefix.components(separatedBy: ":")[1])
@@ -203,7 +190,6 @@ class WifiCommunication {
             } catch let error {
                 print(error)
             }
-            receivedQuestion(questionID: String(questionID))
         } else {
             DbTableLogs.insertLog(log: "error reading questions: prefix not in correct format or buffer truncated")
             print("error reading questions: prefix not in correct format or buffer truncated")

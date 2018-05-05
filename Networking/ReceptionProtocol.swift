@@ -101,7 +101,6 @@ class ReceptionProtocol {
                         }
                     }
                     try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
-                    AppDelegate.wifiCommunicationSingleton?.receivedQuestion(questionID: String(testID))
                 } else {
                     let error = "problem reading test: text array to short"
                     print(error)
