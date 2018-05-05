@@ -114,9 +114,10 @@ class ReceptionProtocol {
     
     static func receivedTESYNFromServer(prefix: String) {
         
-        if prefix.components(separatedBy: ":").count > 2 {
+        if prefix.components(separatedBy: ":").count > 3 {
             let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
             let directCorrection = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+            let testMode = Int(prefix.components(separatedBy: ":")[3].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
             var dataText = [UInt8]()
             while dataText.count < textSize {
                 dataText += AppDelegate.wifiCommunicationSingleton?.client!.read(textSize) ?? [UInt8]()
@@ -135,7 +136,7 @@ class ReceptionProtocol {
                     }
                 }
                 DispatchQueue.main.async {
-                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection)
+                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection, testMode: testMode)
                 }
             } else {
                 let error = "problem reading test: no question ID"

@@ -452,11 +452,65 @@
                         <segue destination="xQz-if-Mve" kind="show" id="sAd-p5-4gd"/>
                         <segue destination="s1x-ZS-Gfr" kind="show" identifier="" id="2FT-lJ-8Wd"/>
                         <segue destination="Nov-ND-jnI" kind="show" id="xv7-18-U8c"/>
+                        <segue destination="AwR-qi-RJ2" kind="show" id="hoI-l3-8EL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XSo-O8-3vl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="901.875" y="-1600"/>
+        </scene>
+        <!--Test Table View Controller-->
+        <scene sceneID="JFz-to-IJu">
+            <objects>
+                <tableViewController storyboardIdentifier="testTable" useStoryboardIdentifierAsRestorationIdentifier="YES" id="AwR-qi-RJ2" customClass="TestTableViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="TCK-gB-Li3">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="QuestionCell" id="ie3-Yh-2f4" customClass="TestTableViewCell" customModule="Learning_Tracker_IOS" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="28" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ie3-Yh-2f4" id="Cuh-Lg-sCq">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Index" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u3i-U2-Lvu">
+                                            <rect key="frame" x="34" y="11" width="42" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Question" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jDx-uI-lzp">
+                                            <rect key="frame" x="98" y="11" width="206" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="IndexLabel" destination="u3i-U2-Lvu" id="XTK-zs-3Dr"/>
+                                    <outlet property="QuestionLabel" destination="jDx-uI-lzp" id="t6x-Vi-NZ2"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="AwR-qi-RJ2" id="kbO-oC-jaM"/>
+                            <outlet property="delegate" destination="AwR-qi-RJ2" id="Go5-OA-M0i"/>
+                        </connections>
+                    </tableView>
+                    <connections>
+                        <outlet property="testTableView" destination="TCK-gB-Li3" id="2Jn-F5-of0"/>
+                        <segue destination="xQz-if-Mve" kind="show" identifier="segueTestShrtaq" id="tHw-Ws-cU0"/>
+                        <segue destination="s1x-ZS-Gfr" kind="show" identifier="segueTestMCQ" id="qdo-RD-ELQ"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1BZ-vu-BX1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1711.875" y="-1045"/>
         </scene>
         <!--Question Short Answer View Controller-->
         <scene sceneID="IwT-Pj-0By">
@@ -518,7 +572,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1712" y="-1279"/>
+            <point key="canvasLocation" x="2708" y="-1600"/>
         </scene>
         <!--Synchroneous Questions Test View Controller-->
         <scene sceneID="fDh-V5-xgv">
@@ -585,7 +639,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1711.875" y="-2068.75"/>
+            <point key="canvasLocation" x="2708" y="-2303"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="WwT-6X-PyC">
@@ -740,4 +794,8 @@
         <image name="owl" width="640" height="603"/>
         <image name="target_image" width="640" height="452"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="qdo-RD-ELQ"/>
+        <segue reference="tHw-Ws-cU0"/>
+    </inferredMetricsTieBreakers>
 </document>

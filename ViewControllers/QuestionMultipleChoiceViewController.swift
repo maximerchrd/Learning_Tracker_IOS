@@ -211,6 +211,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
+        //disable button
+        SubmitButton.isEnabled = false
+        SubmitButton.alpha = 0.4
+        
         //first send answer to server
         if !isCorrection {
             var answers = ""
@@ -262,10 +266,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
                     
                     navController.popViewController(animated: true)
                 }
-            } else {
-                SubmitButton.isEnabled = false
-                SubmitButton.alpha = 0.4
-            }
+            } 
         }
     }
     

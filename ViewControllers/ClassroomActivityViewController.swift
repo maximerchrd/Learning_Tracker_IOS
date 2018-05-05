@@ -48,21 +48,16 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     
-    public func showTest(questionIDs: [Int], directCorrection: Int = 0) {
+    public func showTest(questionIDs: [Int], directCorrection: Int = 0, testMode: Int = 0) {
         if questionIDs.count > 0 {
-            if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "testNavigation") as? SynchroneousQuestionsTestViewController {
+            if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "testTable") as? TestTableViewController {
                 if let navigator = navigationController {
                     do {
+                        var stringIDs = [String]()
                         for questionId in questionIDs {
-                            let questionMC = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: questionId)
-                            if questionMC.Question.count < 1 || questionMC.Question == "none" {
-                                let questionSA = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: questionId)
-                                newViewController.questionsShortAnswer.append(questionSA)
-                            } else {
-                                newViewController.questionsMultipleChoice.append(questionMC)
-                            }
+                            stringIDs.append(String(questionId))
                         }
-                        newViewController.directCorrection = directCorrection
+                        newViewController.questionIDs = stringIDs
                         navigator.pushViewController(newViewController, animated: true)
                     } catch let error {
                         print(error)

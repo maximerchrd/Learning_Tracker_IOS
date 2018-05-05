@@ -131,6 +131,10 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
+        //disable button
+        SubmitButton.isEnabled = false
+        SubmitButton.alpha = 0.4
+        
         //first send answer to server
         if !isCorrection {
             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
@@ -158,8 +162,6 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
                 let alert = UIAlertController(title: NSLocalizedString("Incorrect :-(", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: handleNavigation))
                 self.present(alert, animated: true)
-                SubmitButton.isEnabled = false
-                SubmitButton.alpha = 0.4
             }
         } else {
             if !isSyncTest {
@@ -170,9 +172,6 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
                     
                     navController.popViewController(animated: true)
                 }
-            } else {
-                SubmitButton.isEnabled = false
-                SubmitButton.alpha = 0.4
             }
         }
     }
