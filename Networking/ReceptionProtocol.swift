@@ -113,34 +113,36 @@ class ReceptionProtocol {
     }
     
     static func receivedTESYNFromServer(prefix: String) {
-        DispatchQueue.main.async {
-            if prefix.components(separatedBy: ":").count > 2 {
-                let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-                let directCorrection = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-                var dataText = [UInt8]()
-                while dataText.count < textSize {
-                    dataText += AppDelegate.wifiCommunicationSingleton?.client!.read(textSize) ?? [UInt8]()
-                }
-                let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: data to string yields nil"
-                if dataTextString.contains("oops") {
-                    DbTableLogs.insertLog(log: dataTextString)
-                }
-                if dataTextString.components(separatedBy: "///").count > 2 {
-                    let questionIDs = dataTextString.components(separatedBy: "///")
-                    var IDs = [Int]()
-                    for questionID in questionIDs {
-                        let ID = Int(questionID) ?? -1
-                        if ID != -1 {
-                            IDs.append(ID)
-                        }
+        
+        if prefix.components(separatedBy: ":").count > 2 {
+            let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+            let directCorrection = Int(prefix.components(separatedBy: ":")[2].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+            var dataText = [UInt8]()
+            while dataText.count < textSize {
+                dataText += AppDelegate.wifiCommunicationSingleton?.client!.read(textSize) ?? [UInt8]()
+            }
+            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: data to string yields nil"
+            if dataTextString.contains("oops") {
+                DbTableLogs.insertLog(log: dataTextString)
+            }
+            if dataTextString.components(separatedBy: "///").count > 2 {
+                let questionIDs = dataTextString.components(separatedBy: "///")
+                var IDs = [Int]()
+                for questionID in questionIDs {
+                    let ID = Int(questionID) ?? -1
+                    if ID != -1 {
+                        IDs.append(ID)
                     }
-                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection)
-                } else {
-                    let error = "problem reading test: no question ID"
-                    print(error)
-                    DbTableLogs.insertLog(log: error)
                 }
+                DispatchQueue.main.async {
+                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(questionIDs: IDs, directCorrection: directCorrection)
+                }
+            } else {
+                let error = "problem reading test: no question ID"
+                print(error)
+                DbTableLogs.insertLog(log: error)
             }
         }
+        
     }
 }
