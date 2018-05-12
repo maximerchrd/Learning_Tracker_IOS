@@ -30,7 +30,7 @@ class TestTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         ClassroomActivityViewController.navTestTableViewController = self
-        AppDelegate.activeTest.buildIDsArrayFromMap()
+        AppDelegate.activeTest.buildIDsArraysFromMap()
         questionIDs = AppDelegate.activeTest.questionIDs
         reloadTable()
     }

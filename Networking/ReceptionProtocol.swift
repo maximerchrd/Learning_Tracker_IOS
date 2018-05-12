@@ -19,6 +19,7 @@ class ReceptionProtocol {
             if idGlobal < 0 {
                 let test = Test()
                 test.testName = DbTableTests.getNameFromTestID(testID: -idGlobal)
+                test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
                 test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
                 DispatchQueue.main.async {
                     AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: 0, testMode: 0)
@@ -114,18 +115,23 @@ class ReceptionProtocol {
                             }
                         }
                     }
-                    try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
+                    
                     
                     //parse the test map and insert the corresponding question-question relations inside the database
                     let testMapArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
+                    var questionIdsForTest = ""
                     for question in testMapArray {
                         let relations = question.components(separatedBy: ";;;")
                         let questionID = relations[0]
+                        questionIdsForTest += questionID + "///"
                         for i in 1..<relations.count {
                             DbTableRelationQuestionQuestion.insertRelationQuestionQuestion(idGlobal1: questionID, idGlobal2: relations[i].components(separatedBy: ":::")[0], test: test, condition: relations[i].components(separatedBy: ":::")[1])
                             
                         }
                     }
+                    
+                    //insert test in db after parsing questions
+                    try DbTableTests.insertTest(testID: testID, test: test, questionIDs: questionIdsForTest, objectiveIDs: objectiveIDS, objectives: objectives)
                 } else {
                     let error = "problem reading test: text array to short"
                     print(error)

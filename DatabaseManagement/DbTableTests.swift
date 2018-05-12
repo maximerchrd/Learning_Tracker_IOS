@@ -14,25 +14,27 @@ class DbTableTests {
     static let KEY_ID = "id"
     static let KEY_ID_GLOBAL = "ID_TEST_GLOBAL"
     static let KEY_TEST_NAME = "TEST_NAME"
+    static let KEY_QUESTION_IDS = "QUESTION_IDS"
     static var DBPath = "NoName"
     
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
         try dbQueue.inDatabase { db in
-            try db.create(table: TABLE_NAME, ifNotExists: true) { t in
-                t.column(KEY_ID, .integer).primaryKey()
-                t.column(KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .ignore)
-                t.column(KEY_TEST_NAME, .text).notNull()
+            try db.create(table: DbTableTests.TABLE_NAME, ifNotExists: true) { t in
+                t.column(DbTableTests.KEY_ID, .integer).primaryKey()
+                t.column(DbTableTests.KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .ignore)
+                t.column(DbTableTests.KEY_TEST_NAME, .text).notNull()
+                t.column(DbTableTests.KEY_QUESTION_IDS, .text)
             }
         }
     }
     
-    static func insertTest(testID: Int, test: String, objectiveIDs: [Int], objectives: [String]) throws {
+    static func insertTest(testID: Int, test: String, questionIDs: String, objectiveIDs: [Int], objectives: [String]) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             //insert the test
-            let testRecord = TestRecord(idGlobal: testID, test: test)
+            let testRecord = TestRecord(idGlobal: testID, test: test, questionIDs: questionIDs)
             try testRecord.insert(db)
             
             //insert the corresponding learning objectives
@@ -67,7 +69,6 @@ class DbTableTests {
                     testName = singleRecord.test
                 }
             }
-        
             
             return testName
         } catch let error {
@@ -108,6 +109,31 @@ class DbTableTests {
             objectives.remove(at: index2!)
         }
         return objectives
+    }
+    
+    static func getQuestionIds(testName: String) -> [String] {
+        var questionIds = [String]()
+        var testsRecords = [TestRecord]()
+        do {
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            var sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_TEST_NAME + "=\'" + testName + "\';"
+            print(sql)
+            try dbQueue.inDatabase { db in
+                testsRecords = try TestRecord.fetchAll(db, sql)
+            }
+            
+            for singleRecord in testsRecords {
+                let notParsedIds = singleRecord.questionIDS
+                questionIds = notParsedIds.components(separatedBy: "///")
+                while questionIds.contains("") {
+                    questionIds.remove(at: questionIds.index(of: "")!)
+                }
+            }
+        } catch let error {
+            print(error)
+        }
+        
+        return questionIds
     }
     
     static func getAllTests() throws -> [[String]] {
@@ -153,17 +179,20 @@ class TestRecord : Record {
     var id: Int64?
     var idGlobal: Int
     var test: String
+    var questionIDS: String
     
-    init(idGlobal: Int, test: String) {
+    init(idGlobal: Int, test: String, questionIDs: String) {
         self.idGlobal = idGlobal
         self.test = test
+        self.questionIDS = questionIDs
         super.init()
     }
     
     required init(row: Row) {
-        id = row[DbTableTests.KEY_ID]
+        self.id = row[DbTableTests.KEY_ID]
         self.idGlobal = row[DbTableTests.KEY_ID_GLOBAL]
         self.test = row[DbTableTests.KEY_TEST_NAME]
+        self.questionIDS = row[DbTableTests.KEY_QUESTION_IDS]
         super.init()
     }
     
@@ -175,6 +204,7 @@ class TestRecord : Record {
         container[DbTableTests.KEY_ID] = id
         container[DbTableTests.KEY_ID_GLOBAL] = idGlobal
         container[DbTableTests.KEY_TEST_NAME] = test
+        container[DbTableTests.KEY_QUESTION_IDS] = questionIDS
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

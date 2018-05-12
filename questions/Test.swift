@@ -15,22 +15,15 @@ class Test {
     var IDactive = [String: Bool]()
     var IDresults = [String: Float32]()
     
-    func buildIDsArrayFromMap() {
+    func buildIDsArraysFromMap() {
+        for id in questionIDs {
+            IDactive[id] = true
+            IDresults[id] = -1.0
+        }
         for relation in testMap {
-            if !questionIDs.contains(relation[0]) {
-                questionIDs.append(relation[0])
-                IDactive[relation[0]] = true
-            }
-            if !questionIDs.contains(relation[1]) {
-                questionIDs.append(relation[1])
-                IDactive[relation[1]] = true
-            }
             if !(relation[2] == "") {
                 IDactive[relation[1]] = false
             }
-        }
-        for id in questionIDs {
-            IDresults[id] = -1.0
         }
     }
     
