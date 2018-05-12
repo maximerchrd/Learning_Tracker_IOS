@@ -103,7 +103,7 @@ class WifiCommunication {
         
     }
     
-    public func sendAnswerToServer(answer: String, globalID: Int, questionType: String) {
+    public func sendAnswerToServer(answer: String, globalID: Int, questionType: String, timeSpent: String) {
         pendingAnswer = answer
         var message = ""
         do {
@@ -117,7 +117,7 @@ class WifiCommunication {
             }
             let name = try DbTableSettings.retrieveName()
             message = questionType + "///" + UIDevice.current.identifierForVendor!.uuidString + "///" + name + "///"
-            message += (answer + "///" + question + "///" + String(globalID));
+            message += (answer + "///" + question + "///" + String(globalID)) + "///" + timeSpent;
             if client != nil {
                 client!.send(string: message)
             } else {

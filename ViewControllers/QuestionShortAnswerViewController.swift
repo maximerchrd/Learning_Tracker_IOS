@@ -25,6 +25,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     var newImageX:Float = 0
     var directCorrection = 0
     var isBackButton = true
+    var startTime: TimeInterval?
     
     @IBOutlet weak var AnswerTextField: UITextField!
     @IBOutlet weak var QuestionTextView: UITextView!
@@ -84,6 +85,9 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
             self.AnswerTextField.isEnabled = false
             SubmitButton.setTitle(NSLocalizedString("OK", comment: "OK button"), for: .normal)
         }
+        
+        //start timer
+        startTime = Date.timeIntervalSinceReferenceDate
     }
     
     @objc func keyboardWillShow(notification: NSNotification) {
@@ -131,13 +135,16 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
+        //stop timer
+        let timeInterval = Date.timeIntervalSinceReferenceDate - (startTime ?? 0)
+        
         //disable button
         SubmitButton.isEnabled = false
         SubmitButton.alpha = 0.4
         
         //first send answer to server
         if !isCorrection {
-            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1")
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1", timeSpent: String(timeInterval))
         }
         
         //show correct/incorrect message if direct correction mode activated

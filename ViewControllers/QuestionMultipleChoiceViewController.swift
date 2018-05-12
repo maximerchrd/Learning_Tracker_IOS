@@ -32,6 +32,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var scrollPosition: CGFloat
     var directCorrection = 0
     var isBackButton = true
+    var startTime: TimeInterval?
     
     @IBOutlet weak var QuestionTextView: UITextView!
     @IBOutlet weak var PictureView: UIImageView!
@@ -158,6 +159,9 @@ class QuestionMultipleChoiceViewController: UIViewController {
         if isCorrection {
             SubmitButton.setTitle(NSLocalizedString("OK", comment: "OK button"), for: .normal)
         }
+        
+        //start the timer
+        startTime = Date.timeIntervalSinceReferenceDate
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -211,6 +215,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
+        //stop timer
+        var timeInterval = Date.timeIntervalSinceReferenceDate - (startTime ?? 0)
+        timeInterval = Double(round(10*timeInterval)/10)
+        
         //disable button
         SubmitButton.isEnabled = false
         SubmitButton.alpha = 0.4
@@ -225,7 +233,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
                     answersArray.append((singleCheckBox.titleLabel?.text) ?? " ")
                 }
             }
-            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0", timeSpent: String(timeInterval))
         }
         
         //show correct/incorrect message if direct correction mode activated
