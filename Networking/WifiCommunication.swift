@@ -94,7 +94,7 @@ class WifiCommunication {
                 } else if typeID.range(of:"TEST") != nil {
                     ReceptionProtocol.receivedTESTFromServer(prefix: prefix)
                 } else if typeID.range(of:"TESYN") != nil {
-                    ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
+                    //ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
                 } else {
                     DbTableLogs.insertLog(log: "message received but prefix not supported: " + prefix)
                     print("message received but prefix not supported")

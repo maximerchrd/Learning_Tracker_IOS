@@ -15,7 +15,15 @@ class ReceptionProtocol {
         DispatchQueue.main.async {
             var questionMultipleChoice = QuestionMultipleChoice()
             var questionShortAnswer = QuestionShortAnswer()
-            if (prefix.components(separatedBy: ":")[1].contains("MLT")) {
+            let idGlobal = Int(prefix.components(separatedBy: "///")[1]) ?? 0
+            if idGlobal < 0 {
+                let test = Test()
+                test.testName = DbTableTests.getNameFromTestID(testID: -idGlobal)
+                test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
+                DispatchQueue.main.async {
+                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: 0, testMode: 0)
+                }
+            } else if prefix.components(separatedBy: ":")[1].contains("MLT") {
                 let id_global = Int(prefix.components(separatedBy: "///")[1])
                 let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
                 do {
@@ -85,7 +93,7 @@ class ReceptionProtocol {
                 if dataTextString.components(separatedBy: "///").count > 3 {
                     let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
                     let test = dataTextString.components(separatedBy: "///")[1]
-                    let objectivesArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
+                    let objectivesArray = dataTextString.components(separatedBy: "///")[3].components(separatedBy: "|||")
                     var objectiveIDS = [Int]()
                     var objectives = [String]()
                     for objectiveANDid in objectivesArray {
@@ -101,6 +109,17 @@ class ReceptionProtocol {
                         }
                     }
                     try DbTableTests.insertTest(testID: testID, test: test, objectiveIDs: objectiveIDS, objectives: objectives)
+                    
+                    //parse the test map and insert the corresponding question-question relations inside the database
+                    let testMapArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
+                    for question in testMapArray {
+                        let relations = question.components(separatedBy: ";;;")
+                        let questionID = relations[0]
+                        for i in 1..<relations.count {
+                            DbTableRelationQuestionQuestion.insertRelationQuestionQuestion(idGlobal1: questionID, idGlobal2: relations[i].components(separatedBy: ":::")[0], test: test, condition: relations[i].components(separatedBy: ":::")[1])
+                            
+                        }
+                    }
                 } else {
                     let error = "problem reading test: text array to short"
                     print(error)
@@ -112,7 +131,7 @@ class ReceptionProtocol {
         }
     }
     
-    static func receivedTESYNFromServer(prefix: String) {
+    /*static func receivedTESYNFromServer(prefix: String) {
         
         if prefix.components(separatedBy: ":").count > 3 {
             let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
@@ -145,5 +164,5 @@ class ReceptionProtocol {
             }
         }
         
-    }
+    }*/
 }

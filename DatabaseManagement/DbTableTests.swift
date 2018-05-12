@@ -54,6 +54,29 @@ class DbTableTests {
         }
     }
     
+    static func getNameFromTestID(testID: Int) -> String {
+        do {
+            var testName = "no test found"
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            var testsRecords = [TestRecord]()
+            var sql = "SELECT * FROM " + TABLE_NAME
+            sql += " WHERE " + KEY_ID_GLOBAL + " = " + String(testID)
+            try dbQueue.inDatabase { db in
+                testsRecords = try TestRecord.fetchAll(db, sql)
+                for singleRecord in testsRecords {
+                    testName = singleRecord.test
+                }
+            }
+        
+            
+            return testName
+        } catch let error {
+            print(error)
+        }
+        
+        return ""
+    }
+    
     static func getObjectivesFromTestID(testID: Int) -> [String] {
         var objectives = [String]()
         var objectiveRecords = [LearningObjectiveRecord]()

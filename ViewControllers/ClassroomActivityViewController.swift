@@ -48,20 +48,16 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     
-    public func showTest(questionIDs: [Int], directCorrection: Int = 0, testMode: Int = 0) {
-        if questionIDs.count > 0 {
+    public func showTest(test: Test, directCorrection: Int = 0, testMode: Int = 0) {
+        if test.testMap.count > 0 {
             if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "testTable") as? TestTableViewController {
                 if let navigator = navigationController {
-                    do {
-                        var stringIDs = [String]()
-                        for questionId in questionIDs {
-                            stringIDs.append(String(questionId))
-                        }
-                        newViewController.questionIDs = stringIDs
-                        navigator.pushViewController(newViewController, animated: true)
-                    } catch let error {
-                        print(error)
+                    var stringIDs = [String]()
+                    for questionRelations in test.testMap {
+                        stringIDs.append(questionRelations[0])
                     }
+                    newViewController.questionIDs = stringIDs
+                    navigator.pushViewController(newViewController, animated: true)
                 }
             }
             

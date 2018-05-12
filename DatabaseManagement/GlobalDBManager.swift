@@ -30,6 +30,7 @@ class GlobalDBManager {
             try DbTableLogs.createTable(DatabaseName: databaseURL.path)
             try DbTableTests.createTable(DatabaseName: databaseURL.path)
             try DbTableRelationTestObjective.createTable(DatabaseName: databaseURL.path)
+            try DbTableRelationQuestionQuestion.createTable(DatabaseName: databaseURL.path)
             
             //Register migrations
             var migrator = DatabaseMigrator()
