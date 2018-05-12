@@ -28,6 +28,7 @@ class DbTableRelationQuestionQuestion {
                 t.column(KEY_ID_GLOBAL_2, .text).notNull()
                 t.column(KEY_TEST, .text).notNull()
                 t.column(KEY_CONDITION, .text).notNull()
+                t.uniqueKey([KEY_ID_GLOBAL_1, KEY_ID_GLOBAL_2, KEY_TEST], onConflict: .ignore)
             }
         }
     }

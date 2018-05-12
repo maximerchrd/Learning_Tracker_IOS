@@ -14,8 +14,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     static var wifiCommunicationSingleton: WifiCommunication?
     var disconnectionDetection = 0
-    static var isFirstLayer = true
     static var questionsOnDevices = [String:[String]]()
+    static var activeTest = Test()
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {

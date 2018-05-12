@@ -39,19 +39,16 @@ class WifiCommunication {
                     switch self.client!.send(data: dataConverter.connection()) {
                     case .success:
                         self.displayInstructions(instructionIndex: 1)
-                        AppDelegate.isFirstLayer = true
                         DispatchQueue.global(qos: .utility).async {
                             self.listenToServer()
                         }
                     case .failure(let error):
                         self.displayInstructions(instructionIndex: 2)
-                        AppDelegate.isFirstLayer = false
                         DbTableLogs.insertLog(log: error.localizedDescription)
                         print(error)
                     }
                 case .failure(let error):
                     self.displayInstructions(instructionIndex: 2)
-                    AppDelegate.isFirstLayer = false
                     if error.localizedDescription.contains("3") {
                         DbTableLogs.insertLog(log: error.localizedDescription + "(could connect to ip but server not running?)")
                     } else {

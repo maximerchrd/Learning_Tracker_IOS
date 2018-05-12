@@ -29,22 +29,29 @@ class TestTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        ClassroomActivityViewController.navTestTableViewController = self
+        AppDelegate.activeTest.buildIDsArrayFromMap()
+        questionIDs = AppDelegate.activeTest.questionIDs
         reloadTable()
-        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
+        ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
     }
     
     func reloadTable() {
+        AppDelegate.activeTest.refreshActiveIds()
         do {
-        for questionID in questionIDs {
-            let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: Int(questionID) ?? 0)
-            if questionMultipleChoice.ID > 0 {
-                questionsMultipleChoice[questionID] = questionMultipleChoice
-            } else {
-                let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: Int(questionID) ?? 0)
-                questionsShortAnswer[questionID] = questionShortAnswer
+            for questionID in questionIDs {
+                let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: Int(questionID) ?? 0)
+                if questionMultipleChoice.ID > 0 {
+                    questionsMultipleChoice[questionID] = questionMultipleChoice
+                } else {
+                    let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: Int(questionID) ?? 0)
+                    questionsShortAnswer[questionID] = questionShortAnswer
+                }
             }
-        }
         } catch let error {
             NSLog("%@", error.localizedDescription)
         }
@@ -53,12 +60,14 @@ class TestTableViewController: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let questionMultipleChoice = questionsMultipleChoice[questionIDs[indexPath.row]]
-        if questionMultipleChoice == nil {
-            let questionShortAnswer = questionsShortAnswer[questionIDs[indexPath.row]]
-            showTestShortAnswerQuestion(question: questionShortAnswer!, isCorr: false)
-        } else {
-            showTestMultipleChoiceQuestion(question: questionMultipleChoice!, isCorr: false)
+        if AppDelegate.activeTest.IDactive[questionIDs[indexPath.row]] ?? true {
+            let questionMultipleChoice = questionsMultipleChoice[questionIDs[indexPath.row]]
+            if questionMultipleChoice == nil {
+                let questionShortAnswer = questionsShortAnswer[questionIDs[indexPath.row]]
+                showTestShortAnswerQuestion(question: questionShortAnswer!, isCorr: false)
+            } else {
+                showTestMultipleChoiceQuestion(question: questionMultipleChoice!, isCorr: false)
+            }
         }
     }
     
@@ -129,6 +138,13 @@ class TestTableViewController: UITableViewController {
             cell.QuestionLabel?.text = questionShortAnswer?.Question
         } else {
             cell.QuestionLabel?.text = questionMultipleChoice?.Question
+        }
+        
+        //if the question isn't activated, color text in gray
+        if !(AppDelegate.activeTest.IDactive[questionIDs[indexPath.row]] ?? false) {
+            cell.QuestionLabel.textColor = UIColor.lightGray
+        } else {
+            cell.QuestionLabel.textColor = UIColor.black
         }
         
         return cell

@@ -13,6 +13,7 @@ class ClassroomActivityViewController: UIViewController {
     
     static var navQuestionMultipleChoiceViewController: QuestionMultipleChoiceViewController?
     static var navQuestionShortAnswerViewController: QuestionShortAnswerViewController?
+    static var navTestTableViewController: TestTableViewController?
     
     @IBOutlet weak var InstructionsLabel: UILabel!
     @IBOutlet weak var RestartConnectionButton: UIButton!
@@ -51,12 +52,8 @@ class ClassroomActivityViewController: UIViewController {
     public func showTest(test: Test, directCorrection: Int = 0, testMode: Int = 0) {
         if test.testMap.count > 0 {
             if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "testTable") as? TestTableViewController {
+                AppDelegate.activeTest = test
                 if let navigator = navigationController {
-                    var stringIDs = [String]()
-                    for questionRelations in test.testMap {
-                        stringIDs.append(questionRelations[0])
-                    }
-                    newViewController.questionIDs = stringIDs
                     navigator.pushViewController(newViewController, animated: true)
                 }
             }
@@ -85,6 +82,17 @@ class ClassroomActivityViewController: UIViewController {
                 navigator.pushViewController(ClassroomActivityViewController.navQuestionShortAnswerViewController!, animated: true)
             } else {
                 let error = "Problem going back to SHRTAQ: View Controller is unexpectedly nil"
+                print(error)
+                DbTableLogs.insertLog(log: error)
+            }
+        }
+    }
+    @objc func goBackToTest() {
+        if let navigator = navigationController {
+            if ClassroomActivityViewController.navTestTableViewController != nil {
+                navigator.pushViewController(ClassroomActivityViewController.navTestTableViewController!, animated: true)
+            } else {
+                let error = "Problem going back to TEST: View Controller is unexpectedly nil"
                 print(error)
                 DbTableLogs.insertLog(log: error)
             }
@@ -120,6 +128,8 @@ class ClassroomActivityViewController: UIViewController {
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Question >", style: .plain, target: self, action: #selector(goBackToQuestionMultChoice))
         } else if ClassroomActivityViewController.navQuestionShortAnswerViewController != nil {
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Question >", style: .plain, target: self, action: #selector(goBackToQuestionShortAnswer))
+        } else if ClassroomActivityViewController.navTestTableViewController != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Test >", style: .plain, target: self, action: #selector(goBackToTest))
         } else {
             navigationItem.rightBarButtonItem = nil
         }

@@ -221,8 +221,8 @@ class QuestionMultipleChoiceViewController: UIViewController {
             var answersArray = [String]()
             for singleCheckBox in checkBoxArray {
                 if singleCheckBox.isChecked {
-                    answers += (singleCheckBox.titleLabel?.text)! + "|||"
-                    answersArray.append((singleCheckBox.titleLabel?.text)!)
+                    answers += (singleCheckBox.titleLabel?.text) ?? " " + "|||"
+                    answersArray.append((singleCheckBox.titleLabel?.text) ?? " ")
                 }
             }
             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0")

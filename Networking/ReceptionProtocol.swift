@@ -45,6 +45,12 @@ class ReceptionProtocol {
     static func receivedEVAL(prefix: String) {
         do {
             try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, answer: (AppDelegate.wifiCommunicationSingleton?.pendingAnswer)!, quantitativeEval: prefix.components(separatedBy: "///")[1])
+            if ClassroomActivityViewController.navTestTableViewController != nil {
+                AppDelegate.activeTest.IDresults[prefix.components(separatedBy: "///")[2]] = Float32(prefix.components(separatedBy: "///")[1]) ?? -1.0
+                DispatchQueue.main.async {
+                    ClassroomActivityViewController.navTestTableViewController?.reloadTable()
+                }
+            }
         } catch let error {
             print(error)
         }
