@@ -19,6 +19,7 @@ class TestTableViewController: UITableViewController {
     var questionIDs = [String]()
     var questionsMultipleChoice = [String: QuestionMultipleChoice]()
     var questionsShortAnswer = [String: QuestionShortAnswer]()
+    var directCorrection = 0
     
     //store all the questions view controllers
     var questionMultipleChoiceViewControllers = [QuestionMultipleChoiceViewController]()
@@ -64,9 +65,9 @@ class TestTableViewController: UITableViewController {
             let questionMultipleChoice = questionsMultipleChoice[questionIDs[indexPath.row]]
             if questionMultipleChoice == nil {
                 let questionShortAnswer = questionsShortAnswer[questionIDs[indexPath.row]]
-                showTestShortAnswerQuestion(question: questionShortAnswer!, isCorr: false)
+                showTestShortAnswerQuestion(question: questionShortAnswer!, isCorr: false, directCorrection: directCorrection)
             } else {
-                showTestMultipleChoiceQuestion(question: questionMultipleChoice!, isCorr: false)
+                showTestMultipleChoiceQuestion(question: questionMultipleChoice!, isCorr: false, directCorrection: directCorrection)
             }
         }
     }

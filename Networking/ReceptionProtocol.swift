@@ -17,12 +17,14 @@ class ReceptionProtocol {
             var questionShortAnswer = QuestionShortAnswer()
             let idGlobal = Int(prefix.components(separatedBy: "///")[1]) ?? 0
             if idGlobal < 0 {
+                let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
                 let test = Test()
                 test.testName = DbTableTests.getNameFromTestID(testID: -idGlobal)
                 test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
                 test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
+                
                 DispatchQueue.main.async {
-                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: 0, testMode: 0)
+                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: directCorrection, testMode: 0)
                 }
             } else if prefix.components(separatedBy: ":")[1].contains("MLT") {
                 let id_global = Int(prefix.components(separatedBy: "///")[1])

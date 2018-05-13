@@ -53,6 +53,7 @@ class ClassroomActivityViewController: UIViewController {
         if test.testMap.count > 0 {
             if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "testTable") as? TestTableViewController {
                 AppDelegate.activeTest = test
+                newViewController.directCorrection = directCorrection
                 if let navigator = navigationController {
                     navigator.pushViewController(newViewController, animated: true)
                 }
