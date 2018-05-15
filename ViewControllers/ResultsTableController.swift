@@ -21,6 +21,7 @@ class ResultsTableController: UITableViewController {
     var questions = [String]()
     var answers = [String]()
     var evaluations = [Double]()
+    var dates = [String]()
     @IBOutlet var resultsTableView: UITableView!
     
     //array for filtering according to subject
@@ -78,14 +79,31 @@ class ResultsTableController: UITableViewController {
         questions.removeAll()
         answers.removeAll()
         evaluations.removeAll()
+        dates.removeAll()
         for result in results {
             questions.append(result[0])
             answers.append(result[1])
             evaluations.append(Double(result[2]) ?? -1.0)
+            dates.append(result[3])
         }
         resultsTableView.reloadData()
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if (indexPath.section == 1) {
+            if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ResultFullViewController") as? ResultFullViewController {
+                if let navigator = self.navigationController {
+                    newViewController.questionText = questions[indexPath.row]
+                    newViewController.studentAnswerText = answers[indexPath.row]
+                    newViewController.evaluation = String(evaluations[indexPath.row])
+                    newViewController.date = dates[indexPath.row]
+                    navigator.pushViewController(newViewController, animated: true)
+                } else {
+                    NSLog("%@", "Error trying to show Result Full View: the view controller wasn't pushed on a navigation controller")
+                }
+            }
+        }
+    }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2

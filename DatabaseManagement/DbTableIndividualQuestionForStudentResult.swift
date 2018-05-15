@@ -108,6 +108,7 @@ class DbTableIndividualQuestionForResult {
                 }
                 results[i].append(resultRecord[i].answers)
                 results[i].append(String(resultRecord[i].quantitativeEval))
+                results[i].append(resultRecord[i].date)
             }
         }
         return results
