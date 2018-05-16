@@ -16,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var disconnectionDetection = 0
     static var questionsOnDevices = [String:[String]]()
     static var activeTest = Test()
+    static var testMode = ""//testReconnection"
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {

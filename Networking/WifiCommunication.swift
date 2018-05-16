@@ -64,14 +64,18 @@ class WifiCommunication {
         var prefix = "not initialized"
         var ableToRead = true
         
-        while (self.client != nil && ableToRead) {
-            let data = self.client!.read(80, timeout: 5400)
+        while (self.client != nil && self.client?.fd != nil && ableToRead) {
+            let data = self.client!.read(80, timeout: 40000)
             if data != nil {
                 prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
-                if prefix.contains("oops") {
+                if prefix.contains("oops, problem in listenToServer(): prefix is nil") {
                     DbTableLogs.insertLog(log: prefix)
                     print(prefix)
-                    fatalError()
+                    sendDisconnectionSignal(additionalInformation: "close-connection")
+                    DispatchQueue.main.async {
+                        AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.stopConnectionAlerting()
+                    }
+                    break
                 }
                 print(prefix)
                 let typeID = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[0]
@@ -134,10 +138,11 @@ class WifiCommunication {
         }
     }
     
-    public func sendDisconnectionSignal() {
+    public func sendDisconnectionSignal(additionalInformation: String = "") {
         print("student is leaving the task")
         do {
-            let message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///"
+            let message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///" +
+            additionalInformation + "///"
             if client != nil {
                 client!.send(string: message)
             }
@@ -148,21 +153,16 @@ class WifiCommunication {
     
     fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String, prefixData: [UInt8]) {
         if prefix.components(separatedBy: ":").count > 1 {
-            let imageSize:Int? = Int(prefix.components(separatedBy: ":")[1])
+            let imageSize = Int(prefix.components(separatedBy: ":")[1]) ?? 0
             var textSizeString = prefix.components(separatedBy: ":")[2]
             textSizeString = String(textSizeString.filter { "01234567890.".contains($0) })
-            let textSize:Int? = Int(textSizeString)
+            let textSize = Int(textSizeString) ?? 0
             
-            var dataText = [UInt8]()
-            while dataText.count < textSize ?? 0 {
-                dataText += self.client!.read(textSize! - dataText.count) ?? [UInt8]()
-            }
-            print(imageSize!)
-            
-            var dataImage = [UInt8]()
-            while dataImage.count < imageSize ?? 0 {
-                dataImage += self.client!.read(imageSize! - dataImage.count) ?? [UInt8]()
-            }
+            let dataText = self.readDataIntoArray(expectedSize: textSize )
+
+            print(imageSize)
+            let dataImage = self.readDataIntoArray(expectedSize: imageSize) ?? [UInt8]()
+
             print("Image size actually read:" + String(dataImage.count))
             let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"
             if dataTextString.contains("oops") {
@@ -195,7 +195,8 @@ class WifiCommunication {
     
     func stopConnection() {
         if self.client != nil {
-            self.client!.close()
+            sendDisconnectionSignal(additionalInformation: "close-connection")
+            self.client!.close()            //sets the file descriptor to nil
         }
     }
     
@@ -231,5 +232,20 @@ class WifiCommunication {
             }
             return ssid
         }
+    }
+    
+    public func readDataIntoArray(expectedSize: Int) -> [UInt8] {
+        //read data
+        var arrayToFill = [UInt8]()
+        var ableToRead = true
+        while self.client != nil && self.client?.fd != nil && ableToRead && arrayToFill.count < expectedSize {
+            let data = self.client!.read(expectedSize - arrayToFill.count, timeout: 3)
+            if data != nil {
+                arrayToFill += data ?? [UInt8]()
+            } else {
+                ableToRead = false
+            }
+        }
+        return arrayToFill
     }
 }

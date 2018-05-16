@@ -100,15 +100,34 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     @IBAction func restartConnection(_ sender: Any) {
-        if stopConnectionButton {
-            AppDelegate.wifiCommunicationSingleton!.stopConnection()
-            stopConnectionButton = false
-            RestartConnectionButton.setTitle("Start Connection", for: .normal)
+        if (AppDelegate.testMode.contains("testReconnection")) {
+            var i = 0
+            while (i<3) {
+                AppDelegate.wifiCommunicationSingleton!.stopConnection()
+                Thread.sleep(forTimeInterval: 3)
+                AppDelegate.wifiCommunicationSingleton!.startConnection()
+                
+            }
         } else {
-            AppDelegate.wifiCommunicationSingleton!.startConnection()
-            stopConnectionButton = true
-            RestartConnectionButton.setTitle("Stop Connection", for: .normal)
+            if stopConnectionButton {
+                AppDelegate.wifiCommunicationSingleton!.stopConnection()
+                stopConnectionButton = false
+                RestartConnectionButton.setTitle("Start Connection", for: .normal)
+            } else {
+                AppDelegate.wifiCommunicationSingleton!.startConnection()
+                stopConnectionButton = true
+                RestartConnectionButton.setTitle("Stop Connection", for: .normal)
+            }
         }
+    }
+    
+    public func stopConnectionAlerting() {
+        AppDelegate.wifiCommunicationSingleton!.stopConnection()
+        stopConnectionButton = false
+        RestartConnectionButton.setTitle("Start Connection", for: .normal)
+        let alert = UIAlertController(title: NSLocalizedString("Oops!", comment: "pop up if receiving problem"), message: "We had a problem receiving some data. Try to reconnect.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        self.present(alert, animated: true)
     }
     
     override func viewDidLoad() {
