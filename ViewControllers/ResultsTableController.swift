@@ -22,6 +22,9 @@ class ResultsTableController: UITableViewController {
     var answers = [String]()
     var evaluations = [Double]()
     var dates = [String]()
+    var questionType = [String]()
+    var rightAnswerOptions = [[String]]()
+    var wrongAnswerOptions = [[String]]()
     @IBOutlet var resultsTableView: UITableView!
     
     //array for filtering according to subject
@@ -85,6 +88,25 @@ class ResultsTableController: UITableViewController {
             answers.append(result[1])
             evaluations.append(Double(result[2]) ?? -1.0)
             dates.append(result[3])
+            questionType.append(result[4])
+            rightAnswerOptions.append([String]())
+            wrongAnswerOptions.append([String]())
+            if result[4] == "SHRTAQ" {
+                if result.count > 4 {
+                    for i in 5..<result.count {
+                        rightAnswerOptions[rightAnswerOptions.count - 1].append(result[i])
+                    }
+                }
+            } else {
+                if result.count > 5 {
+                    for i in 6..<(6 + (Int(result[5]))!) {
+                        rightAnswerOptions[rightAnswerOptions.count - 1].append(result[i])
+                    }
+                    for i in (6 + (Int(result[5]))!)..<result.count {
+                        wrongAnswerOptions[wrongAnswerOptions.count - 1].append(result[i])
+                    }
+                }
+            }
         }
         resultsTableView.reloadData()
     }
@@ -97,6 +119,8 @@ class ResultsTableController: UITableViewController {
                     newViewController.studentAnswerText = answers[indexPath.row]
                     newViewController.evaluation = String(evaluations[indexPath.row])
                     newViewController.date = dates[indexPath.row]
+                    newViewController.rightAnswers = rightAnswerOptions[indexPath.row]
+                    newViewController.wrongAnswers = wrongAnswerOptions[indexPath.row]
                     navigator.pushViewController(newViewController, animated: true)
                 } else {
                     NSLog("%@", "Error trying to show Result Full View: the view controller wasn't pushed on a navigation controller")

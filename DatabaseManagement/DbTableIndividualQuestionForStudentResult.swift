@@ -100,15 +100,29 @@ class DbTableIndividualQuestionForResult {
             for i in 0..<resultRecord.count {
                 results.append([String]())
                 let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: resultRecord[i].idGlobal)
+                var questionShortAnswer: QuestionShortAnswer?
+                questionShortAnswer = nil
                 if questionMultipleChoice.Question != "none" {
                     results[i].append(questionMultipleChoice.Question)
                 } else {
-                    let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: resultRecord[i].idGlobal)
-                    results[i].append(questionShortAnswer.Question)
+                    questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: resultRecord[i].idGlobal)
+                    results[i].append(questionShortAnswer!.Question)
                 }
                 results[i].append(resultRecord[i].answers)
                 results[i].append(String(resultRecord[i].quantitativeEval))
                 results[i].append(resultRecord[i].date)
+                if questionShortAnswer == nil {
+                    results[i].append("QMC")
+                    results[i].append(String(questionMultipleChoice.NbCorrectAnswers))
+                    for option in questionMultipleChoice.Options {
+                        results[i].append(option)
+                    }
+                } else {
+                    results[i].append("SHRTAQ")
+                    for option in questionShortAnswer!.Options {
+                        results[i].append(option)
+                    }
+                }
             }
         }
         return results
