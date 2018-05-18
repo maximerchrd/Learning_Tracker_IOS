@@ -46,6 +46,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        if AppDelegate.wifiCommunicationSingleton != nil {
+            AppDelegate.wifiCommunicationSingleton?.connectToServer() //we need it because we lose the connection when locking the device. Once this problem solved, we can probably get rid of it
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -88,9 +91,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             //print("LOCK STATUS CHANGED")
             disconnectionDetection = disconnectionDetection - 1
-            if disconnectionDetection < 1 {
-                AppDelegate.wifiCommunicationSingleton?.connectToServer() //we need it because we lose the connection when locking the device. Once this problem solved, we can probably get rid of it
-            }
         }
     }
 }
