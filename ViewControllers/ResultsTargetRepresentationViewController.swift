@@ -40,7 +40,7 @@ class ResultsTargetRepresentationViewController: UIViewController {
             subjects.remove(at: subjects.index(of: "")!)
         }
         
-        let uiButtonSubject = UIButton(frame: CGRect(x: 0, y: 0, width: 250, height: 30))
+        let uiButtonSubject = UIButton(frame: CGRect(x: 0, y: 0, width: 210, height: 30))
         var titleString = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
         if titleString.count < 28 {
             for _ in titleString.count..<28 {
@@ -68,7 +68,7 @@ class ResultsTargetRepresentationViewController: UIViewController {
         tests.insert(NSLocalizedString("All tests", comment: "All tests in the database"), at: 0)
         testIDs.insert(0, at: 0)
         
-        let uiButtonTest = UIButton(frame: CGRect(x: 0, y: 0, width: 250, height: 30))
+        let uiButtonTest = UIButton(frame: CGRect(x: 0, y: 0, width: 210, height: 30))
         var testTitleString = NSLocalizedString("Test: ", comment: "on button to chose subject") + selectedTest
         if testTitleString.count < 28 {
             for _ in testTitleString.count..<28 {
