@@ -68,9 +68,6 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         newImageHeight = Float(originalImageHeight) / Float(originaImageWidth) * screenWidth
         newImageX = 0
         
-        //add observer to push view when keyboard shows up
-        NotificationCenter.default.addObserver(self, selector: #selector(QuestionShortAnswerViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(QuestionShortAnswerViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
         //set delegate to hide keyboard when return pressed
         self.AnswerTextField.delegate = self
@@ -90,14 +87,6 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         startTime = Date.timeIntervalSinceReferenceDate
     }
     
-    @objc func keyboardWillShow(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
-            if self.view.frame.origin.y == 0{
-                self.view.frame.origin.y -= keyboardSize.height
-            }
-        }
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         //dismiss keyboard if we are coming back to question
         self.view.endEditing(true)
@@ -110,16 +99,10 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    @objc func keyboardWillHide(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
-            if self.view.frame.origin.y != 0{
-                self.view.frame.origin.y += keyboardSize.height
-            }
-        }
-    }
     
+    //function enabling dismissing of keyboard when return pressed
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        AnswerTextField.endEditing(true)
+        self.view.endEditing(true)
         return false
     }
     

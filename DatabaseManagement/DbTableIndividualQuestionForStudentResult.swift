@@ -112,12 +112,14 @@ class DbTableIndividualQuestionForResult {
                 results[i].append(String(resultRecord[i].quantitativeEval))
                 results[i].append(resultRecord[i].date)
                 if questionShortAnswer == nil {
+                    results[i].append(questionMultipleChoice.Image)
                     results[i].append("QMC")
                     results[i].append(String(questionMultipleChoice.NbCorrectAnswers))
                     for option in questionMultipleChoice.Options {
                         results[i].append(option)
                     }
                 } else {
+                    results[i].append(questionShortAnswer!.Image)
                     results[i].append("SHRTAQ")
                     for option in questionShortAnswer!.Options {
                         results[i].append(option)

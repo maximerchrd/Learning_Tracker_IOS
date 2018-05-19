@@ -16,6 +16,7 @@ class ResultFullViewController: UIViewController {
     @IBOutlet weak var allAnswersTextView: UITextView!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var evaluationLabel: UILabel!
+    @IBOutlet weak var ImageView: UIImageView!
     
     var questionText = ""
     var studentAnswerText = ""
@@ -24,6 +25,7 @@ class ResultFullViewController: UIViewController {
     var rightAnswers = [String]()
     var wrongAnswers = [String]()
     var questionType = ""
+    var imagePath = ""
     
     override func viewDidLoad() {
         questionTextView.text = questionText
@@ -42,10 +44,17 @@ class ResultFullViewController: UIViewController {
             allAnswers += answer + "\n"
         }
         
-        allAnswers += allAnswers
         allAnswersTextView.text = allAnswers
         
 
+        //Display Picture
+        let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory
+        let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
+        let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
+        if let dirPath          = paths.first {
+            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(imagePath)
+            ImageView.image    = UIImage(contentsOfFile: imageURL.path)
+        }
     }
 }
 

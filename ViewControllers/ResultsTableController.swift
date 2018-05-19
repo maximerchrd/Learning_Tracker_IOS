@@ -25,6 +25,7 @@ class ResultsTableController: UITableViewController {
     var questionType = [String]()
     var rightAnswerOptions = [[String]]()
     var wrongAnswerOptions = [[String]]()
+    var imagePaths = [String]()
     @IBOutlet var resultsTableView: UITableView!
     
     //array for filtering according to subject
@@ -83,26 +84,31 @@ class ResultsTableController: UITableViewController {
         answers.removeAll()
         evaluations.removeAll()
         dates.removeAll()
+        questionType.removeAll()
+        rightAnswerOptions.removeAll()
+        wrongAnswerOptions.removeAll()
+        imagePaths.removeAll()
         for result in results {
             questions.append(result[0])
             answers.append(result[1])
             evaluations.append(Double(result[2]) ?? -1.0)
             dates.append(result[3])
-            questionType.append(result[4])
+            imagePaths.append(result[4])
+            questionType.append(result[5])
             rightAnswerOptions.append([String]())
             wrongAnswerOptions.append([String]())
-            if result[4] == "SHRTAQ" {
-                if result.count > 4 {
-                    for i in 5..<result.count {
+            if result[5] == "SHRTAQ" {
+                if result.count > 5 {
+                    for i in 6..<result.count {
                         rightAnswerOptions[rightAnswerOptions.count - 1].append(result[i])
                     }
                 }
             } else {
-                if result.count > 5 {
-                    for i in 6..<(6 + (Int(result[5]))!) {
+                if result.count > 6 {
+                    for i in 7..<(7 + (Int(result[6]))!) {
                         rightAnswerOptions[rightAnswerOptions.count - 1].append(result[i])
                     }
-                    for i in (6 + (Int(result[5]))!)..<result.count {
+                    for i in (7 + (Int(result[6]))!)..<result.count {
                         wrongAnswerOptions[wrongAnswerOptions.count - 1].append(result[i])
                     }
                 }
@@ -121,6 +127,7 @@ class ResultsTableController: UITableViewController {
                     newViewController.date = dates[indexPath.row]
                     newViewController.rightAnswers = rightAnswerOptions[indexPath.row]
                     newViewController.wrongAnswers = wrongAnswerOptions[indexPath.row]
+                    newViewController.imagePath = imagePaths[indexPath.row]
                     navigator.pushViewController(newViewController, animated: true)
                 } else {
                     NSLog("%@", "Error trying to show Result Full View: the view controller wasn't pushed on a navigation controller")
