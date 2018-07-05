@@ -1,17 +1,15 @@
 //
-//  ResultsCharViewController.swift
+//  ResultsCityRepresentationViewController.swift
 //  Learning_Tracker_IOS
 //
-//  Created by Maxime Richard on 27.02.18.
+//  Created by Maxime Richard on 03.07.18.
 //  Copyright © 2018 Maxime Richard. All rights reserved.
 //
 
 import Foundation
 import UIKit
-import Charts
 
-class ResultsChartViewController: UIViewController {
-    
+class ResultsCityRepresentationViewController: UIViewController {
     //used to know which pickerView Button was tapped when displaying pickerView
     var activePickerType = 0
     
@@ -21,7 +19,9 @@ class ResultsChartViewController: UIViewController {
     var tests = [String]()
     var testIDs = [Int]()
     
-    @IBOutlet weak var BarChart: HorizontalBarChartView!
+    var objectiveLeftSide = CGFloat(0.0)
+    
+    @IBOutlet weak var scrollView: UIScrollView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,7 +36,7 @@ class ResultsChartViewController: UIViewController {
         if indexOfEmpty != nil {
             subjects.remove(at: subjects.index(of: "")!)
         }
-
+        
         let uiButtonSubject = UIButton(frame: CGRect(x: 0, y: 0, width: 210, height: 30))
         var titleString = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
         if titleString.count < 28 {
@@ -84,7 +84,10 @@ class ResultsChartViewController: UIViewController {
         //add buttons to the navigation bar
         navigationItem.rightBarButtonItems = [subjectsButton, testsButton]
         
-        barChartUpdate(subject: "All", testID: 0)
+        //initialize scroll View and draw the results
+        let origin = scrollView.bounds.origin
+        let offset = scrollView.contentOffset
+        drawCity(subject: "All", testID: 0)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -97,11 +100,15 @@ class ResultsChartViewController: UIViewController {
         AppDelegate.AppUtility.lockOrientation(.all, andRotateTo: .portrait)
     }
     
-    public func barChartUpdate (subject: String, testID: Int) {
+    func drawCity(subject: String, testID: Int, test: String = "") {
         do {
+            //START selecting the right objectives and results
             var evalForObjectives = try DbTableLearningObjective.getResultsPerObjective(subject: subject)
             var objectives = evalForObjectives[0]
             var results = evalForObjectives[1]
+            
+            var certifObjectives = [String]()
+            var certifResults = [String]()
             
             //filter test objectives if a test is selected
             if testID != 0 {
@@ -117,47 +124,121 @@ class ResultsChartViewController: UIViewController {
                     results.remove(at: index)
                     objectives.remove(at: index)
                 }
+                
+                //get results for objectives if the test is certificative
+                let testType = DbTableTests.getTypeFromTestID(testID: testID)
+                if testType.range(of:"CERTIF") != nil {
+                    let certifEvalForObjectives = try DbTableIndividualQuestionForResult.getResultsPerObjectiveForCertificativeTest(test: test)
+                    certifObjectives = certifEvalForObjectives[0]
+                    certifResults = certifEvalForObjectives[1]
+                }
+            }
+            //END selecting the right objectives and results
+            
+            //START drawing the buildings
+            //first clean up the scroll view
+            objectiveLeftSide = 0.0
+            for subView in scrollView.subviews {
+                subView.removeFromSuperview()
             }
             
-            objectives.insert("", at: 0)
-            results.insert("0.0", at: 0)
-            
-            var entries = [BarChartDataEntry]()
-            for i in 0..<results.count {
-                let entry = BarChartDataEntry(x: Double(i) - 0.5, yValues: [Double(results[i]) ?? 0.0])
-                entries.append(entry)
+            if certifObjectives.count > 0 {
+                //we display a certificative test
+                for i in 0..<certifObjectives.count {
+                    let objIndex = objectives.index(of: certifObjectives[i]) ?? -1
+                    if objIndex >= 0 {
+                        drawBuilding(objective: certifObjectives[i], formativeResult: Double(results[objIndex]) ?? -1.0, certificativeResult: Double(certifResults[i]) ?? -1.0)
+                    } else {
+                        drawBuilding(objective: certifObjectives[i], formativeResult: -1.0, certificativeResult: Double(certifResults[i]) ?? -1.0)
+                    }
+                }
+            } else {
+                for i in 0..<objectives.count {
+                    drawBuilding(objective: objectives[i], formativeResult: Double(results[i]) ?? -1.0)
+                }
             }
-            let dataSet = BarChartDataSet(values: entries, label: NSLocalizedString("Evaluation for each learning objective", comment: "chart label"))
-            dataSet.drawValuesEnabled = false
-            let data = BarChartData(dataSets: [dataSet])
-            
-            BarChart.data = data
-            
-            let xAxis = BarChart.xAxis
-            xAxis.granularity = 0.5
-            //xAxis.setDrawGridLines(false);
-            xAxis.valueFormatter = IndexAxisValueFormatter(values: objectives)
-            xAxis.labelPosition = XAxis.LabelPosition.bottomInside
-            xAxis.labelCount = results.count * 2
-            xAxis.axisMinimum = 0.0
-            xAxis.drawGridLinesEnabled = false
-            
-            
-            
-            let yAxis = BarChart.leftAxis
-            yAxis.axisMaximum = 100.0
-            yAxis.axisMinimum = 0.0
-            yAxis.labelCount = 10
-            let yAxisright = BarChart.rightAxis
-            yAxisright.axisMaximum = 100.0
-            yAxisright.axisMinimum = 0.0
-            yAxisright.labelCount = 10
-
-            BarChart.notifyDataSetChanged()
+            //END drawing the buildings
         } catch let error {
             print(error)
         }
     }
+    
+    func drawBuilding(objective: String, formativeResult: Double = -1.0, certificativeResult: Double = -1.0) {
+        var screenWidth = UIScreen.main.bounds.width
+        var screenHeight = UIScreen.main.bounds.height
+        if screenWidth > screenHeight {
+            let saveWidth = screenWidth
+            screenWidth = screenHeight
+            screenHeight = saveWidth
+        }
+        let objectiveWidth = screenWidth * 0.4
+        
+        var qualitativeEvaluation = ""
+        
+        var nbOfObjectives = 0
+        
+        if (formativeResult != -1 && certificativeResult != -1) {
+            nbOfObjectives = 2
+        } else {
+            nbOfObjectives = 1
+        }
+        
+        //format objective label
+        let objectiveLabel = UILabel(frame: CGRect(x: objectiveLeftSide, y: 0, width: objectiveWidth * CGFloat(nbOfObjectives), height: screenWidth * 0.15))
+        objectiveLabel.text = objective
+        objectiveLabel.lineBreakMode = .byWordWrapping
+        objectiveLabel.numberOfLines = 3
+        
+        scrollView.addSubview(objectiveLabel)
+        
+        var offsetIndex = CGFloat(0)
+        for i in 0..<2 {
+            if i == 0 && formativeResult != -1 || i == 1 && certificativeResult != -1 {
+                var result = -1.0
+                var indication = ""
+                
+                if i == 0 && formativeResult != -1 {
+                    result = formativeResult
+                    indication = "Formative: "
+                } else if i == 1 && certificativeResult != -1 {
+                    result = certificativeResult
+                    indication = "Certificative: "
+                }
+                
+                //format image
+                let imageView = UIImageView(frame: CGRect(x: objectiveLeftSide + objectiveWidth * offsetIndex, y: screenWidth * 0.15, width: objectiveWidth, height: screenWidth * 0.55))
+                
+                if result < 50 {
+                    imageView.image = UIImage(named: "building_worst")
+                    qualitativeEvaluation = "Can do better :-|"
+                } else if result < 70 {
+                    imageView.image = UIImage(named: "building_worst")
+                    qualitativeEvaluation = "OK"
+                } else if result < 90 {
+                    imageView.image = UIImage(named: "building_best")
+                    qualitativeEvaluation = "Good!"
+                } else {
+                    imageView.image = UIImage(named: "building_best")
+                    qualitativeEvaluation = "Excellent!!! :-))"
+                }
+                
+                scrollView.addSubview(imageView)
+                
+                //format indication and evaluation label
+                let indicationLabel = UILabel(frame: CGRect(x: objectiveLeftSide + objectiveWidth * offsetIndex, y: screenWidth * 0.7, width: objectiveWidth, height: screenWidth * 0.15))
+                indicationLabel.text = indication + qualitativeEvaluation
+                indicationLabel.lineBreakMode = .byWordWrapping
+                indicationLabel.numberOfLines = 3
+                scrollView.addSubview(indicationLabel)
+                
+                offsetIndex += 1.0
+            }
+        }
+        
+        objectiveLeftSide += objectiveWidth * CGFloat(nbOfObjectives) + 30
+        scrollView.contentSize = CGSize(width: objectiveLeftSide, height: 0)
+    }
+    
     @objc func addTestTapped() {
         activePickerType = 1
         let alertView = UIAlertController(
@@ -167,7 +248,7 @@ class ResultsChartViewController: UIViewController {
         
         let pickerViewTest = UIPickerView(frame:
             CGRect(x: 0, y: 50, width: 260, height: 162))
-      
+        
         pickerViewTest.dataSource = self as UIPickerViewDataSource
         pickerViewTest.delegate = self as UIPickerViewDelegate
         
@@ -186,7 +267,7 @@ class ResultsChartViewController: UIViewController {
     func OKTestButtonPressed() {
         let testIndex = tests.index(of: selectedTest) ?? 0
         let testID = testIDs[testIndex]
-        barChartUpdate(subject: "All", testID: testID)
+        drawCity(subject: "All", testID: testID, test: selectedTest)
         (navigationItem.rightBarButtonItems![1].customView as! UIButton).titleLabel?.text = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
         selectedSubject = NSLocalizedString("All subjects", comment: "All subjects in the database")
         (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
@@ -216,7 +297,7 @@ class ResultsChartViewController: UIViewController {
     }
     
     func OKButtonPressed() {
-        barChartUpdate(subject: selectedSubject, testID: 0)
+        drawCity(subject: selectedSubject, testID: 0)
         (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
         selectedTest = NSLocalizedString("All tests", comment: "All tests in the database")
         (navigationItem.rightBarButtonItems![1].customView as! UIButton).titleLabel?.text = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
@@ -227,8 +308,9 @@ class ResultsChartViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 }
-extension ResultsChartViewController: UIPickerViewDelegate, UIPickerViewDataSource {
 
+extension ResultsCityRepresentationViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -275,7 +357,7 @@ extension ResultsChartViewController: UIPickerViewDelegate, UIPickerViewDataSour
         if activePickerType == 0 {
             label.text = subjects[row]
         } else {
-          label.text = tests[row]
+            label.text = tests[row]
         }
         
         return label

@@ -15,6 +15,7 @@ class DbTableTests {
     static let KEY_ID_GLOBAL = "ID_TEST_GLOBAL"
     static let KEY_TEST_NAME = "TEST_NAME"
     static let KEY_QUESTION_IDS = "QUESTION_IDS"
+    static let KEY_TEST_TYPE = "TEST_TYPE"
     static var DBPath = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -26,15 +27,16 @@ class DbTableTests {
                 t.column(DbTableTests.KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .ignore)
                 t.column(DbTableTests.KEY_TEST_NAME, .text).notNull()
                 t.column(DbTableTests.KEY_QUESTION_IDS, .text)
+                t.column(DbTableTests.KEY_TEST_TYPE, .text)
             }
         }
     }
     
-    static func insertTest(testID: Int, test: String, questionIDs: String, objectiveIDs: [Int], objectives: [String]) throws {
+    static func insertTest(testID: Int, test: String, questionIDs: String = "", objectiveIDs: [Int] = [Int](), objectives: [String] = [String](), testType: String = "FORMATIVE") throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             //insert the test
-            let testRecord = TestRecord(idGlobal: testID, test: test, questionIDs: questionIDs)
+            let testRecord = TestRecord(idGlobal: testID, test: test, questionIDs: questionIDs, testType: testType)
             try testRecord.insert(db)
             
             //insert the corresponding learning objectives
@@ -71,6 +73,28 @@ class DbTableTests {
             }
             
             return testName
+        } catch let error {
+            print(error)
+        }
+        
+        return ""
+    }
+    
+    static func getTypeFromTestID(testID: Int) -> String {
+        do {
+            var testType = "no test found"
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            var testsRecords = [TestRecord]()
+            var sql = "SELECT * FROM " + TABLE_NAME
+            sql += " WHERE " + KEY_ID_GLOBAL + " = " + String(testID)
+            try dbQueue.inDatabase { db in
+                testsRecords = try TestRecord.fetchAll(db, sql)
+                for singleRecord in testsRecords {
+                    testType = singleRecord.testType
+                }
+            }
+            
+            return testType
         } catch let error {
             print(error)
         }
@@ -116,7 +140,7 @@ class DbTableTests {
         var testsRecords = [TestRecord]()
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            var sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_TEST_NAME + "=\'" + testName + "\';"
+            let sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_TEST_NAME + "=\'" + testName + "\';"
             print(sql)
             try dbQueue.inDatabase { db in
                 testsRecords = try TestRecord.fetchAll(db, sql)
@@ -180,11 +204,13 @@ class TestRecord : Record {
     var idGlobal: Int
     var test: String
     var questionIDS: String
+    var testType: String
     
-    init(idGlobal: Int, test: String, questionIDs: String) {
+    init(idGlobal: Int, test: String, questionIDs: String, testType: String) {
         self.idGlobal = idGlobal
         self.test = test
         self.questionIDS = questionIDs
+        self.testType = testType
         super.init()
     }
     
@@ -193,6 +219,7 @@ class TestRecord : Record {
         self.idGlobal = row[DbTableTests.KEY_ID_GLOBAL]
         self.test = row[DbTableTests.KEY_TEST_NAME]
         self.questionIDS = row[DbTableTests.KEY_QUESTION_IDS]
+        self.testType = row[DbTableTests.KEY_TEST_TYPE]
         super.init()
     }
     
@@ -205,6 +232,7 @@ class TestRecord : Record {
         container[DbTableTests.KEY_ID_GLOBAL] = idGlobal
         container[DbTableTests.KEY_TEST_NAME] = test
         container[DbTableTests.KEY_QUESTION_IDS] = questionIDS
+        container[DbTableTests.KEY_TEST_TYPE] = testType
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

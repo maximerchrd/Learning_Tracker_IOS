@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var questionsOnDevices = [String:[String]]()
     static var activeTest = Test()
     static var testMode = ""//testReconnection"
+    var orientationLock = UIInterfaceOrientationMask.all
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
@@ -25,6 +26,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         registerforDeviceLockNotification()
         application.isIdleTimerDisabled = true
         return true
+    }
+    
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        return self.orientationLock
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -54,6 +59,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    //START code used to force screen orientation
+    struct AppUtility {
+        static func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
+            if let delegate = UIApplication.shared.delegate as? AppDelegate {
+                delegate.orientationLock = orientation
+            }
+        }
+        
+        static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation) {
+            self.lockOrientation(orientation)
+            UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
+        }
+    }
+    //END code used to force screen orientation
 
     // Following code used to distinguish screen lock from other inactivation triggers in order to send disconnection signal
     // !!!Device connects to server every time its unlocked!!! (because connection is mysteriously lost when device locked)

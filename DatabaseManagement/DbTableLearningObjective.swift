@@ -52,6 +52,24 @@ class DbTableLearningObjective {
         }
     }
     
+    static func getObjectiveNameFromID(objectiveID: Int) -> String {
+        var objective = ""
+        do {
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            var request = "SELECT * FROM " + TABLE_NAME
+            request += " WHERE " + KEY_ID_GLOBAL + " = " + String(objectiveID)
+        
+            try dbQueue.inDatabase { db in
+                let objectiveRecord = try LearningObjectiveRecord.fetchOne(db, request)
+                objective = objectiveRecord?.objective ?? ""
+            }
+        } catch let error {
+            print(error)
+        }
+        
+        return objective
+    }
+    
     static func getResultsPerObjective(subject: String) throws -> [[String]] {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var objectives = [String]()

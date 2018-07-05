@@ -141,4 +141,36 @@ class ReceptionProtocol {
             }
         }
     }
+    
+    static func receivedOEVALFromServer(prefix: String) {
+        if prefix.components(separatedBy: ":").count > 1 {
+            let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
+            var dataText = AppDelegate.wifiCommunicationSingleton?.readDataIntoArray(expectedSize: textSize) ?? [UInt8]()
+            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading objectives evaluation: dataText to string yields nil"
+            if dataTextString.contains("oops") {
+                DbTableLogs.insertLog(log: dataTextString)
+            }
+            do {
+                if dataTextString.components(separatedBy: "///").count >= 5 {
+                    let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
+                    let testName = dataTextString.components(separatedBy: "///")[1]
+                    let objectiveID = Int(dataTextString.components(separatedBy: "///")[2]) ?? 0
+                    let objective = dataTextString.components(separatedBy: "///")[3]
+                    let evaluation = dataTextString.components(separatedBy: "///")[4]
+                    
+                    //insert test in db after parsing questions
+                    try DbTableLearningObjective.insertLearningObjective(objectiveID: objectiveID, objective: objective, levelCognitiveAbility: 0)
+                    try DbTableRelationTestObjective.insertRelationTestObjective(idTest: testID, idObjective: objectiveID)
+                    try DbTableTests.insertTest(testID: testID, test: testName, testType: "CERTIF")
+                    try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: objectiveID, quantitativeEval: evaluation, testBelonging: testName, type: 2)
+                } else {
+                    let error = "problem reading test: text array to short"
+                    print(error)
+                    DbTableLogs.insertLog(log: error)
+                }
+            } catch let error {
+                print(error)
+            }
+        }
+    }
 }

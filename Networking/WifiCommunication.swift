@@ -86,7 +86,7 @@ class WifiCommunication {
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data!)
                 } else if typeID.range(of:"QID") != nil {
                     ReceptionProtocol.receivedQID(prefix: prefix)
-                } else if typeID.range(of:"EVAL") != nil {
+                } else if typeID.elementsEqual("EVAL") {
                     ReceptionProtocol.receivedEVAL(prefix: prefix)
                 } else if typeID.range(of:"UPDEV") != nil {
                     ReceptionProtocol.receivedUPDEV(prefix: prefix)
@@ -96,6 +96,8 @@ class WifiCommunication {
                     ReceptionProtocol.receivedTESTFromServer(prefix: prefix)
                 } else if typeID.range(of:"TESYN") != nil {
                     //ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
+                } else if typeID.elementsEqual("OEVAL") {
+                    ReceptionProtocol.receivedOEVALFromServer(prefix: prefix)
                 } else {
                     DbTableLogs.insertLog(log: "message received but prefix not supported: " + prefix)
                     print("message received but prefix not supported")
@@ -161,7 +163,7 @@ class WifiCommunication {
             let dataText = self.readDataIntoArray(expectedSize: textSize )
 
             print(imageSize)
-            let dataImage = self.readDataIntoArray(expectedSize: imageSize) ?? [UInt8]()
+            let dataImage = self.readDataIntoArray(expectedSize: imageSize)
 
             print("Image size actually read:" + String(dataImage.count))
             let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"

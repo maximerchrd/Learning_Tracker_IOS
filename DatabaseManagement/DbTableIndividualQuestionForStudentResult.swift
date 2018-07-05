@@ -22,6 +22,7 @@ class DbTableIndividualQuestionForResult {
     static let KEY_QUALITATIVE_EVAL = "QUALITATIVE_EVAL"
     static let KEY_TEST_BELONGING = "TEST_BELONGING"
     static let KEY_WEIGHTS_OF_ANSWERS = "WEIGHTS_OF_ANSWERS"
+    static let KEY_TYPE = "TYPE"        //0: Question Multiple Choice; 1: Question Short Answer; 2: Objective
     static var DBPath = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -40,6 +41,7 @@ class DbTableIndividualQuestionForResult {
                 t.column(KEY_QUALITATIVE_EVAL, .text).notNull()
                 t.column(KEY_TEST_BELONGING, .text).notNull()
                 t.column(KEY_WEIGHTS_OF_ANSWERS, .text).notNull()
+                t.column(KEY_TYPE, .integer)
             }
         }
     }
@@ -51,7 +53,7 @@ class DbTableIndividualQuestionForResult {
             try individualQuestionForResult.insert(db)
         }
     }
-    static func insertIndividualQuestionForResult(questionID: Int, quantitativeEval: String) throws {
+    static func insertIndividualQuestionForResult(questionID: Int, quantitativeEval: String, testBelonging: String = "none", type: Int = 2) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         let date = Date()
         let formatter = DateFormatter()
@@ -59,7 +61,7 @@ class DbTableIndividualQuestionForResult {
         let dateNow = formatter.string(from: date)
         print(dateNow)
         try dbQueue.inDatabase { db in
-            let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: dateNow, answers: "none", timeForSolving: "none", questionWeight: -1, evalType: "none", quantitativeEval: quantitativeEval, qualitativeEval: "none", testBelonging: "none", weightsOfAnswers: "none")
+            let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: dateNow, answers: "none", timeForSolving: "none", questionWeight: -1, evalType: "none", quantitativeEval: quantitativeEval, qualitativeEval: "none", testBelonging: testBelonging, weightsOfAnswers: "none", type: type)
             try individualQuestionForResult.insert(db)
         }
     }
@@ -130,6 +132,32 @@ class DbTableIndividualQuestionForResult {
         return results
     }
     
+    static func getResultsPerObjectiveForCertificativeTest (test: String) throws -> [[String]] {
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        var objectives = [String]()
+        var results = [String]()
+        var idQuestions = [Int]()
+        var resultsForEachObjective = [[String]]()
+        
+        try dbQueue.inDatabase { db in
+            let request = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_TYPE + " = ? AND " + KEY_TEST_BELONGING + " = ?"
+            
+            var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request, arguments: [2, test])
+            for i in 0..<resultRecord.count {
+                idQuestions.append(resultRecord[i].idGlobal)
+                results.append(resultRecord[i].quantitativeEval)
+            }
+            
+            for idQuestion in idQuestions {
+                objectives.append(DbTableLearningObjective.getObjectiveNameFromID(objectiveID: idQuestion))
+            }
+        }
+        resultsForEachObjective.append(objectives)
+        resultsForEachObjective.append(results)
+        
+        return resultsForEachObjective
+    }
+    
     static func getLatestEvaluationForQuestionID (questionID: Int) throws -> Double {
         var result = 0.0
         let dbQueue = try DatabaseQueue(path: DBPath)
@@ -157,8 +185,9 @@ class IndividualQuestionForResultRecord : Record {
     var qualitativeEval: String
     var testBelonging: String
     var weightsOfAnswers: String
+    var type: Int
     
-    init(idGlobal: Int, date: String, answers: String, timeForSolving: String, questionWeight: Double, evalType: String, quantitativeEval: String, qualitativeEval: String, testBelonging: String, weightsOfAnswers: String) {
+    init(idGlobal: Int, date: String, answers: String, timeForSolving: String, questionWeight: Double, evalType: String, quantitativeEval: String, qualitativeEval: String, testBelonging: String, weightsOfAnswers: String, type: Int = -1) {
         self.idGlobal = idGlobal
         self.date = date
         self.answers = answers
@@ -169,6 +198,7 @@ class IndividualQuestionForResultRecord : Record {
         self.qualitativeEval = qualitativeEval
         self.testBelonging = testBelonging
         self.weightsOfAnswers = weightsOfAnswers
+        self.type = type
         super.init()
     }
     
@@ -184,6 +214,7 @@ class IndividualQuestionForResultRecord : Record {
         self.qualitativeEval = row[DbTableIndividualQuestionForResult.KEY_QUALITATIVE_EVAL]
         self.testBelonging = row[DbTableIndividualQuestionForResult.KEY_TEST_BELONGING]
         self.weightsOfAnswers = row[DbTableIndividualQuestionForResult.KEY_WEIGHTS_OF_ANSWERS]
+        self.type = row[DbTableIndividualQuestionForResult.KEY_TYPE]
         super.init()
     }
     
@@ -203,6 +234,7 @@ class IndividualQuestionForResultRecord : Record {
         container[DbTableIndividualQuestionForResult.KEY_QUALITATIVE_EVAL] = qualitativeEval
         container[DbTableIndividualQuestionForResult.KEY_TEST_BELONGING] = testBelonging
         container[DbTableIndividualQuestionForResult.KEY_WEIGHTS_OF_ANSWERS] = weightsOfAnswers
+        container[DbTableIndividualQuestionForResult.KEY_TYPE] = type
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {
