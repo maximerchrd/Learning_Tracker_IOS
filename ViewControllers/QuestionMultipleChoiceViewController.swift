@@ -229,7 +229,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
             var answersArray = [String]()
             for singleCheckBox in checkBoxArray {
                 if singleCheckBox.isChecked {
-                    answers += (singleCheckBox.titleLabel?.text) ?? " " + "|||"
+                    answers += (singleCheckBox.titleLabel?.text ?? " ") + "|||"
                     answersArray.append((singleCheckBox.titleLabel?.text) ?? " ")
                 }
             }
