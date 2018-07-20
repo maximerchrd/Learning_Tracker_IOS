@@ -49,7 +49,9 @@ class DataConversion {
             questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[8])
             questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[9])
             questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[10])
-            questionMultipleChoice.ID = Int(wholeText.components(separatedBy: "///")[11])!
+            let idString = wholeText.components(separatedBy: "///")[11]
+            let intmax = Int.max
+            questionMultipleChoice.ID = Int64(wholeText.components(separatedBy: "///")[11])!
             questionMultipleChoice.NbCorrectAnswers = Int(wholeText.components(separatedBy: "///")[12])!
             questionMultipleChoice.Image = wholeText.components(separatedBy: "///")[15]
             
@@ -92,7 +94,7 @@ class DataConversion {
         //prepares the question
         if wholeText.components(separatedBy: "///").count > 5 {
             questionShortAnswer.Question = wholeText.components(separatedBy: "///")[0]
-            questionShortAnswer.ID = Int(wholeText.components(separatedBy: "///")[1])!
+            questionShortAnswer.ID = Int64(wholeText.components(separatedBy: "///")[1])!
             questionShortAnswer.Options = wholeText.components(separatedBy: "///")[2].components(separatedBy: "|||")
             let indexOfEmptyOption = questionShortAnswer.Options.index(of: "")
             if indexOfEmptyOption != nil {

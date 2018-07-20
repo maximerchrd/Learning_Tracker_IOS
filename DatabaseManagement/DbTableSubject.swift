@@ -28,14 +28,14 @@ class DbTableSubject {
         }
     }
     
-    static func insertSubject(questionID: Int, subject: String) throws {
+    static func insertSubject(questionID: Int64, subject: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let subjectRecord = SubjectRecord(idGlobal: 2000000, subject: subject)
             try subjectRecord.insert(db)
             let subjectToUpdate = try SubjectRecord.fetchOne(db, key: [KEY_SUBJECT: subject])
             if subjectToUpdate?.idGlobal == 2000000 {
-                subjectToUpdate?.idGlobal = 2000000 + Int((subjectToUpdate?.id)!)
+                subjectToUpdate?.idGlobal = 2000000 + Int64((subjectToUpdate?.id)!)
                 try subjectToUpdate?.update(db)
             }
             try DbTableRelationQuestionSubject.insertRelationQuestionSubject(questionID: questionID, subject: subject)
@@ -66,10 +66,10 @@ class DbTableSubject {
 
 class SubjectRecord : Record {
     var id: Int64?
-    var idGlobal: Int
+    var idGlobal: Int64
     var subject: String
     
-    init(idGlobal: Int, subject: String) {
+    init(idGlobal: Int64, subject: String) {
         self.idGlobal = idGlobal
         self.subject = subject
         super.init()

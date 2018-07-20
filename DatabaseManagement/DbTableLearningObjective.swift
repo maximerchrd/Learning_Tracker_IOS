@@ -30,21 +30,21 @@ class DbTableLearningObjective {
         }
     }
     
-    static func insertLearningObjective(questionID: Int, objective: String, levelCognitiveAbility: Int) throws {
+    static func insertLearningObjective(questionID: Int64, objective: String, levelCognitiveAbility: Int) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let learningObjective = LearningObjectiveRecord(idGlobal: 2000000, objective: objective, levelCognitiveAbility: levelCognitiveAbility)
             try learningObjective.insert(db)
             let learningObjectiveToUpdate = try LearningObjectiveRecord.fetchOne(db, key: [KEY_OBJECTIVE: objective])
             if learningObjectiveToUpdate?.idGlobal == 2000000 {
-                learningObjectiveToUpdate?.idGlobal = 2000000 + Int((learningObjectiveToUpdate?.id)!)
+                learningObjectiveToUpdate?.idGlobal = 2000000 + Int64((learningObjectiveToUpdate?.id)!)
                 try learningObjectiveToUpdate?.update(db)
             }
             try DbTableRelationQuestionObjective.insertRelationQuestionObjective(questionID: questionID, objective: objective)
         }
     }
     
-    static func insertLearningObjective(objectiveID: Int, objective: String, levelCognitiveAbility: Int) throws {
+    static func insertLearningObjective(objectiveID: Int64, objective: String, levelCognitiveAbility: Int) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let learningObjective = LearningObjectiveRecord(idGlobal: objectiveID, objective: objective, levelCognitiveAbility: levelCognitiveAbility)
@@ -52,7 +52,7 @@ class DbTableLearningObjective {
         }
     }
     
-    static func getObjectiveNameFromID(objectiveID: Int) -> String {
+    static func getObjectiveNameFromID(objectiveID: Int64) -> String {
         var objective = ""
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
@@ -74,7 +74,7 @@ class DbTableLearningObjective {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var objectives = [String]()
         var results = [String]()
-        var idQuestions = [Int]()
+        var idQuestions = [Int64]()
         var evaluationsForEachQuestion = [String]()
         var objectivesForEachQuestion = [[String]]()
         var resultsForEachObjective = [[String]]()
@@ -154,11 +154,11 @@ class DbTableLearningObjective {
 
 class LearningObjectiveRecord : Record {
     var id: Int64?
-    var idGlobal: Int
+    var idGlobal: Int64
     var objective: String
     var levelCognitiveAbility: Int
     
-    init(idGlobal: Int, objective: String, levelCognitiveAbility: Int) {
+    init(idGlobal: Int64, objective: String, levelCognitiveAbility: Int) {
         self.idGlobal = idGlobal
         self.objective = objective
         self.levelCognitiveAbility = levelCognitiveAbility

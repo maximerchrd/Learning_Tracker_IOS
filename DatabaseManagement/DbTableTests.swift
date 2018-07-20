@@ -32,7 +32,7 @@ class DbTableTests {
         }
     }
     
-    static func insertTest(testID: Int, test: String, questionIDs: String = "", objectiveIDs: [Int] = [Int](), objectives: [String] = [String](), testType: String = "FORMATIVE") throws {
+    static func insertTest(testID: Int64, test: String, questionIDs: String = "", objectiveIDs: [Int64] = [Int64](), objectives: [String] = [String](), testType: String = "FORMATIVE") throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             //insert the test
@@ -58,7 +58,7 @@ class DbTableTests {
         }
     }
     
-    static func getNameFromTestID(testID: Int) -> String {
+    static func getNameFromTestID(testID: Int64) -> String {
         do {
             var testName = "no test found"
             let dbQueue = try DatabaseQueue(path: DBPath)
@@ -80,7 +80,7 @@ class DbTableTests {
         return ""
     }
     
-    static func getTypeFromTestID(testID: Int) -> String {
+    static func getTypeFromTestID(testID: Int64) -> String {
         do {
             var testType = "no test found"
             let dbQueue = try DatabaseQueue(path: DBPath)
@@ -102,7 +102,7 @@ class DbTableTests {
         return ""
     }
     
-    static func getObjectivesFromTestID(testID: Int) -> [String] {
+    static func getObjectivesFromTestID(testID: Int64) -> [String] {
         var objectives = [String]()
         var objectiveRecords = [LearningObjectiveRecord]()
         
@@ -169,7 +169,7 @@ class DbTableTests {
         
         //fill array with tests and corresponding ids
         var tests = [String]()
-        var ids = [Int]()
+        var ids = [Int64]()
         for singleRecord in testsRecords {
             tests.append(singleRecord.test)
             ids.append(singleRecord.idGlobal)
@@ -201,12 +201,12 @@ class DbTableTests {
 
 class TestRecord : Record {
     var id: Int64?
-    var idGlobal: Int
+    var idGlobal: Int64
     var test: String
     var questionIDS: String
     var testType: String
     
-    init(idGlobal: Int, test: String, questionIDs: String, testType: String) {
+    init(idGlobal: Int64, test: String, questionIDs: String, testType: String) {
         self.idGlobal = idGlobal
         self.test = test
         self.questionIDS = questionIDs

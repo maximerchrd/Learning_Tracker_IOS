@@ -46,14 +46,14 @@ class DbTableIndividualQuestionForResult {
         }
     }
     
-    static func insertIndividualQuestionForResult(questionID: Int, date: String, answers: String, timeForSolving: String, questionWeight: Double, evalType: String, quantitativeEval: String, qualitativeEval: String, testBelonging: String, weightsOfAnswers: String) throws {
+    static func insertIndividualQuestionForResult(questionID: Int64, date: String, answers: String, timeForSolving: String, questionWeight: Double, evalType: String, quantitativeEval: String, qualitativeEval: String, testBelonging: String, weightsOfAnswers: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: date, answers: answers, timeForSolving: timeForSolving, questionWeight: questionWeight, evalType: evalType, quantitativeEval: quantitativeEval, qualitativeEval: qualitativeEval, testBelonging: testBelonging, weightsOfAnswers: weightsOfAnswers)
             try individualQuestionForResult.insert(db)
         }
     }
-    static func insertIndividualQuestionForResult(questionID: Int, quantitativeEval: String, testBelonging: String = "none", type: Int = 2) throws {
+    static func insertIndividualQuestionForResult(questionID: Int64, quantitativeEval: String, testBelonging: String = "none", type: Int = 2) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         let date = Date()
         let formatter = DateFormatter()
@@ -65,7 +65,7 @@ class DbTableIndividualQuestionForResult {
             try individualQuestionForResult.insert(db)
         }
     }
-    static func insertIndividualQuestionForResult(questionID: Int, answer: String, quantitativeEval: String) throws {
+    static func insertIndividualQuestionForResult(questionID: Int64, answer: String, quantitativeEval: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         let date = Date()
         let formatter = DateFormatter()
@@ -136,7 +136,7 @@ class DbTableIndividualQuestionForResult {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var objectives = [String]()
         var results = [String]()
-        var idQuestions = [Int]()
+        var idQuestions = [Int64]()
         var resultsForEachObjective = [[String]]()
         
         try dbQueue.inDatabase { db in
@@ -158,7 +158,7 @@ class DbTableIndividualQuestionForResult {
         return resultsForEachObjective
     }
     
-    static func getLatestEvaluationForQuestionID (questionID: Int) throws -> Double {
+    static func getLatestEvaluationForQuestionID (questionID: Int64) throws -> Double {
         var result = 0.0
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
@@ -175,7 +175,7 @@ class DbTableIndividualQuestionForResult {
 
 class IndividualQuestionForResultRecord : Record {
     var id: Int64?
-    var idGlobal: Int
+    var idGlobal: Int64
     var date: String
     var answers: String
     var timeForSolving: String
@@ -187,7 +187,7 @@ class IndividualQuestionForResultRecord : Record {
     var weightsOfAnswers: String
     var type: Int
     
-    init(idGlobal: Int, date: String, answers: String, timeForSolving: String, questionWeight: Double, evalType: String, quantitativeEval: String, qualitativeEval: String, testBelonging: String, weightsOfAnswers: String, type: Int = -1) {
+    init(idGlobal: Int64, date: String, answers: String, timeForSolving: String, questionWeight: Double, evalType: String, quantitativeEval: String, qualitativeEval: String, testBelonging: String, weightsOfAnswers: String, type: Int = -1) {
         self.idGlobal = idGlobal
         self.date = date
         self.answers = answers

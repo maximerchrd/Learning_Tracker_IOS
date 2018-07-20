@@ -28,7 +28,7 @@ class DbTableRelationQuestionAnswerOption {
         }
     }
     
-    static func insertRelationQuestionAnswerOption(questionID: Int, option: String) throws {
+    static func insertRelationQuestionAnswerOption(questionID: Int64, option: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let relationQuestionAnswerOption = RelationQuestionAnswerOptionRecord(idGlobal: questionID, option: option)
@@ -39,10 +39,10 @@ class DbTableRelationQuestionAnswerOption {
 
 class RelationQuestionAnswerOptionRecord : Record {
     var id: Int64?
-    var idGlobal: Int
+    var idGlobal: Int64
     var option: String
     
-    init(idGlobal: Int, option: String) {
+    init(idGlobal: Int64, option: String) {
         self.idGlobal = idGlobal
         self.option = option
         super.init()

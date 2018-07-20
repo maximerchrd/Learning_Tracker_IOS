@@ -17,7 +17,7 @@ class ResultsCityRepresentationViewController: UIViewController {
     var subjects = [String]()
     var selectedTest = NSLocalizedString("All tests", comment: "All tests in the database")
     var tests = [String]()
-    var testIDs = [Int]()
+    var testIDs = [Int64]()
     
     var objectiveLeftSide = CGFloat(0.0)
     
@@ -57,7 +57,7 @@ class ResultsCityRepresentationViewController: UIViewController {
             let allTests = try DbTableTests.getAllTests()
             for test in allTests {
                 tests.append(test[0])
-                testIDs.append(Int(test[1]) ?? -1)
+                testIDs.append(Int64(test[1]) ?? -1)
             }
         } catch let error {
             print(error)
@@ -100,7 +100,7 @@ class ResultsCityRepresentationViewController: UIViewController {
         AppDelegate.AppUtility.lockOrientation(.all, andRotateTo: .portrait)
     }
     
-    func drawCity(subject: String, testID: Int, test: String = "") {
+    func drawCity(subject: String, testID: Int64, test: String = "") {
         do {
             //START selecting the right objectives and results
             var evalForObjectives = try DbTableLearningObjective.getResultsPerObjective(subject: subject)

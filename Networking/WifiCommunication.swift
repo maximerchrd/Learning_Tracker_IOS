@@ -27,9 +27,9 @@ class WifiCommunication {
     public func connectToServer() {
         DispatchQueue.global(qos: .utility).async {
             //first check if we are connected to a wifi network
-            if self.currentSSIDs().count == 0 {
-                self.displayInstructions(instructionIndex: 0)
-            } else {
+            //if self.currentSSIDs().count == 0 {
+            //    self.displayInstructions(instructionIndex: 0)
+            //} else {
                 do { try self.host = DbTableSettings.retrieveMaster() } catch {}
                 self.client = TCPClient(address: self.host, port: Int32(self.PORT_NUMBER))
                 let dataConverter = DataConversion()
@@ -56,7 +56,7 @@ class WifiCommunication {
                     }
                     print(error)
                 }
-            }
+            //}
         }
     }
     
@@ -109,7 +109,7 @@ class WifiCommunication {
         
     }
     
-    public func sendAnswerToServer(answer: String, globalID: Int, questionType: String, timeSpent: String) {
+    public func sendAnswerToServer(answer: String, globalID: Int64, questionType: String, timeSpent: String) {
         pendingAnswer = answer
         var message = ""
         do {
@@ -171,7 +171,7 @@ class WifiCommunication {
                 DbTableLogs.insertLog(log: dataTextString)
             }
             print(dataTextString)
-            var questionID = -1
+            var questionID:Int64 = -1
             do {
                 if typeOfQuest.range(of: "MULTQ") != nil {
                     let questionMult = DataConversion.bytesToMultq(textData: dataText, imageData: dataImage)

@@ -162,6 +162,24 @@ class QuestionMultipleChoiceViewController: UIViewController {
         
         //start the timer
         startTime = Date.timeIntervalSinceReferenceDate
+        
+        /**
+         * START CODE USED FOR TESTING
+         */
+        if questionMultipleChoice.Question.contains("*ç%&") {
+             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: optionsArray[0], globalID: questionMultipleChoice.ID, questionType: "ANSW0", timeSpent: "2.63")
+            if let navController = self.navigationController {
+                //set cached view controller to nil to prevent students answering several times to same question
+                isBackButton = false
+                ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
+                print( ClassroomActivityViewController.navQuestionMultipleChoiceViewController as Any )
+                
+                navController.popViewController(animated: true)
+            }
+        }
+        /**
+         * END CODE USED FOR TESTING
+         */
     }
 
     override func viewDidAppear(_ animated: Bool) {

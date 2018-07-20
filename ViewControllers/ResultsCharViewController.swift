@@ -19,7 +19,7 @@ class ResultsChartViewController: UIViewController {
     var subjects = [String]()
     var selectedTest = NSLocalizedString("All tests", comment: "All tests in the database")
     var tests = [String]()
-    var testIDs = [Int]()
+    var testIDs = [Int64]()
     
     @IBOutlet weak var BarChart: HorizontalBarChartView!
     
@@ -57,7 +57,7 @@ class ResultsChartViewController: UIViewController {
             let allTests = try DbTableTests.getAllTests()
             for test in allTests {
                 tests.append(test[0])
-                testIDs.append(Int(test[1]) ?? -1)
+                testIDs.append(Int64(test[1]) ?? -1)
             }
         } catch let error {
             print(error)
@@ -97,7 +97,7 @@ class ResultsChartViewController: UIViewController {
         AppDelegate.AppUtility.lockOrientation(.all, andRotateTo: .portrait)
     }
     
-    public func barChartUpdate (subject: String, testID: Int) {
+    public func barChartUpdate (subject: String, testID: Int64) {
         do {
             var evalForObjectives = try DbTableLearningObjective.getResultsPerObjective(subject: subject)
             var objectives = evalForObjectives[0]

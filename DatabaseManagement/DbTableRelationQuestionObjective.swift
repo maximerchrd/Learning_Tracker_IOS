@@ -30,7 +30,7 @@ class DbTableRelationQuestionObjective {
         }
     }
     
-    static func insertRelationQuestionObjective(questionID: Int, objective: String) throws {
+    static func insertRelationQuestionObjective(questionID: Int64, objective: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let idglobalobjective = String(questionID) + objective
@@ -42,11 +42,11 @@ class DbTableRelationQuestionObjective {
 
 class RelationQuestionObjectiveRecord : Record {
     var id: Int64?
-    var idGlobal: Int
+    var idGlobal: Int64
     var objective: String
     var idGlobalObjective: String
     
-    init(idGlobal: Int, objective: String, idGlobalObjective:String) {
+    init(idGlobal: Int64, objective: String, idGlobalObjective:String) {
         self.idGlobal = idGlobal
         self.objective = objective
         self.idGlobalObjective = idGlobalObjective

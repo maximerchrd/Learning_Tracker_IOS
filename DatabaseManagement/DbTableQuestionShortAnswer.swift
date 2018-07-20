@@ -55,7 +55,7 @@ class DbTableQuestionShortAnswer {
         }
     }
     
-    static func retrieveQuestionShortAnswerWithID (globalID: Int) throws -> QuestionShortAnswer {
+    static func retrieveQuestionShortAnswerWithID (globalID: Int64) throws -> QuestionShortAnswer {
         var questionShortAnswerToReturn = QuestionShortAnswer()
         var optionsArray = [String]()
         var questionShortAnswerRec = QuestionShortAnswerRecord(questionShortAnswerArg: questionShortAnswerToReturn)

@@ -15,7 +15,7 @@ class ReceptionProtocol {
         DispatchQueue.main.async {
             var questionMultipleChoice = QuestionMultipleChoice()
             var questionShortAnswer = QuestionShortAnswer()
-            let idGlobal = Int(prefix.components(separatedBy: "///")[1]) ?? 0
+            let idGlobal = Int64(prefix.components(separatedBy: "///")[1]) ?? 0
             if idGlobal < 0 {
                 let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
                 let test = Test()
@@ -27,7 +27,7 @@ class ReceptionProtocol {
                     AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: directCorrection, testMode: 0)
                 }
             } else if prefix.components(separatedBy: ":")[1].contains("MLT") {
-                let id_global = Int(prefix.components(separatedBy: "///")[1])
+                let id_global = Int64(prefix.components(separatedBy: "///")[1])
                 let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
                 do {
                     questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
@@ -47,7 +47,7 @@ class ReceptionProtocol {
     
     static func receivedEVAL(prefix: String) {
         do {
-            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int(prefix.components(separatedBy: "///")[2])!, answer: (AppDelegate.wifiCommunicationSingleton?.pendingAnswer)!, quantitativeEval: prefix.components(separatedBy: "///")[1])
+            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(prefix.components(separatedBy: "///")[2])!, answer: (AppDelegate.wifiCommunicationSingleton?.pendingAnswer)!, quantitativeEval: prefix.components(separatedBy: "///")[1])
             if ClassroomActivityViewController.navTestTableViewController != nil {
                 AppDelegate.activeTest.IDresults[prefix.components(separatedBy: "///")[2]] = Float32(prefix.components(separatedBy: "///")[1]) ?? -1.0
                 DispatchQueue.main.async {
@@ -71,7 +71,7 @@ class ReceptionProtocol {
         DispatchQueue.main.async {
             var questionMultipleChoice = QuestionMultipleChoice()
             var questionShortAnswer = QuestionShortAnswer()
-            let id_global = Int(prefix.components(separatedBy: "///")[1])
+            let id_global = Int64(prefix.components(separatedBy: "///")[1])
             do {
                 questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
                 
@@ -97,14 +97,14 @@ class ReceptionProtocol {
             }
             do {
                 if dataTextString.components(separatedBy: "///").count > 3 {
-                    let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
+                    let testID = Int64(dataTextString.components(separatedBy: "///")[0]) ?? 0
                     let test = dataTextString.components(separatedBy: "///")[1]
                     let objectivesArray = dataTextString.components(separatedBy: "///")[3].components(separatedBy: "|||")
-                    var objectiveIDS = [Int]()
+                    var objectiveIDS = [Int64]()
                     var objectives = [String]()
                     for objectiveANDid in objectivesArray {
                         if objectiveANDid.count > 0 {
-                            objectiveIDS.append(Int(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
+                            objectiveIDS.append(Int64(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
                             if objectiveANDid.components(separatedBy: "/|/").count > 1 {
                                 objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
                             } else {
@@ -152,9 +152,9 @@ class ReceptionProtocol {
             }
             do {
                 if dataTextString.components(separatedBy: "///").count >= 5 {
-                    let testID = Int(dataTextString.components(separatedBy: "///")[0]) ?? 0
+                    let testID = Int64(dataTextString.components(separatedBy: "///")[0]) ?? 0
                     let testName = dataTextString.components(separatedBy: "///")[1]
-                    let objectiveID = Int(dataTextString.components(separatedBy: "///")[2]) ?? 0
+                    let objectiveID = Int64(dataTextString.components(separatedBy: "///")[2]) ?? 0
                     let objective = dataTextString.components(separatedBy: "///")[3]
                     let evaluation = dataTextString.components(separatedBy: "///")[4]
                     

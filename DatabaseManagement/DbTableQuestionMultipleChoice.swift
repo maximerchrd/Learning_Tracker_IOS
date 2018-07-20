@@ -80,7 +80,7 @@ class DbTableQuestionMultipleChoice {
         }
     }
     
-    static func retrieveQuestionMultipleChoiceWithID (globalID: Int) throws -> QuestionMultipleChoice {
+    static func retrieveQuestionMultipleChoiceWithID (globalID: Int64) throws -> QuestionMultipleChoice {
         var questionMultipleChoiceToReturn = QuestionMultipleChoice()
         var questionMultipleChoice = QuestionMultipleChoiceRecord(questionMultipleChoiceArg: questionMultipleChoiceToReturn)
         do {

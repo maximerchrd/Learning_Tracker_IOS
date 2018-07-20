@@ -36,7 +36,7 @@ class DbTableAnswerOptions {
         }
     }
     
-    static func insertAnswerOption(questionID: Int, option: String) throws {
+    static func insertAnswerOption(questionID: Int64, option: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let answerOption = AnswerOptionRecord(idGlobal: questionID, option: option)
@@ -44,7 +44,7 @@ class DbTableAnswerOptions {
         }
     }
     
-    static func retrieveAnswerOptions(questionID: Int) throws -> [String]{
+    static func retrieveAnswerOptions(questionID: Int64) throws -> [String]{
         var answerOptions = [String]()
         var answerOptionRecord = [AnswerOptionRecord]()
         do {
@@ -63,7 +63,7 @@ class DbTableAnswerOptions {
         return answerOptions
     }
     
-    static func deleteAnswerOptions(questionID: Int) throws -> [String]{
+    static func deleteAnswerOptions(questionID: Int64) throws -> [String]{
         var answerOptions = [String]()
         var answerOptionRecord = [AnswerOptionRecord]()
         do {
@@ -85,10 +85,10 @@ class DbTableAnswerOptions {
 
 class AnswerOptionRecord : Record {
     var id: Int64?
-    var idGlobal: Int
+    var idGlobal: Int64
     var option: String
     
-    init(idGlobal: Int, option: String) {
+    init(idGlobal: Int64, option: String) {
         self.idGlobal = idGlobal
         self.option = option
         super.init()

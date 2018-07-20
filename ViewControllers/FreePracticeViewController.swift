@@ -17,7 +17,7 @@ class FreePracticeViewController: UIViewController {
     
     @IBOutlet weak var SubjectPicker: UIPickerView!
     @IBAction func StartPracticeButtonTouched(_ sender: Any) {
-        var questionIds = [Int]()
+        var questionIds = [Int64]()
         var results = [Double]()
         do {
             questionIds = try DbTableRelationQuestionSubject.getQuestionsForSubject(subject: selectedSubject)

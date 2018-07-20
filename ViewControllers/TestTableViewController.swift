@@ -45,11 +45,11 @@ class TestTableViewController: UITableViewController {
         AppDelegate.activeTest.refreshActiveIds()
         do {
             for questionID in questionIDs {
-                let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: Int(questionID) ?? 0)
+                let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: Int64(questionID) ?? 0)
                 if questionMultipleChoice.ID > 0 {
                     questionsMultipleChoice[questionID] = questionMultipleChoice
                 } else {
-                    let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: Int(questionID) ?? 0)
+                    let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: Int64(questionID) ?? 0)
                     questionsShortAnswer[questionID] = questionShortAnswer
                 }
             }

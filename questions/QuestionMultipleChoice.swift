@@ -9,7 +9,7 @@
 import Foundation
 
 class QuestionMultipleChoice {
-    var ID = 0
+    var ID:Int64 = 0
     var Subject = ""
     var Level = ""
     var Question = "none"

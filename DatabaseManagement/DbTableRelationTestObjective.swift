@@ -29,7 +29,7 @@ class DbTableRelationTestObjective {
         }
     }
     
-    static func insertRelationTestObjective(idTest: Int, idObjective: Int) throws {
+    static func insertRelationTestObjective(idTest: Int64, idObjective: Int64) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let relationTestObjective = RelationTestObjectiveRecord(idTest: idTest, idObjective: idObjective)
@@ -40,10 +40,10 @@ class DbTableRelationTestObjective {
 
 class RelationTestObjectiveRecord : Record {
     var id: Int64?
-    var idTest: Int
-    var idObjective: Int
+    var idTest: Int64
+    var idObjective: Int64
     
-    init(idTest: Int, idObjective:Int) {
+    init(idTest: Int64, idObjective:Int64) {
         self.idTest = idTest
         self.idObjective = idObjective
         super.init()

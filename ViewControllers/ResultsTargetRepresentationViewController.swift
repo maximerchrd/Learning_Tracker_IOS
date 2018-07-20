@@ -17,7 +17,7 @@ class ResultsTargetRepresentationViewController: UIViewController {
     var subjects = [String]()
     var selectedTest = NSLocalizedString("All tests", comment: "All tests in the database")
     var tests = [String]()
-    var testIDs = [Int]()
+    var testIDs = [Int64]()
     
     var evaluations_low = [String]()
     var evaluations_middle = [String]()
@@ -60,7 +60,7 @@ class ResultsTargetRepresentationViewController: UIViewController {
             let allTests = try DbTableTests.getAllTests()
             for test in allTests {
                 tests.append(test[0])
-                testIDs.append(Int(test[1]) ?? -1)
+                testIDs.append(Int64(Int(test[1]) ?? -1))
             }
         } catch let error {
             print(error)
@@ -90,7 +90,7 @@ class ResultsTargetRepresentationViewController: UIViewController {
         updateTargetRepresentation(subject: NSLocalizedString("All subjects", comment: "All subjects in the database"), testID: 0)
     }
     
-    public func updateTargetRepresentation(subject: String, testID: Int) {
+    public func updateTargetRepresentation(subject: String, testID: Int64) {
         for singleLabel in labelsArray {
             singleLabel.removeFromSuperview()
         }

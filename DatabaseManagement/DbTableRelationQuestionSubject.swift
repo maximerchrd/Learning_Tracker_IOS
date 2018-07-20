@@ -30,7 +30,7 @@ class DbTableRelationQuestionSubject {
         }
     }
     
-    static func insertRelationQuestionSubject(questionID: Int, subject: String) throws {
+    static func insertRelationQuestionSubject(questionID: Int64, subject: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             let idGlobalSubject = String(questionID) + subject
@@ -39,7 +39,7 @@ class DbTableRelationQuestionSubject {
         }
     }
     
-    static func getQuestionsForSubject(subject: String) throws -> [Int] {
+    static func getQuestionsForSubject(subject: String) throws -> [Int64] {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var relationQuestionSubjectRecords = [RelationQuestionSubjectRecord]()
         let subjectPurged = subject.replacingOccurrences(of: "'", with: "''")
@@ -52,7 +52,7 @@ class DbTableRelationQuestionSubject {
         try dbQueue.inDatabase { db in
             relationQuestionSubjectRecords = try RelationQuestionSubjectRecord.fetchAll(db, request)
         }
-        var questionIDs = [Int]()
+        var questionIDs = [Int64]()
         for singleRecord in relationQuestionSubjectRecords {
             questionIDs.append(singleRecord.idGlobal)
         }
@@ -65,11 +65,11 @@ class DbTableRelationQuestionSubject {
 
 class RelationQuestionSubjectRecord : Record {
     var id: Int64?
-    var idGlobal: Int
+    var idGlobal: Int64
     var subject: String
     var idGlobalSubject: String
     
-    init(idGlobal: Int, subject: String, idGlobalSubject: String) {
+    init(idGlobal: Int64, subject: String, idGlobalSubject: String) {
         self.idGlobal = idGlobal
         self.subject = subject
         self.idGlobalSubject = idGlobalSubject
