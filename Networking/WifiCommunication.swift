@@ -11,14 +11,16 @@ import UIKit
 import SwiftSocket
 import SystemConfiguration.CaptiveNetwork
 import MultipeerConnectivity
+import CocoaAsyncSocket
 
-class WifiCommunication {
+class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     let PORT_NUMBER = 9090
     var host = "xxx.xxx.x.xxx"
     var client: TCPClient?
     var classroomActivityViewController: ClassroomActivityViewController?
     var pendingAnswer = "none"
     var peeridUidDictionary = [String:MCPeerID]()
+    var socket:GCDAsyncUdpSocket!
     
     init(classroomActivityViewControllerArg: ClassroomActivityViewController) {
         classroomActivityViewController = classroomActivityViewControllerArg
@@ -27,10 +29,26 @@ class WifiCommunication {
     public func connectToServer() {
         DispatchQueue.global(qos: .utility).async {
             //first check if we are connected to a wifi network
-            //if self.currentSSIDs().count == 0 {
-            //    self.displayInstructions(instructionIndex: 0)
-            //} else {
-                do { try self.host = DbTableSettings.retrieveMaster() } catch {}
+            if self.currentSSIDs().count == 0 {
+                self.displayInstructions(instructionIndex: 0)
+            } else {
+                //try to connect automatically
+                var automaticConnection = 1
+                do {
+                    automaticConnection = try DbTableSettings.retrieveAutomaticConnection()
+                } catch let error {
+                    print(error)
+                }
+                
+                if automaticConnection == 1  {
+                    self.listenForIPThroughUDP()
+                    Thread.sleep(forTimeInterval: 3)
+                    if self.host == "xxx.xxx.x.xxx" {
+                        do { try self.host = DbTableSettings.retrieveMaster() } catch {}
+                    }
+                } else {
+                    do { try self.host = DbTableSettings.retrieveMaster() } catch {}
+                }
                 self.client = TCPClient(address: self.host, port: Int32(self.PORT_NUMBER))
                 let dataConverter = DataConversion()
                 
@@ -56,7 +74,7 @@ class WifiCommunication {
                     }
                     print(error)
                 }
-            //}
+            }
         }
     }
     
@@ -235,7 +253,7 @@ class WifiCommunication {
             return ssid
         }
     }
-    
+
     public func readDataIntoArray(expectedSize: Int) -> [UInt8] {
         //read data
         var arrayToFill = [UInt8]()
@@ -250,4 +268,33 @@ class WifiCommunication {
         }
         return arrayToFill
     }
+    
+    //START UDP COMMUNICATION STUFFS
+    fileprivate func listenForIPThroughUDP() {
+        print("try to listen for UDP broadcast")
+        do {
+            socket = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.main)
+            try socket.enableBroadcast(true)
+            try socket.bind(toPort: 9722)
+            try socket.beginReceiving()
+        } catch let error {
+            print(error)
+        }
+    }
+    
+    func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
+        let receivedMessage = String(data: data, encoding: .utf8) ?? "couldn't read message"
+        print(receivedMessage)
+        
+        if receivedMessage.components(separatedBy: "///")[0] == "IPADDRESS" {
+            DbTableSettings.setMaster(master: receivedMessage.components(separatedBy: "///")[1])
+        }
+        
+        do {
+            try socket.close()
+        } catch let error {
+            print(error)
+        }
+    }
+    //END UDP COMMUNICATION STUFFS
 }

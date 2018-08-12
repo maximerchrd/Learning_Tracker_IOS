@@ -14,7 +14,7 @@ class DbTableSettings {
     static let KEY_IDsettings = "id"
     static let KEY_NAME = "name"
     static let KEY_MASTER = "master"
-    static let KEY_SERVICEINDEX = "serviceindex"
+    static let KEY_AUTOMATIC_CONNECTION = "automatic_connection"
     static var DBName = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -25,6 +25,7 @@ class DbTableSettings {
                 t.column(KEY_IDsettings, .integer).primaryKey()
                 t.column(KEY_NAME, .text).notNull()
                 t.column(KEY_MASTER, .text).notNull()
+                t.column(KEY_AUTOMATIC_CONNECTION, .text).notNull()
             }
         }
     }
@@ -76,6 +77,21 @@ class DbTableSettings {
         return master
     }
     
+    static func retrieveAutomaticConnection () throws -> Int {
+        var automaticConnection = 1
+        do {
+            let dbQueue = try DatabaseQueue(path: DBName)
+            try dbQueue.inDatabase { db in
+                let setting = try Setting.fetchOne(db)
+                automaticConnection = setting!.automaticConnection
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+        return automaticConnection
+    }
+    
     static func setNameAndMaster(name: String, master: String) {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
@@ -92,16 +108,51 @@ class DbTableSettings {
             print(error.localizedDescription)
         }
     }
+    
+    static func setMaster(master: String) {
+        do {
+            let dbQueue = try DatabaseQueue(path: DBName)
+            try dbQueue.inDatabase { db in
+                let setting = try Setting.fetchOne(db)
+                let name = setting!.name
+                try db.execute(
+                    "UPDATE " + TABLE_NAME + " SET master = ? WHERE name = ?",
+                    arguments: [master, name])
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+    }
+    
+    static func setAutomaticConnection(automaticConnection: Int) {
+        do {
+            let dbQueue = try DatabaseQueue(path: DBName)
+            try dbQueue.inDatabase { db in
+                let setting = try Setting.fetchOne(db)
+                let name = setting!.name
+
+                try db.execute(
+                    "UPDATE " + TABLE_NAME + " SET " + KEY_AUTOMATIC_CONNECTION + " = ? WHERE name = ?",
+                    arguments: [automaticConnection, name])
+            }
+        } catch let error {
+            print(error)
+            print(error.localizedDescription)
+        }
+    }
 }
 
 class Setting : Record {
     var id: Int64?
     var name: String
     var master: String
+    var automaticConnection: Int
     
     init(name: String, master: String) {
         self.name = name
         self.master = master
+        self.automaticConnection = 1
         super.init()
     }
     
@@ -109,6 +160,7 @@ class Setting : Record {
         id = row["id"]
         name = row[DbTableSettings.KEY_NAME]
         master = row[DbTableSettings.KEY_MASTER]
+        automaticConnection = row[DbTableSettings.KEY_AUTOMATIC_CONNECTION]
         super.init()
     }
     
@@ -120,6 +172,7 @@ class Setting : Record {
         container["id"] = id
         container[DbTableSettings.KEY_NAME] = name
         container[DbTableSettings.KEY_MASTER] = master
+        container[DbTableSettings.KEY_AUTOMATIC_CONNECTION] = automaticConnection
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

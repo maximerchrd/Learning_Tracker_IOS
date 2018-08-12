@@ -16,8 +16,20 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     
     @IBOutlet weak var NameTextField: UITextField!
     @IBOutlet weak var IpAddressTextField: UITextField!
+    @IBOutlet weak var automaticConnectionSwitch: UISwitch!
     
 
+    @IBAction func automaticConnectionAction(_ sender: Any) {
+        if automaticConnectionSwitch.isOn {
+            DbTableSettings.setAutomaticConnection(automaticConnection: 1)
+            IpAddressTextField.isEnabled = false
+            IpAddressTextField.textColor = UIColor.gray
+        } else {
+            DbTableSettings.setAutomaticConnection(automaticConnection: 0)
+            IpAddressTextField.isEnabled = true
+            IpAddressTextField.textColor = UIColor.black
+        }
+    }
     
     @IBAction func SaveAndGoBackButtonPressed(_ sender: Any) {
         DbTableSettings.setNameAndMaster(name: NameTextField.text!, master: IpAddressTextField.text!)
@@ -53,6 +65,13 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         do {
             NameTextField.text = try DbTableSettings.retrieveName()
             IpAddressTextField.text = try DbTableSettings.retrieveMaster()
+            let automaticConnection = try DbTableSettings.retrieveAutomaticConnection()
+            if automaticConnection == 1 {
+                IpAddressTextField.isEnabled = false
+                IpAddressTextField.textColor = UIColor.gray
+            } else {
+                automaticConnectionSwitch.isOn = false
+            }
             self.NameTextField.delegate = self;
             self.IpAddressTextField.delegate = self;
         } catch let error {
