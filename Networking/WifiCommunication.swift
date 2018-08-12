@@ -274,7 +274,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         do {
             socket = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.main)
             try socket.enableBroadcast(true)
-            try socket.bind(toPort: 9722)
+            try socket.bind(toPort: 9346)
             try socket.beginReceiving()
         } catch let error {
             print(error)
