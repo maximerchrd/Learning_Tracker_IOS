@@ -271,7 +271,6 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     
     //START UDP COMMUNICATION STUFFS
     fileprivate func listenForIPThroughUDP() {
-        print("try to listen for UDP broadcast")
         do {
             socket = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.main)
             try socket.enableBroadcast(true)
@@ -287,14 +286,10 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         print(receivedMessage)
         
         if receivedMessage.components(separatedBy: "///")[0] == "IPADDRESS" {
+            self.host = receivedMessage.components(separatedBy: "///")[1]
             DbTableSettings.setMaster(master: receivedMessage.components(separatedBy: "///")[1])
         }
-        
-        do {
-            try socket.close()
-        } catch let error {
-            print(error)
-        }
+        socket.close()
     }
     //END UDP COMMUNICATION STUFFS
 }
