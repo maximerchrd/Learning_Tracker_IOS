@@ -28,12 +28,16 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     
     public func connectToServer() {
         DispatchQueue.global(qos: .utility).async {
+            //reinitialize ip address to check if we get it from automatic connection
+            self.host = "xxx.xxx.x.xxx"
+            
             //first check if we are connected to a wifi network
             if self.currentSSIDs().count == 0 {
                 self.displayInstructions(instructionIndex: 0)
             } else {
                 //try to connect automatically
                 var automaticConnection = 1
+                var automaticConnectionSuccess = true
                 do {
                     automaticConnection = try DbTableSettings.retrieveAutomaticConnection()
                 } catch let error {
@@ -45,6 +49,9 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     Thread.sleep(forTimeInterval: 3)
                     if self.host == "xxx.xxx.x.xxx" {
                         do { try self.host = DbTableSettings.retrieveMaster() } catch {}
+                        self.displayInstructions(instructionIndex: 3)
+                        automaticConnectionSuccess = false
+                        self.socket.close()
                     }
                 } else {
                     do { try self.host = DbTableSettings.retrieveMaster() } catch {}
@@ -56,17 +63,23 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 case .success:
                     switch self.client!.send(data: dataConverter.connection()) {
                     case .success:
-                        self.displayInstructions(instructionIndex: 1)
+                        if automaticConnectionSuccess {
+                            self.displayInstructions(instructionIndex: 1)
+                        }
                         DispatchQueue.global(qos: .utility).async {
                             self.listenToServer()
                         }
                     case .failure(let error):
-                        self.displayInstructions(instructionIndex: 2)
+                        if automaticConnectionSuccess {
+                            self.displayInstructions(instructionIndex: 2)
+                        }
                         DbTableLogs.insertLog(log: error.localizedDescription)
                         print(error)
                     }
                 case .failure(let error):
-                    self.displayInstructions(instructionIndex: 2)
+                    if automaticConnectionSuccess {
+                        self.displayInstructions(instructionIndex: 2)
+                    }
                     if error.localizedDescription.contains("3") {
                         DbTableLogs.insertLog(log: error.localizedDescription + "(could connect to ip but server not running?)")
                     } else {
@@ -233,8 +246,12 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND CONNECT TO THE RIGHT WIFI NETWORK", comment: "instruction NO NETWORK after the KEEP CALM")
             case 1:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
-            default:
+            case 2:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")
+            case 3:
+                self.classroomActivityViewController?.InstructionsLabel.text = "Automatic connection failed. If it keeps failing, set the ip address of the teacher manually in \"Settings\""
+            default:
+                print("Display instruction not recognized")
             }
         }
     }
@@ -272,10 +289,13 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     //START UDP COMMUNICATION STUFFS
     fileprivate func listenForIPThroughUDP() {
         do {
-            socket = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.main)
+            if socket == nil {
+                socket = GCDAsyncUdpSocket(delegate: self, delegateQueue: DispatchQueue.main)
+            }
             try socket.enableBroadcast(true)
             try socket.bind(toPort: 9346)
             try socket.beginReceiving()
+            
         } catch let error {
             print(error)
         }
