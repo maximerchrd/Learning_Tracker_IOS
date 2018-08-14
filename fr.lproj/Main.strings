@@ -1,9 +1,9 @@
 
 /* Class = "UIButton"; normalTitle = "Start Classroom Activity"; ObjectID = "3GW-TH-Eq6"; */
-"3GW-TH-Eq6.normalTitle" = "Commencer l'activité en classe";
+"3GW-TH-Eq6.normalTitle" = "Activité en classe";
 
 /* Class = "UIButton"; normalTitle = "Evaluation Results"; ObjectID = "QlR-oR-TPz"; */
-"QlR-oR-TPz.normalTitle" = "Visualisation des résultats";
+"QlR-oR-TPz.normalTitle" = "Résultats";
 
 /* Class = "UIButton"; normalTitle = "Practice"; ObjectID = "bWm-TL-NY6"; */
 "bWm-TL-NY6.normalTitle" = "S'exercer";

@@ -10,7 +10,6 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    @IBOutlet weak var welcomeMessageLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,16 +17,7 @@ class ViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        var name = ""
-        do {
-            name = try DbTableSettings.retrieveName()
-        } catch let error {
-            print (error)
-        }
-        var welcomeMessage = NSLocalizedString("Hello ", comment: "first part of welcome message")
-        welcomeMessage += name.components(separatedBy: " ")[0]
-        welcomeMessage += NSLocalizedString(". Welcome to Learning Tracker. Check in parameters that you have the right ip address before starting a classroom activity.", comment: "second part of welcome message")
-        welcomeMessageLabel.text = welcomeMessage
+        
     }
     
     override func didReceiveMemoryWarning() {
