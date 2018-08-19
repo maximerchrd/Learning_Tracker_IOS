@@ -46,7 +46,12 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 
                 if automaticConnection == 1  {
                     self.listenForIPThroughUDP()
-                    Thread.sleep(forTimeInterval: 3)
+                    for _ in 0..<10 {
+                        Thread.sleep(forTimeInterval: 0.5)
+                        if self.host != "xxx.xxx.x.xxx" {
+                            break
+                        }
+                    }
                     if self.host == "xxx.xxx.x.xxx" {
                         do { try self.host = DbTableSettings.retrieveMaster() } catch {}
                         self.displayInstructions(instructionIndex: 3)

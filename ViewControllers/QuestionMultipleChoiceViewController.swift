@@ -255,9 +255,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         }
         
         //add question ID to answered ids for the test
-        if AppDelegate.activeTest != nil {
-            AppDelegate.activeTest.answeredIds.append(String(questionMultipleChoice.ID))
-        }
+        AppDelegate.activeTest.answeredIds.append(String(questionMultipleChoice.ID))
         
         //show correct/incorrect message if direct correction mode activated
         if (directCorrection == 1) {
