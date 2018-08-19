@@ -144,6 +144,10 @@ class TestTableViewController: UITableViewController {
         //if the question isn't activated, color text in gray
         if !(AppDelegate.activeTest.IDactive[questionIDs[indexPath.row]] ?? false) {
             cell.QuestionLabel.textColor = UIColor.lightGray
+        } else if AppDelegate.activeTest.answeredIds.contains(questionIDs[indexPath.row]) {
+            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: cell.QuestionLabel.text ?? "")
+            attributeString.addAttribute(NSAttributedStringKey.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
+            cell.QuestionLabel.attributedText = attributeString
         } else {
             cell.QuestionLabel.textColor = UIColor.black
         }

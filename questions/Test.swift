@@ -13,6 +13,7 @@ class Test {
     var testMap = [[String]]()
     var questionIDs = [String]()
     var IDactive = [String: Bool]()
+    var answeredIds = [String]()
     var IDresults = [String: Float32]()
     
     func buildIDsArraysFromMap() {

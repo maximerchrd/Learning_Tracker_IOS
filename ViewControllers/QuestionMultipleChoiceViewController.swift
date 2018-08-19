@@ -254,6 +254,11 @@ class QuestionMultipleChoiceViewController: UIViewController {
             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0", timeSpent: String(timeInterval))
         }
         
+        //add question ID to answered ids for the test
+        if AppDelegate.activeTest != nil {
+            AppDelegate.activeTest.answeredIds.append(String(questionMultipleChoice.ID))
+        }
+        
         //show correct/incorrect message if direct correction mode activated
         if (directCorrection == 1) {
             var answers = ""
