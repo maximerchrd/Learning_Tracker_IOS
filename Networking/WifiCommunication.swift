@@ -27,7 +27,11 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     }
     
     public func connectToServer() {
-        DispatchQueue.global(qos: .utility).async {
+        var threadProperty = DispatchQoS.QoSClass.utility
+        if AppDelegate.locked {
+            threadProperty = DispatchQoS.QoSClass.userInteractive
+        }
+        DispatchQueue.global(qos: threadProperty).async {
             //reinitialize ip address to check if we get it from automatic connection
             self.host = "xxx.xxx.x.xxx"
             
@@ -44,7 +48,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     print(error)
                 }
                 
-                if automaticConnection == 1  {
+                if automaticConnection == 1 && !AppDelegate.locked {
                     self.listenForIPThroughUDP()
                     for _ in 0..<10 {
                         Thread.sleep(forTimeInterval: 0.5)
@@ -61,11 +65,16 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 } else {
                     do { try self.host = DbTableSettings.retrieveMaster() } catch {}
                 }
+                AppDelegate.locked = false
+                
                 self.client = TCPClient(address: self.host, port: Int32(self.PORT_NUMBER))
                 let dataConverter = DataConversion()
                 
                 switch self.client!.connect(timeout: 4) {
                 case .success:
+                    if AppDelegate.disconnectionSignalWithoutConnectionYet != "" {
+                        self.client!.send(data: AppDelegate.disconnectionSignalWithoutConnectionYet.data(using: .utf8)!)
+                    }
                     switch self.client!.send(data: dataConverter.connection()) {
                     case .success:
                         if automaticConnectionSuccess {
@@ -181,8 +190,11 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         do {
             let message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///" +
             additionalInformation + "///"
+            AppDelegate.disconnectionSignalWithoutConnectionYet = message
             if client != nil {
                 client!.send(string: message)
+                Thread.sleep(forTimeInterval: 0.7)
+                AppDelegate.disconnectionSignalWithoutConnectionYet = ""
             }
         } catch let error {
             print(error)
