@@ -199,6 +199,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
         OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)
         OptionsScrollView.contentOffset.y = scrollPosition
+        OptionsScrollView.flashScrollIndicators()
     }
     override func viewWillDisappear(_ animated: Bool) {
         if isBackButton {
