@@ -16,6 +16,7 @@ class DbTableTests {
     static let KEY_TEST_NAME = "TEST_NAME"
     static let KEY_QUESTION_IDS = "QUESTION_IDS"
     static let KEY_TEST_TYPE = "TEST_TYPE"
+    static let KEY_MEDALS_INSTRUCTIONS = "MEDALS_INSTRUCTIONS"
     static var DBPath = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -28,15 +29,16 @@ class DbTableTests {
                 t.column(DbTableTests.KEY_TEST_NAME, .text).notNull()
                 t.column(DbTableTests.KEY_QUESTION_IDS, .text)
                 t.column(DbTableTests.KEY_TEST_TYPE, .text)
+                t.column(DbTableTests.KEY_MEDALS_INSTRUCTIONS, .text)
             }
         }
     }
     
-    static func insertTest(testID: Int64, test: String, questionIDs: String = "", objectiveIDs: [Int64] = [Int64](), objectives: [String] = [String](), testType: String = "FORMATIVE") throws {
+    static func insertTest(testID: Int64, test: String, questionIDs: String = "", objectiveIDs: [Int64] = [Int64](), objectives: [String] = [String](), testType: String = "FORMATIVE", medalsInstructions: String = "") throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.inDatabase { db in
             //insert the test
-            let testRecord = TestRecord(idGlobal: testID, test: test, questionIDs: questionIDs, testType: testType)
+            let testRecord = TestRecord(idGlobal: testID, test: test, questionIDs: questionIDs, testType: testType, medalsInstructions: medalsInstructions)
             try testRecord.insert(db)
             
             //insert the corresponding learning objectives
@@ -95,6 +97,27 @@ class DbTableTests {
             }
             
             return testType
+        } catch let error {
+            print(error)
+        }
+        
+        return ""
+    }
+    
+    static func getMedalsInstructionsFromTestID(testID: Int64) -> String {
+        do {
+            var medalsInstructions = "no test found"
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            var testsRecords = [TestRecord]()
+            var sql = "SELECT * FROM " + TABLE_NAME
+            sql += " WHERE " + KEY_ID_GLOBAL + " = " + String(testID)
+            try dbQueue.inDatabase { db in
+                testsRecords = try TestRecord.fetchAll(db, sql)
+                for singleRecord in testsRecords {
+                    medalsInstructions = singleRecord.medalsInstructions
+                }
+            }
+            return medalsInstructions
         } catch let error {
             print(error)
         }
@@ -205,12 +228,14 @@ class TestRecord : Record {
     var test: String
     var questionIDS: String
     var testType: String
+    var medalsInstructions: String
     
-    init(idGlobal: Int64, test: String, questionIDs: String, testType: String) {
+    init(idGlobal: Int64, test: String, questionIDs: String, testType: String, medalsInstructions: String) {
         self.idGlobal = idGlobal
         self.test = test
         self.questionIDS = questionIDs
         self.testType = testType
+        self.medalsInstructions = medalsInstructions
         super.init()
     }
     
@@ -220,6 +245,7 @@ class TestRecord : Record {
         self.test = row[DbTableTests.KEY_TEST_NAME]
         self.questionIDS = row[DbTableTests.KEY_QUESTION_IDS]
         self.testType = row[DbTableTests.KEY_TEST_TYPE]
+        self.medalsInstructions = row[DbTableTests.KEY_MEDALS_INSTRUCTIONS]
         super.init()
     }
     
@@ -233,6 +259,7 @@ class TestRecord : Record {
         container[DbTableTests.KEY_TEST_NAME] = test
         container[DbTableTests.KEY_QUESTION_IDS] = questionIDS
         container[DbTableTests.KEY_TEST_TYPE] = testType
+        container[DbTableTests.KEY_MEDALS_INSTRUCTIONS] = medalsInstructions
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

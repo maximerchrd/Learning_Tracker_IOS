@@ -17,7 +17,9 @@ class Test {
     var answeredIds = [String]()
     var IDresults = [String: Float32]()
     var startTime: TimeInterval?
+    var finishTime = 0.0
     var score = 0.0
+    var medalsInstructions = [(String, String)]()
     
     func buildIDsArraysFromMap() {
         for id in questionIDs {
@@ -62,6 +64,7 @@ class Test {
             //stop timer
             var timeInterval = Date.timeIntervalSinceReferenceDate - (startTime ?? 0)
             timeInterval = Double(round(10*timeInterval)/10)
+            finishTime = timeInterval
             do {
                 try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(testID) ?? 0, quantitativeEval: String(score), qualitativeEval: "no medal", type: 3, timeForSolving: String(timeInterval))
             } catch let error {
@@ -69,5 +72,21 @@ class Test {
             }
         }
         return finished
+    }
+    
+    func parseMedalsInstructions(instructions: String) {
+        medalsInstructions.removeAll()
+        let instructionsArray = instructions.components(separatedBy: ";")
+        for instruction in instructionsArray {
+            if instruction.count > 0 {
+                var time = instruction.components(separatedBy: ":")[1].components(separatedBy: "/")[0]
+                if time == "0" || time == "0.0" {
+                    time = "1000000"
+                }
+                let score = instruction.components(separatedBy: ":")[1].components(separatedBy: "/")[1]
+                let couple = (time,score)
+                medalsInstructions.append(couple)
+            }
+        }
     }
 }

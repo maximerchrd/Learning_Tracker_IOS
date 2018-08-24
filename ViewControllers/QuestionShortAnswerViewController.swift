@@ -164,9 +164,6 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
                 }
             }
         }
-        
-        //update current test if exists
-        AppDelegate.activeTest.calculateScoreAndCheckIfOver()
     }
     
     func handleNavigation(alert: UIAlertAction!) {

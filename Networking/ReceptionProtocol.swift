@@ -23,6 +23,7 @@ class ReceptionProtocol {
                 test.testName = DbTableTests.getNameFromTestID(testID: -idGlobal)
                 test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
                 test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
+                test.parseMedalsInstructions(instructions: DbTableTests.getMedalsInstructionsFromTestID(testID: -idGlobal))
                 
                 DispatchQueue.main.async {
                     AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: directCorrection, testMode: 0)
@@ -130,8 +131,11 @@ class ReceptionProtocol {
                         }
                     }
                     
+                    ///get medals instructions
+                    let medalsInstructions = dataTextString.components(separatedBy: "///")[5]
+                    
                     //insert test in db after parsing questions
-                    try DbTableTests.insertTest(testID: testID, test: test, questionIDs: questionIdsForTest, objectiveIDs: objectiveIDS, objectives: objectives)
+                    try DbTableTests.insertTest(testID: testID, test: test, questionIDs: questionIdsForTest, objectiveIDs: objectiveIDS, objectives: objectives, medalsInstructions: medalsInstructions)
                 } else {
                     let error = "problem reading test: text array to short"
                     print(error)

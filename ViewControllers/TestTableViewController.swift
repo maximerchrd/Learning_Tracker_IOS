@@ -39,6 +39,34 @@ class TestTableViewController: UITableViewController {
         reloadTable()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        //update current test if exists
+        if AppDelegate.activeTest.calculateScoreAndCheckIfOver() {
+            //test over
+            if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[2].1) ?? 0.0 && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[2].0) ?? 0.0 {
+                //gold medal
+                displayMedal(medalName: "gold-medal.png", message: "You got the GOLD MEDAL")
+            } else if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[1].1) ?? 0.0 && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[1].0) ?? 0.0 {
+                //silver medal
+                displayMedal(medalName: "silver-medal.png", message: "You got the SILVER MEDAL")
+            } else if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[0].1) ?? 0.0 && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[0].0) ?? 0.0 {
+                //bronze medal
+                displayMedal(medalName: "bronze-medal.png", message: "You got the BRONZE MEDAL")
+            }
+        }
+    }
+    
+    func displayMedal(medalName: String, message: String) {
+        let alert = UIAlertController(title: NSLocalizedString("You are a Champ!", comment: ""), message: message + "\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
+        let medalImage = UIImage(named: medalName)
+        let imageView = UIImageView(frame: CGRect(origin: CGPoint(x:self.view.frame.width * 0.3, y:self.view.frame.height * 0.2), size: CGSize(width: (medalImage?.size.width ?? 0.0) / (medalImage?.size.height ?? 1.0) * 100, height: 100)) )
+        imageView.image = medalImage
+        alert.view.addSubview(imageView)
+    
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
         ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
