@@ -33,6 +33,9 @@ class TestTableViewController: UITableViewController {
         ClassroomActivityViewController.navTestTableViewController = self
         AppDelegate.activeTest.buildIDsArraysFromMap()
         questionIDs = AppDelegate.activeTest.questionIDs
+        
+        //start the timer
+        AppDelegate.activeTest.startTime = Date.timeIntervalSinceReferenceDate
         reloadTable()
     }
     

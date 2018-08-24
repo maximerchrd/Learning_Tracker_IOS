@@ -22,7 +22,7 @@ class DbTableIndividualQuestionForResult {
     static let KEY_QUALITATIVE_EVAL = "QUALITATIVE_EVAL"
     static let KEY_TEST_BELONGING = "TEST_BELONGING"
     static let KEY_WEIGHTS_OF_ANSWERS = "WEIGHTS_OF_ANSWERS"
-    static let KEY_TYPE = "TYPE"        //0: Question Multiple Choice; 1: Question Short Answer; 2: Objective
+    static let KEY_TYPE = "TYPE"        //0: Question Multiple Choice; 1: Question Short Answer; 2: Objective, 3: Test
     static var DBPath = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -65,6 +65,20 @@ class DbTableIndividualQuestionForResult {
             try individualQuestionForResult.insert(db)
         }
     }
+    
+    static func insertIndividualQuestionForResult(questionID: Int64, quantitativeEval: String, qualitativeEval: String, testBelonging: String = "none", type: Int = 2, timeForSolving: String) throws {
+        let dbQueue = try DatabaseQueue(path: DBPath)
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        let dateNow = formatter.string(from: date)
+        print(dateNow)
+        try dbQueue.inDatabase { db in
+            let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: dateNow, answers: "none", timeForSolving: timeForSolving, questionWeight: -1, evalType: "none", quantitativeEval: quantitativeEval, qualitativeEval: qualitativeEval, testBelonging: testBelonging, weightsOfAnswers: "none", type: type)
+            try individualQuestionForResult.insert(db)
+        }
+    }
+    
     static func insertIndividualQuestionForResult(questionID: Int64, answer: String, quantitativeEval: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         let date = Date()

@@ -19,6 +19,7 @@ class ReceptionProtocol {
             if idGlobal < 0 {
                 let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
                 let test = Test()
+                test.testID = String(-idGlobal)
                 test.testName = DbTableTests.getNameFromTestID(testID: -idGlobal)
                 test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
                 test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)

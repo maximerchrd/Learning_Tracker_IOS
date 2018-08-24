@@ -9,12 +9,15 @@
 import Foundation
 
 class Test {
+    var testID = ""
     var testName = ""
     var testMap = [[String]]()
     var questionIDs = [String]()
     var IDactive = [String: Bool]()
     var answeredIds = [String]()
     var IDresults = [String: Float32]()
+    var startTime: TimeInterval?
+    var score = 0.0
     
     func buildIDsArraysFromMap() {
         for id in questionIDs {
@@ -41,5 +44,30 @@ class Test {
                 }
             }
         }
+    }
+    
+    func calculateScoreAndCheckIfOver() -> Bool {
+        var finished = false
+        var nbActiveQuestions = 0
+        score = 0.0
+        for (id, active) in IDactive {
+            if active {
+                score = score + Double(IDresults[id] ?? 0.0)
+                nbActiveQuestions = nbActiveQuestions + 1
+            }
+        }
+        if nbActiveQuestions == answeredIds.count {
+            finished = true
+            score = score / Double(answeredIds.count)
+            //stop timer
+            var timeInterval = Date.timeIntervalSinceReferenceDate - (startTime ?? 0)
+            timeInterval = Double(round(10*timeInterval)/10)
+            do {
+                try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(testID) ?? 0, quantitativeEval: String(score), qualitativeEval: "no medal", type: 3, timeForSolving: String(timeInterval))
+            } catch let error {
+                print(error)
+            }
+        }
+        return finished
     }
 }
