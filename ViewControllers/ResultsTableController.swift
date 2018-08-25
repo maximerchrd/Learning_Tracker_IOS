@@ -13,6 +13,7 @@ class ResultsTableViewCell: UITableViewCell {
     @IBOutlet weak var QuestionLabel: UILabel!
     @IBOutlet weak var AnswerLabel: UILabel!
     @IBOutlet weak var EvaluationLabel: UILabel!
+    @IBOutlet weak var medalImage: UIImageView!
 }
 
 
@@ -103,7 +104,7 @@ class ResultsTableController: UITableViewController {
                         rightAnswerOptions[rightAnswerOptions.count - 1].append(result[i])
                     }
                 }
-            } else {
+            } else if result[5] == "MCQ" {
                 if result.count > 6 {
                     for i in 7..<(7 + (Int(result[6]))!) {
                         rightAnswerOptions[rightAnswerOptions.count - 1].append(result[i])
@@ -121,14 +122,16 @@ class ResultsTableController: UITableViewController {
         if (indexPath.section == 1) {
             if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ResultFullViewController") as? ResultFullViewController {
                 if let navigator = self.navigationController {
-                    newViewController.questionText = questions[indexPath.row]
-                    newViewController.studentAnswerText = answers[indexPath.row]
-                    newViewController.evaluation = String(evaluations[indexPath.row])
-                    newViewController.date = dates[indexPath.row]
-                    newViewController.rightAnswers = rightAnswerOptions[indexPath.row]
-                    newViewController.wrongAnswers = wrongAnswerOptions[indexPath.row]
-                    newViewController.imagePath = imagePaths[indexPath.row]
-                    navigator.pushViewController(newViewController, animated: true)
+                    if questionType[indexPath.row] != "3" {
+                        newViewController.questionText = questions[indexPath.row]
+                        newViewController.studentAnswerText = answers[indexPath.row]
+                        newViewController.evaluation = String(evaluations[indexPath.row])
+                        newViewController.date = dates[indexPath.row]
+                        newViewController.rightAnswers = rightAnswerOptions[indexPath.row]
+                        newViewController.wrongAnswers = wrongAnswerOptions[indexPath.row]
+                        newViewController.imagePath = imagePaths[indexPath.row]
+                        navigator.pushViewController(newViewController, animated: true)
+                    }
                 } else {
                     NSLog("%@", "Error trying to show Result Full View: the view controller wasn't pushed on a navigation controller")
                 }
@@ -152,12 +155,18 @@ class ResultsTableController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ResultCell", for: indexPath) as! ResultsTableViewCell
         
         if (indexPath.section == 1) {
-            let question = questions[indexPath.row]
-            cell.QuestionLabel?.text = question
-            let answer = answers[indexPath.row]
-            cell.AnswerLabel?.text = answer
-            let evaluation = evaluations[indexPath.row]
-            cell.EvaluationLabel?.text = String(evaluation)
+            if questionType[indexPath.row] == "3" {
+                cell.QuestionLabel?.text = questions[indexPath.row]
+                cell.EvaluationLabel?.text = String(evaluations[indexPath.row])
+                cell.medalImage.image = UIImage(named: imagePaths[indexPath.row])
+            } else {
+                let question = questions[indexPath.row]
+                cell.QuestionLabel?.text = question
+                let answer = answers[indexPath.row]
+                cell.AnswerLabel?.text = answer
+                let evaluation = evaluations[indexPath.row]
+                cell.EvaluationLabel?.text = String(evaluation)
+            }
         } else {
             cell.QuestionLabel?.text = "Question"
             cell.QuestionLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)

@@ -115,30 +115,39 @@ class DbTableIndividualQuestionForResult {
             var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request)
             for i in 0..<resultRecord.count {
                 results.append([String]())
-                let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: resultRecord[i].idGlobal)
-                var questionShortAnswer: QuestionShortAnswer?
-                questionShortAnswer = nil
-                if questionMultipleChoice.Question != "none" {
-                    results[i].append(questionMultipleChoice.Question)
+                if resultRecord[i].type == 3 {
+                    results[i].append(resultRecord[i].testBelonging)
+                    results[i].append(resultRecord[i].answers)
+                    results[i].append(String(resultRecord[i].quantitativeEval))
+                    results[i].append(resultRecord[i].date)
+                    results[i].append(resultRecord[i].qualitativeEval + ".png")
+                    results[i].append(String(resultRecord[i].type))
                 } else {
-                    questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: resultRecord[i].idGlobal)
-                    results[i].append(questionShortAnswer!.Question)
-                }
-                results[i].append(resultRecord[i].answers)
-                results[i].append(String(resultRecord[i].quantitativeEval))
-                results[i].append(resultRecord[i].date)
-                if questionShortAnswer == nil {
-                    results[i].append(questionMultipleChoice.Image)
-                    results[i].append("QMC")
-                    results[i].append(String(questionMultipleChoice.NbCorrectAnswers))
-                    for option in questionMultipleChoice.Options {
-                        results[i].append(option)
+                    let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: resultRecord[i].idGlobal)
+                    var questionShortAnswer: QuestionShortAnswer?
+                    questionShortAnswer = nil
+                    if questionMultipleChoice.Question != "none" {
+                        results[i].append(questionMultipleChoice.Question)
+                    } else {
+                        questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: resultRecord[i].idGlobal)
+                        results[i].append(questionShortAnswer!.Question)
                     }
-                } else {
-                    results[i].append(questionShortAnswer!.Image)
-                    results[i].append("SHRTAQ")
-                    for option in questionShortAnswer!.Options {
-                        results[i].append(option)
+                    results[i].append(resultRecord[i].answers)
+                    results[i].append(String(resultRecord[i].quantitativeEval))
+                    results[i].append(resultRecord[i].date)
+                    if questionShortAnswer == nil {
+                        results[i].append(questionMultipleChoice.Image)
+                        results[i].append("QMC")
+                        results[i].append(String(questionMultipleChoice.NbCorrectAnswers))
+                        for option in questionMultipleChoice.Options {
+                            results[i].append(option)
+                        }
+                    } else {
+                        results[i].append(questionShortAnswer!.Image)
+                        results[i].append("SHRTAQ")
+                        for option in questionShortAnswer!.Options {
+                            results[i].append(option)
+                        }
                     }
                 }
             }
