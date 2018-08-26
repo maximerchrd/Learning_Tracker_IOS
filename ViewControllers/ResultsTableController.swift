@@ -175,6 +175,10 @@ class ResultsTableController: UITableViewController {
             cell.AnswerLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
             cell.EvaluationLabel?.text = "Evaluation"
             cell.EvaluationLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
+            var frame = cell.QuestionLabel?.frame
+            frame?.origin = (cell.EvaluationLabel?.frame.origin)!
+            cell.EvaluationLabel?.frame = frame!
+            cell.medalImage.image = nil
         }
         return cell
     }

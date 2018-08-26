@@ -65,11 +65,6 @@ class Test {
             var timeInterval = Date.timeIntervalSinceReferenceDate - (startTime ?? 0)
             timeInterval = Double(round(10*timeInterval)/10)
             finishTime = timeInterval
-            do {
-                try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(testID) ?? 0, quantitativeEval: String(score), qualitativeEval: "no medal", type: 3, timeForSolving: String(timeInterval))
-            } catch let error {
-                print(error)
-            }
         }
         return finished
     }
