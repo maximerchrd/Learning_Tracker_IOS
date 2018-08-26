@@ -166,6 +166,7 @@ class ResultsTableController: UITableViewController {
                 cell.AnswerLabel?.text = answer
                 let evaluation = evaluations[indexPath.row]
                 cell.EvaluationLabel?.text = String(evaluation)
+                cell.medalImage.image = nil
             }
         } else {
             cell.QuestionLabel?.text = "Question"
