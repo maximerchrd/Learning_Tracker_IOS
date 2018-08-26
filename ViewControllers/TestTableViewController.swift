@@ -34,9 +34,22 @@ class TestTableViewController: UITableViewController {
         AppDelegate.activeTest.buildIDsArraysFromMap()
         questionIDs = AppDelegate.activeTest.questionIDs
         
-        //start the timer
-        AppDelegate.activeTest.startTime = Date.timeIntervalSinceReferenceDate
+        if AppDelegate.activeTest.medalsInstructions.count == 3 {
+            let instruc = AppDelegate.activeTest.medalsInstructions
+            var message = "Gold medal\nTime: " + (instruc[2].0 != "0" ? instruc[2].0 : "no time limit;") + " \nScore: " + instruc[2].1 + "\n\n"
+            message += "Silver medal\nTime: " + (instruc[1].0 != "0" ? instruc[1].0 : "no time limit;") + " \nScore: " + instruc[1].1 + "\n\n"
+            message += "Bronze medal\nTime: " + (instruc[0].0 != "1000000" ? instruc[0].0 : "no time limit;") + " \nScore: " + instruc[0].1 + "\n\n"
+            let alert = UIAlertController(title: NSLocalizedString("Medals", comment: ""), message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: startTimer))
+            self.present(alert, animated: true, completion: nil)
+        } else {
+            //start the timer
+            AppDelegate.activeTest.startTime = Date.timeIntervalSinceReferenceDate
+        }
         reloadTable()
+    }
+    func startTimer(alert: UIAlertAction!) {
+        AppDelegate.activeTest.startTime = Date.timeIntervalSinceReferenceDate
     }
     
     override func viewDidAppear(_ animated: Bool) {
