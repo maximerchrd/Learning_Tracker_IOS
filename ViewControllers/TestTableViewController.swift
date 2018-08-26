@@ -9,6 +9,11 @@
 import Foundation
 import UIKit
 
+var timer = Timer()
+var seconds = 0
+var timerLabel = UILabel()
+var goingBack = true
+
 class TestTableViewCell: UITableViewCell {
     @IBOutlet weak var IndexLabel: UILabel!
     @IBOutlet weak var QuestionLabel: UILabel!
@@ -48,8 +53,26 @@ class TestTableViewController: UITableViewController {
         }
         reloadTable()
     }
+    
     func startTimer(alert: UIAlertAction!) {
         AppDelegate.activeTest.startTime = Date.timeIntervalSinceReferenceDate
+        seconds = 0
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(self.updateTimer)), userInfo: nil, repeats: true)
+        if let navigationBar = self.navigationController?.navigationBar {
+            let timerFrame = CGRect(x: navigationBar.frame.width/2.3, y: 0, width: navigationBar.frame.width/2, height: navigationBar.frame.height)
+            
+            timerLabel = UILabel(frame: timerFrame)
+            timerLabel.text = "00:00"
+            
+            navigationBar.addSubview(timerLabel)
+        }
+    }
+    
+    @objc func updateTimer() {
+        seconds += 1
+        let sec = seconds % 60
+        let min: Int = seconds / 60
+        timerLabel.text = String(format: "%02d", min) + ":" + String(format: "%02d", sec)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -72,7 +95,12 @@ class TestTableViewController: UITableViewController {
             } catch let error {
                 print(error)
             }
+            
+            //stop timer
+            timer.invalidate()
         }
+        
+        goingBack = true
     }
     
     func displayMedal(medalName: String, message: String) {
@@ -89,6 +117,9 @@ class TestTableViewController: UITableViewController {
     override func viewWillDisappear(_ animated: Bool) {
         ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
         ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
+        if goingBack {
+            timerLabel.text = ""
+        }
     }
     
     func reloadTable() {
@@ -123,6 +154,8 @@ class TestTableViewController: UITableViewController {
     }
     
     fileprivate func showTestMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool, directCorrection: Int = 0) {
+        goingBack = false
+        
         //first check if the view controller was already pushed (question was seen before)
         var controllerIndex = -1
         for i in 0..<questionMultipleChoiceViewControllers.count {
@@ -147,6 +180,8 @@ class TestTableViewController: UITableViewController {
     }
     
     fileprivate func showTestShortAnswerQuestion(question: QuestionShortAnswer, isCorr: Bool, directCorrection: Int = 0) {
+        goingBack = false
+        
         //first check if the view controller was already pushed (question was seen before)
         var controllerIndex = -1
         for i in 0..<questionShortAnswerViewControllers.count {
