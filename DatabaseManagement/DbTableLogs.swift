@@ -19,7 +19,7 @@ class DbTableLogs {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_LOG, .text).notNull()
@@ -30,7 +30,7 @@ class DbTableLogs {
     static func insertLog(log: String) {
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.write { db in
                 let logRecord = LogRecord(log: Date().description + log)
                 try logRecord.insert(db)
             }
@@ -46,7 +46,7 @@ class DbTableLogs {
     static func getNotSentLogs() throws -> [String] {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var logsRecords = [LogRecord]()
-        try dbQueue.inDatabase { db in
+        try dbQueue.read { db in
             logsRecords = try LogRecord.fetchAll(db)
         }
         var logs = [String]()
@@ -57,7 +57,7 @@ class DbTableLogs {
     }
     static func deleteLog() throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             //let logRecord = LogRecord()
             try LogRecord.deleteAll(db)
             //try logRecord.delete(db)

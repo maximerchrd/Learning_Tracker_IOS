@@ -20,7 +20,7 @@ class DbTableLearningObjective {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
@@ -32,7 +32,7 @@ class DbTableLearningObjective {
     
     static func insertLearningObjective(questionID: Int64, objective: String, levelCognitiveAbility: Int) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let learningObjective = LearningObjectiveRecord(idGlobal: 2000000, objective: objective, levelCognitiveAbility: levelCognitiveAbility)
             try learningObjective.insert(db)
             let learningObjectiveToUpdate = try LearningObjectiveRecord.fetchOne(db, key: [KEY_OBJECTIVE: objective])
@@ -46,7 +46,7 @@ class DbTableLearningObjective {
     
     static func insertLearningObjective(objectiveID: Int64, objective: String, levelCognitiveAbility: Int) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let learningObjective = LearningObjectiveRecord(idGlobal: objectiveID, objective: objective, levelCognitiveAbility: levelCognitiveAbility)
             try learningObjective.insert(db)
         }
@@ -59,7 +59,7 @@ class DbTableLearningObjective {
             var request = "SELECT * FROM " + TABLE_NAME
             request += " WHERE " + KEY_ID_GLOBAL + " = " + String(objectiveID)
         
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 let objectiveRecord = try LearningObjectiveRecord.fetchOne(db, request)
                 objective = objectiveRecord?.objective ?? ""
             }
@@ -80,7 +80,7 @@ class DbTableLearningObjective {
         var resultsForEachObjective = [[String]]()
         
         if subject == "All" || subject == "All Subjects" {
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 let individualResultsRecord = try IndividualQuestionForResultRecord.fetchAll(db)
                 for singleRecord in individualResultsRecord {
                     idQuestions.append(singleRecord.idGlobal)
@@ -96,7 +96,7 @@ class DbTableLearningObjective {
                 }
             }
         } else {
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 let individualResultsRecord = try IndividualQuestionForResultRecord.fetchAll(db)
                 let questionsOfSubject = try DbTableRelationQuestionSubject.getQuestionsForSubject(subject: subject)
                 for singleRecord in individualResultsRecord {

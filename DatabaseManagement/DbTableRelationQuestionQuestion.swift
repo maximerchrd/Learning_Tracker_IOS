@@ -21,7 +21,7 @@ class DbTableRelationQuestionQuestion {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL_1, .integer).notNull()
@@ -36,11 +36,11 @@ class DbTableRelationQuestionQuestion {
     static func insertRelationQuestionQuestion(idGlobal1: String, idGlobal2: String, test: String, condition: String) {
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.write { db in
                 let relationQuestionQuestion = RelationQuestionQuestionRecord(idGlobal1: idGlobal1, idGlobal2: idGlobal2, test: test, condition: condition)
                 try relationQuestionQuestion.insert(db)
             }
-        }catch let error {
+        } catch let error {
                 print(error)
             }
     }
@@ -51,7 +51,7 @@ class DbTableRelationQuestionQuestion {
             var testMap = [[String]]()
             let request = "SELECT * FROM " + DbTableRelationQuestionQuestion.TABLE_NAME + " WHERE " + DbTableRelationQuestionQuestion.KEY_TEST + " = '" + test + "';"
             var relationQuestionQuestionRecords = [RelationQuestionQuestionRecord]()
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 relationQuestionQuestionRecords = try RelationQuestionQuestionRecord.fetchAll(db, request)
             }
             for singleRecord in relationQuestionQuestionRecords {

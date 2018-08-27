@@ -19,7 +19,7 @@ class DbTableRelationTestObjective {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_TEST, .integer).notNull()
@@ -31,7 +31,7 @@ class DbTableRelationTestObjective {
     
     static func insertRelationTestObjective(idTest: Int64, idObjective: Int64) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let relationTestObjective = RelationTestObjectiveRecord(idTest: idTest, idObjective: idObjective)
             try relationTestObjective.insert(db)
         }

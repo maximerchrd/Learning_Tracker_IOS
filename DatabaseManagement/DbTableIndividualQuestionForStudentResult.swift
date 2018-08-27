@@ -28,7 +28,7 @@ class DbTableIndividualQuestionForResult {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
@@ -48,7 +48,7 @@ class DbTableIndividualQuestionForResult {
     
     static func insertIndividualQuestionForResult(questionID: Int64, date: String, answers: String, timeForSolving: String, questionWeight: Double, evalType: String, quantitativeEval: String, qualitativeEval: String, testBelonging: String, weightsOfAnswers: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: date, answers: answers, timeForSolving: timeForSolving, questionWeight: questionWeight, evalType: evalType, quantitativeEval: quantitativeEval, qualitativeEval: qualitativeEval, testBelonging: testBelonging, weightsOfAnswers: weightsOfAnswers)
             try individualQuestionForResult.insert(db)
         }
@@ -60,7 +60,7 @@ class DbTableIndividualQuestionForResult {
         formatter.dateFormat = "dd/MM/yyyy"
         let dateNow = formatter.string(from: date)
         print(dateNow)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: dateNow, answers: "none", timeForSolving: "none", questionWeight: -1, evalType: "none", quantitativeEval: quantitativeEval, qualitativeEval: "none", testBelonging: testBelonging, weightsOfAnswers: "none", type: type)
             try individualQuestionForResult.insert(db)
         }
@@ -73,7 +73,7 @@ class DbTableIndividualQuestionForResult {
         formatter.dateFormat = "dd/MM/yyyy"
         let dateNow = formatter.string(from: date)
         print(dateNow)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: dateNow, answers: "none", timeForSolving: timeForSolving, questionWeight: -1, evalType: "none", quantitativeEval: quantitativeEval, qualitativeEval: qualitativeEval, testBelonging: testBelonging, weightsOfAnswers: "none", type: type)
             try individualQuestionForResult.insert(db)
         }
@@ -86,7 +86,7 @@ class DbTableIndividualQuestionForResult {
         formatter.dateFormat = "dd/MM/yyyy"
         let dateNow = formatter.string(from: date)
         print(dateNow)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let individualQuestionForResult = IndividualQuestionForResultRecord(idGlobal: questionID, date: dateNow, answers: answer, timeForSolving: "none", questionWeight: -1, evalType: "none", quantitativeEval: quantitativeEval, qualitativeEval: "none", testBelonging: "none", weightsOfAnswers: "none")
             try individualQuestionForResult.insert(db)
         }
@@ -94,7 +94,7 @@ class DbTableIndividualQuestionForResult {
     
     static func setEvalForQuestionAndStudentIDs (eval: String, idQuestion: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             var individualQuestionForResult = try IndividualQuestionForResultRecord.fetchAll(db, "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_ID + "=(SELECT MAX (" + KEY_ID + ") FROM (SELECT * FROM '" + TABLE_NAME + "') WHERE ID_GLOBAL='" + idQuestion + "')")
             individualQuestionForResult[0].quantitativeEval = eval
             try individualQuestionForResult[0].update(db)
@@ -107,7 +107,7 @@ class DbTableIndividualQuestionForResult {
         let subj = DbTableRelationQuestionSubject.KEY_SUBJECT
         let questid = DbTableRelationQuestionSubject.KEY_ID_GLOBAL
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.read { db in
             var request = "SELECT * FROM " + TABLE_NAME
             if subject != "All" {
                 request += " INNER JOIN \(relSubj) ON \(TABLE_NAME).\(KEY_ID_GLOBAL) = \(relSubj).\(questid) WHERE \(relSubj).\(subj) = '\(subject)'"
@@ -162,7 +162,7 @@ class DbTableIndividualQuestionForResult {
         var idQuestions = [Int64]()
         var resultsForEachObjective = [[String]]()
         
-        try dbQueue.inDatabase { db in
+        try dbQueue.read { db in
             let request = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_TYPE + " = ? AND " + KEY_TEST_BELONGING + " = ?"
             
             var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request, arguments: [2, test])
@@ -184,7 +184,7 @@ class DbTableIndividualQuestionForResult {
     static func getLatestEvaluationForQuestionID (questionID: Int64) throws -> Double {
         var result = 0.0
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.read { db in
             var request = "SELECT * FROM " + TABLE_NAME
             request += " WHERE " + KEY_ID + "=(SELECT MAX (" + KEY_ID + ") FROM " + TABLE_NAME + " WHERE ID_GLOBAL='" + String(questionID) + "')"
             var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request)

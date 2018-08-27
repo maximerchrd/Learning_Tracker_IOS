@@ -20,7 +20,7 @@ class DbTableSettings {
     static func createTable(DatabaseName: String) throws {
         DBName = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_IDsettings, .integer).primaryKey()
                 t.column(KEY_NAME, .text).notNull()
@@ -33,7 +33,7 @@ class DbTableSettings {
     static func initializeSettings() throws {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.inDatabase { db in
+            try dbQueue.write { db in
                 let settings = try Setting.fetchAll(db)
                 if (settings.count == 0) {
                     let setting = Setting(name:"Anonymous", master:"192.168.1.100")
@@ -51,7 +51,7 @@ class DbTableSettings {
         var name = "error fetching name"
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                let setting = try Setting.fetchOne(db)
                 name = setting!.name
             }
@@ -66,7 +66,7 @@ class DbTableSettings {
         var master = "error fetching master"
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 let setting = try Setting.fetchOne(db)
                 master = setting!.master
             }
@@ -81,7 +81,7 @@ class DbTableSettings {
         var automaticConnection = 1
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.inDatabase { db in
+            try dbQueue.write { db in
                 let setting = try Setting.fetchOne(db)
                 automaticConnection = setting!.automaticConnection
             }
@@ -95,7 +95,7 @@ class DbTableSettings {
     static func setNameAndMaster(name: String, master: String) {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.inDatabase { db in
+            try dbQueue.write { db in
                 let setting = try Setting.fetchOne(db)
                 let old_name = setting!.name
                 let old_master = setting!.master
@@ -112,7 +112,7 @@ class DbTableSettings {
     static func setMaster(master: String) {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.inDatabase { db in
+            try dbQueue.write { db in
                 let setting = try Setting.fetchOne(db)
                 let name = setting!.name
                 try db.execute(
@@ -128,7 +128,7 @@ class DbTableSettings {
     static func setAutomaticConnection(automaticConnection: Int) {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.inDatabase { db in
+            try dbQueue.write { db in
                 let setting = try Setting.fetchOne(db)
                 let name = setting!.name
 

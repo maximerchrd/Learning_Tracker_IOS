@@ -44,7 +44,7 @@ class DbTableQuestionMultipleChoice {
     static func createTable(DatabasePath: String) throws {
         DBPath = DatabasePath
         let dbQueue = try DatabaseQueue(path: DatabasePath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_QUESTIONMULTIPLECHOICE_NAME, ifNotExists: true) { t in
                 t.column(KEY_IDquestionMultipleChoice, .integer).primaryKey()
                 t.column(KEY_Level, .text).notNull()
@@ -68,7 +68,7 @@ class DbTableQuestionMultipleChoice {
     
     static func insertQuestionMultipleChoice(Question: QuestionMultipleChoice) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let questionMultChoice = QuestionMultipleChoiceRecord(questionMultipleChoiceArg: Question)
             try questionMultChoice.insert(db)
             
@@ -85,7 +85,7 @@ class DbTableQuestionMultipleChoice {
         var questionMultipleChoice = QuestionMultipleChoiceRecord(questionMultipleChoiceArg: questionMultipleChoiceToReturn)
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 questionMultipleChoice = (try QuestionMultipleChoiceRecord.fetchOne(db, key: [KEY_ID_GLOBAL: globalID])) ?? QuestionMultipleChoiceRecord(questionMultipleChoiceArg: QuestionMultipleChoice())
             }
         } catch let error {
@@ -100,7 +100,7 @@ class DbTableQuestionMultipleChoice {
         var questionMultipleChoice = [QuestionMultipleChoiceRecord(questionMultipleChoiceArg: QuestionMultipleChoice())]
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 questionMultipleChoice = try QuestionMultipleChoiceRecord.fetchAll(db)
             }
         } catch let error {
@@ -118,7 +118,7 @@ class DbTableQuestionMultipleChoice {
         var questionMultipleChoice = [QuestionMultipleChoiceRecord(questionMultipleChoiceArg: QuestionMultipleChoice())]
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 questionMultipleChoice = try QuestionMultipleChoiceRecord.fetchAll(db)
             }
         } catch let error {

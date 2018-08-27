@@ -23,7 +23,7 @@ class DbTableQuestionShortAnswer {
     static func createTable(DatabasePath: String) throws {
         DBPath = DatabasePath
         let dbQueue = try DatabaseQueue(path: DatabasePath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_QUESTIONSHORTANSWER_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_Level, .text).notNull()
@@ -36,7 +36,7 @@ class DbTableQuestionShortAnswer {
     
     static func insertQuestionShortAnswer(Question: QuestionShortAnswer) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let questionShortAnswer = QuestionShortAnswerRecord(questionShortAnswerArg: Question)
             try questionShortAnswer.insert(db)
             
@@ -62,7 +62,7 @@ class DbTableQuestionShortAnswer {
         var answerOptionRecord = [AnswerOptionRecord]()
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 questionShortAnswerRec = (try QuestionShortAnswerRecord.fetchOne(db, key: [KEY_ID_GLOBAL: globalID])) ?? QuestionShortAnswerRecord(questionShortAnswerArg: QuestionShortAnswer())
                 optionsArray = try DbTableAnswerOptions.retrieveAnswerOptions(questionID: questionShortAnswerRec.questionShortAnswer.ID)
             }
@@ -79,7 +79,7 @@ class DbTableQuestionShortAnswer {
         var questionShortAnswers = [QuestionShortAnswerRecord(questionShortAnswerArg: QuestionShortAnswer())]
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 questionShortAnswers = try QuestionShortAnswerRecord.fetchAll(db)
             }
         } catch let error {
@@ -97,7 +97,7 @@ class DbTableQuestionShortAnswer {
         var questionShortAnswers = [QuestionShortAnswerRecord(questionShortAnswerArg: QuestionShortAnswer())]
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 questionShortAnswers = try QuestionShortAnswerRecord.fetchAll(db)
             }
         } catch let error {

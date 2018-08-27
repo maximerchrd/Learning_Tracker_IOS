@@ -103,6 +103,7 @@ class ClassroomActivityViewController: UIViewController {
         if (AppDelegate.testMode.contains("testReconnection")) {
             var i = 0
             while (i<3) {
+                i = i + 1
                 AppDelegate.wifiCommunicationSingleton!.stopConnection()
                 Thread.sleep(forTimeInterval: 3)
                 AppDelegate.wifiCommunicationSingleton!.startConnection()
@@ -139,8 +140,8 @@ class ClassroomActivityViewController: UIViewController {
         }
         AppDelegate.wifiCommunicationSingleton!.connectToServer()
         
-        CrownImageView.animationImages = [#imageLiteral(resourceName: "crown_1"), #imageLiteral(resourceName: "crown_2"), #imageLiteral(resourceName: "crown_3"), #imageLiteral(resourceName: "crown_4"), #imageLiteral(resourceName: "crown_5"), #imageLiteral(resourceName: "crown_6"), #imageLiteral(resourceName: "crown_7")]
-        CrownImageView.animationDuration = 1
+        //CrownImageView.animationImages = [#imageLiteral(resourceName: "crown_1"), #imageLiteral(resourceName: "crown_2"), #imageLiteral(resourceName: "crown_3"), #imageLiteral(resourceName: "crown_4"), #imageLiteral(resourceName: "crown_5"), #imageLiteral(resourceName: "crown_6"), #imageLiteral(resourceName: "crown_7")]
+        //CrownImageView.animationDuration = 1
     }
     
     override func viewDidAppear(_ animated: Bool) {

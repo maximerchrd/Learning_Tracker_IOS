@@ -20,7 +20,7 @@ class DbTableRelationQuestionSubject {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
@@ -32,7 +32,7 @@ class DbTableRelationQuestionSubject {
     
     static func insertRelationQuestionSubject(questionID: Int64, subject: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let idGlobalSubject = String(questionID) + subject
             let relationQuestionSubjectRecord = RelationQuestionSubjectRecord(idGlobal: questionID, subject: subject, idGlobalSubject: idGlobalSubject)
             try relationQuestionSubjectRecord.insert(db)
@@ -49,7 +49,7 @@ class DbTableRelationQuestionSubject {
         } else {
             request = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_SUBJECT + "='" + subjectPurged + "'"
         }
-        try dbQueue.inDatabase { db in
+        try dbQueue.read { db in
             relationQuestionSubjectRecords = try RelationQuestionSubjectRecord.fetchAll(db, request)
         }
         var questionIDs = [Int64]()

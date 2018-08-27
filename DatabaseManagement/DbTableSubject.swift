@@ -19,7 +19,7 @@ class DbTableSubject {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
@@ -30,7 +30,7 @@ class DbTableSubject {
     
     static func insertSubject(questionID: Int64, subject: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let subjectRecord = SubjectRecord(idGlobal: 2000000, subject: subject)
             try subjectRecord.insert(db)
             let subjectToUpdate = try SubjectRecord.fetchOne(db, key: [KEY_SUBJECT: subject])
@@ -45,7 +45,7 @@ class DbTableSubject {
     static func getAllSubjects() throws -> [String] {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var subjectsRecords = [SubjectRecord]()
-        try dbQueue.inDatabase { db in
+        try dbQueue.read { db in
             subjectsRecords = try SubjectRecord.fetchAll(db)
         }
         var subjects = [String]()

@@ -20,7 +20,7 @@ class DbTableRelationQuestionObjective {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
@@ -32,7 +32,7 @@ class DbTableRelationQuestionObjective {
     
     static func insertRelationQuestionObjective(questionID: Int64, objective: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let idglobalobjective = String(questionID) + objective
             let relationQuestionObjective = RelationQuestionObjectiveRecord(idGlobal: questionID, objective: objective, idGlobalObjective: idglobalobjective)
             try relationQuestionObjective.insert(db)

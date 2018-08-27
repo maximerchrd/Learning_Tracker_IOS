@@ -22,7 +22,7 @@ class DbTableTests {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: DbTableTests.TABLE_NAME, ifNotExists: true) { t in
                 t.column(DbTableTests.KEY_ID, .integer).primaryKey()
                 t.column(DbTableTests.KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .ignore)
@@ -36,7 +36,7 @@ class DbTableTests {
     
     static func insertTest(testID: Int64, test: String, questionIDs: String = "", objectiveIDs: [Int64] = [Int64](), objectives: [String] = [String](), testType: String = "FORMATIVE", medalsInstructions: String = "") throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             //insert the test
             let testRecord = TestRecord(idGlobal: testID, test: test, questionIDs: questionIDs, testType: testType, medalsInstructions: medalsInstructions)
             try testRecord.insert(db)
@@ -67,7 +67,7 @@ class DbTableTests {
             var testsRecords = [TestRecord]()
             var sql = "SELECT * FROM " + TABLE_NAME
             sql += " WHERE " + KEY_ID_GLOBAL + " = " + String(testID)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 testsRecords = try TestRecord.fetchAll(db, sql)
                 for singleRecord in testsRecords {
                     testName = singleRecord.test
@@ -89,7 +89,7 @@ class DbTableTests {
             var testsRecords = [TestRecord]()
             var sql = "SELECT * FROM " + TABLE_NAME
             sql += " WHERE " + KEY_ID_GLOBAL + " = " + String(testID)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 testsRecords = try TestRecord.fetchAll(db, sql)
                 for singleRecord in testsRecords {
                     testType = singleRecord.testType
@@ -111,7 +111,7 @@ class DbTableTests {
             var testsRecords = [TestRecord]()
             var sql = "SELECT * FROM " + TABLE_NAME
             sql += " WHERE " + KEY_ID_GLOBAL + " = " + String(testID)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 testsRecords = try TestRecord.fetchAll(db, sql)
                 for singleRecord in testsRecords {
                     medalsInstructions = singleRecord.medalsInstructions
@@ -131,7 +131,7 @@ class DbTableTests {
         
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 let rel = DbTableRelationTestObjective.TABLE_NAME
                 let obj = DbTableLearningObjective.TABLE_NAME
                 let objId = DbTableLearningObjective.KEY_ID_GLOBAL
@@ -165,7 +165,7 @@ class DbTableTests {
             let dbQueue = try DatabaseQueue(path: DBPath)
             let sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_TEST_NAME + "=\'" + testName + "\';"
             print(sql)
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 testsRecords = try TestRecord.fetchAll(db, sql)
             }
             
@@ -186,7 +186,7 @@ class DbTableTests {
     static func getAllTests() throws -> [[String]] {
         let dbQueue = try DatabaseQueue(path: DBPath)
         var testsRecords = [TestRecord]()
-        try dbQueue.inDatabase { db in
+        try dbQueue.read { db in
             testsRecords = try TestRecord.fetchAll(db)
         }
         

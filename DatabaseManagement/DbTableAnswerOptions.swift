@@ -19,7 +19,7 @@ class DbTableAnswerOptions {
     static func createTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
@@ -31,14 +31,14 @@ class DbTableAnswerOptions {
     static func dropTable(DatabaseName: String) throws {
         DBPath = DatabaseName
         let dbQueue = try DatabaseQueue(path: DatabaseName)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             try db.drop(table: TABLE_NAME)
         }
     }
     
     static func insertAnswerOption(questionID: Int64, option: String) throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
-        try dbQueue.inDatabase { db in
+        try dbQueue.write { db in
             let answerOption = AnswerOptionRecord(idGlobal: questionID, option: option)
             try answerOption.insert(db)
         }
@@ -50,7 +50,7 @@ class DbTableAnswerOptions {
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
             let query = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_ID_GLOBAL + "='" + String(questionID) + "';"
-            try dbQueue.inDatabase { db in
+            try dbQueue.read { db in
                 answerOptionRecord = try AnswerOptionRecord.fetchAll(db, query)
             }
         } catch let error {
@@ -69,7 +69,7 @@ class DbTableAnswerOptions {
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
             let query = "DELETE FROM " + TABLE_NAME + " WHERE " + KEY_ID_GLOBAL + "='" + String(questionID) + "';"
-            try dbQueue.inDatabase { db in
+            try dbQueue.write { db in
                 answerOptionRecord = try AnswerOptionRecord.fetchAll(db, query)
             }
         } catch let error {
