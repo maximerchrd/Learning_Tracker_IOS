@@ -543,7 +543,7 @@
         <!--Classroom Activity View Controller-->
         <scene sceneID="zbO-Rn-pDX">
             <objects>
-                <viewController id="lpg-k4-sOO" customClass="ClassroomActivityViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="classroomActivity" id="lpg-k4-sOO" customClass="ClassroomActivityViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DoR-a5-A5w">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -938,7 +938,7 @@
         <image name="settings" width="55" height="55"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="qdo-RD-ELQ"/>
-        <segue reference="tHw-Ws-cU0"/>
+        <segue reference="2FT-lJ-8Wd"/>
+        <segue reference="sAd-p5-4gd"/>
     </inferredMetricsTieBreakers>
 </document>

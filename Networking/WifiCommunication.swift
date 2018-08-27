@@ -110,7 +110,11 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         var ableToRead = true
         
         while (self.client != nil && self.client?.fd != nil && ableToRead) {
-            let data = self.client!.read(80, timeout: 40000)
+            var timeout = 40000
+            if AppDelegate.testConnection != 0 {
+                timeout = 1
+            }
+            let data = self.client!.read(80, timeout: timeout)
             if data != nil {
                 prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
                 if prefix.contains("oops, problem in listenToServer(): prefix is nil") {

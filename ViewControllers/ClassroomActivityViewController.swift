@@ -153,6 +153,17 @@ class ClassroomActivityViewController: UIViewController {
         } else {
             navigationItem.rightBarButtonItem = nil
         }
+        
+        if AppDelegate.testConnection != 0 {
+            DispatchQueue.global(qos: .utility).async {
+                Thread.sleep(forTimeInterval: 1.8)
+                if let navigator = self.navigationController {
+                    DispatchQueue.main.async {
+                        navigator.popViewController(animated: false)
+                    }
+                }
+            }
+        }
     }
     
     override func didReceiveMemoryWarning() {
