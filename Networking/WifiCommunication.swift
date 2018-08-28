@@ -70,6 +70,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 self.client = TCPClient(address: self.host, port: Int32(self.PORT_NUMBER))
                 let dataConverter = DataConversion()
                 
+                //app crashes after around 250 connections in a row
                 switch self.client!.connect(timeout: 4) {
                 case .success:
                     if AppDelegate.disconnectionSignalWithoutConnectionYet != "" {
@@ -230,6 +231,11 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     questionID = questionMult.ID
                     if questionMult.Question != "error" {
                         try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
+                    }
+                    
+                    //code for functional testing
+                    if questionMult.Question.contains("7492qJfzdDSB") {
+                        self.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
                     }
                 } else if typeOfQuest.range(of: "SHRTA") != nil {
                     let questionShrt = DataConversion.bytesToShrtaq(textData: dataText, imageData: dataImage)
