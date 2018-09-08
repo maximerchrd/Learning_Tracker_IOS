@@ -21,6 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var disconnectionSignalWithoutConnectionYet = ""
     static var locked = false
     static var testConnection = 0
+    static var QRCode = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

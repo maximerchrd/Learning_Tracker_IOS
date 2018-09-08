@@ -19,7 +19,17 @@ class ClassroomActivityViewController: UIViewController {
     @IBOutlet weak var RestartConnectionButton: UIButton!
     @IBOutlet weak var CrownImageView: UIImageView!
     var stopConnectionButton = true
+    var QRCode:String = ""
     
+    @IBAction func scanQRCode(_ sender: Any) {
+        if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ScanQRCodeViewController") as? ScanQRCodeViewController {
+            if let navigator = self.navigationController {
+                navigator.pushViewController(newViewController, animated: true)
+            } else {
+                NSLog("%@", "Error trying to show Scan QR code: the view controller wasn't pushed on a navigation controller")
+            }
+        }
+    }
     
     public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool, directCorrection: Int = 0) {
         // Safe Push VC
@@ -164,6 +174,47 @@ class ClassroomActivityViewController: UIViewController {
                     }
                 }
             }
+        }
+        
+        if AppDelegate.QRCode != "" {
+            if AppDelegate.QRCode.components(separatedBy: ":").count == 4 {
+                //launch question or test read by QR Code scanner
+                var questionMultipleChoice = QuestionMultipleChoice()
+                var questionShortAnswer = QuestionShortAnswer()
+                let idGlobal = Int64(AppDelegate.QRCode.components(separatedBy: ":")[0]) ?? 0
+                let directCorrection = Int(AppDelegate.QRCode.components(separatedBy: ":")[2]) ?? 0
+                if idGlobal < 0 {
+                    
+                    let test = Test()
+                    test.testID = String(-idGlobal)
+                    test.testName = DbTableTests.getNameFromTestID(testID: -idGlobal)
+                    test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
+                    test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
+                    test.parseMedalsInstructions(instructions: DbTableTests.getMedalsInstructionsFromTestID(testID: -idGlobal))
+                    
+                    DispatchQueue.main.async {
+                        AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: directCorrection, testMode: 0)
+                    }
+                } else {
+                    do {
+                        questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: idGlobal)
+                        
+                        if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
+                            AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
+                        } else {
+                            questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: idGlobal)
+                            AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false, directCorrection: directCorrection)
+                        }
+                    } catch let error {
+                        print(error)
+                    }
+                }
+            } else {
+                let ac = UIAlertController(title: "Error Reading QR Code", message: "The scanned QR Code is not recognized by Koeko.", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "OK", style: .default))
+                present(ac, animated: true)
+            }
+            AppDelegate.QRCode = ""
         }
     }
     
