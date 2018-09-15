@@ -73,7 +73,7 @@ class Test {
         medalsInstructions.removeAll()
         let instructionsArray = instructions.components(separatedBy: ";")
         for instruction in instructionsArray {
-            if instruction.count > 0 {
+            if instruction.count > 0 && instruction != "null" {
                 var time = instruction.components(separatedBy: ":")[1].components(separatedBy: "/")[0]
                 if time == "0" || time == "0.0" {
                     time = "1000000"

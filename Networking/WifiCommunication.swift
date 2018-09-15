@@ -214,38 +214,41 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
             let textSize = Int(textSizeString) ?? 0
             
             let dataText = self.readDataIntoArray(expectedSize: textSize )
-
-            print(imageSize)
+            print("expected textSize: " + String(textSize) + " actual textSize read: " + String(dataText.count))
             let dataImage = self.readDataIntoArray(expectedSize: imageSize)
-
-            print("Image size actually read:" + String(dataImage.count))
+            print("expected imageSize: " + String(imageSize) + " actual imageSize read: " + String(dataImage.count))
+           
             let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"
             if dataTextString.contains("oops") {
                 DbTableLogs.insertLog(log: dataTextString)
             }
             print(dataTextString)
             var questionID:Int64 = -1
-            do {
-                if typeOfQuest.range(of: "MULTQ") != nil {
-                    let questionMult = DataConversion.bytesToMultq(textData: dataText, imageData: dataImage)
-                    questionID = questionMult.ID
-                    if questionMult.Question != "error" {
-                        try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
+            
+            //insert question only if we received all the data
+            if textSize == dataText.count && imageSize == dataImage.count {
+                do {
+                    if typeOfQuest.range(of: "MULTQ") != nil {
+                        let questionMult = DataConversion.bytesToMultq(textData: dataText, imageData: dataImage)
+                        questionID = questionMult.ID
+                        if questionMult.Question != "error" {
+                            try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
+                        }
+                        
+                        //code for functional testing
+                        if questionMult.Question.contains("7492qJfzdDSB") {
+                            self.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
+                        }
+                    } else if typeOfQuest.range(of: "SHRTA") != nil {
+                        let questionShrt = DataConversion.bytesToShrtaq(textData: dataText, imageData: dataImage)
+                        questionID = questionShrt.ID
+                        if questionShrt.Question != "error" {
+                            try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
+                        }
                     }
-                    
-                    //code for functional testing
-                    if questionMult.Question.contains("7492qJfzdDSB") {
-                        self.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
-                    }
-                } else if typeOfQuest.range(of: "SHRTA") != nil {
-                    let questionShrt = DataConversion.bytesToShrtaq(textData: dataText, imageData: dataImage)
-                    questionID = questionShrt.ID
-                    if questionShrt.Question != "error" {
-                        try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
-                    }
+                } catch let error {
+                    print(error)
                 }
-            } catch let error {
-                print(error)
             }
         } else {
             DbTableLogs.insertLog(log: "error reading questions: prefix not in correct format or buffer truncated")
@@ -303,11 +306,18 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         var arrayToFill = [UInt8]()
         var ableToRead = true
         while self.client != nil && self.client?.fd != nil && ableToRead && arrayToFill.count < expectedSize {
-            let data = self.client!.read(expectedSize - arrayToFill.count, timeout: 3)
+            let data = self.client!.read(expectedSize - arrayToFill.count, timeout: 300)
             if data != nil {
                 arrayToFill += data ?? [UInt8]()
             } else {
                 ableToRead = false
+            }
+            if ableToRead == false && arrayToFill.count < expectedSize {
+                if data == nil {
+                    print("Reading picture data, data is nil")
+                } else {
+                    print("We are reading the picture data, we had a problem but data is not nil! WTF!!!")
+                }
             }
         }
         return arrayToFill
