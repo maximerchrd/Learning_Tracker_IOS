@@ -88,7 +88,6 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                         if automaticConnectionSuccess {
                             self.displayInstructions(instructionIndex: 2)
                         }
-                        DbTableLogs.insertLog(log: error.localizedDescription)
                         print(error)
                     }
                 case .failure(let error):
@@ -97,8 +96,10 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     }
                     if error.localizedDescription.contains("3") {
                         DbTableLogs.insertLog(log: error.localizedDescription + "(could connect to ip but server not running?)")
+                        print(error.localizedDescription + "(could connect to ip but server not running?)")
                     } else {
                         DbTableLogs.insertLog(log: error.localizedDescription + "(ip not valid?)")
+                        print(error.localizedDescription + "(ip not valid?)")
                     }
                     print(error)
                 }
@@ -220,9 +221,10 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
            
             let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"
             if dataTextString.contains("oops") {
-                DbTableLogs.insertLog(log: dataTextString)
+                let errorMessage = dataTextString + ". The dataText size was: " + String(dataText.count)
+                print(errorMessage)
             }
-            print(dataTextString)
+            print(dataTextString + " and the data: " + String(describing: dataText))
             var questionID:Int64 = -1
             
             //insert question only if we received all the data
@@ -249,10 +251,17 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 } catch let error {
                     print(error)
                 }
+                //send back a signal that we got the question
+                let accuseReception = "OK///" + String(questionID) + "///"
+                self.client?.send(data: accuseReception.data(using: .utf8)!)
+            } else {
+                var errorMessage = "\n expected textsize: " + String(textSize) + "; actual textSize: " + String(dataText.count)
+                errorMessage += "\n expected imagesize: " + String(imageSize) + "; actual imageSize: " + String(dataImage.count)
+                print(errorMessage)
             }
         } else {
-            DbTableLogs.insertLog(log: "error reading questions: prefix not in correct format or buffer truncated")
-            print("error reading questions: prefix not in correct format or buffer truncated")
+            let errorMessage = "error reading questions: prefix not in correct format or buffer truncated"
+            print(errorMessage)
         }
     }
     
@@ -313,11 +322,15 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 ableToRead = false
             }
             if ableToRead == false && arrayToFill.count < expectedSize {
+                var errorMessage = ""
                 if data == nil {
-                    print("Reading picture data, data is nil")
+                    errorMessage = "Reading data, data is nil"
                 } else {
-                    print("We are reading the picture data, we had a problem but data is not nil! WTF!!!")
+                    errorMessage = "We are reading data, we had a problem but data is not nil! WTF!!!"
                 }
+                errorMessage += "\n self.client: " + String(describing: self.client)
+                errorMessage += "\n self.client?.fd:" + String(describing: self.client?.fd)
+                print(errorMessage)
             }
         }
         return arrayToFill
