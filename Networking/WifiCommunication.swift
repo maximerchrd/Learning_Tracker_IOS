@@ -116,9 +116,9 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
             if AppDelegate.testConnection != 0 {
                 timeout = 1
             }
-            let data = self.client!.read(80, timeout: timeout)
+            let data = readDataIntoArray(expectedSize: 80, timeout: timeout)
             if data != nil {
-                prefix = String(bytes: data!, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
+                prefix = String(bytes: data, encoding: .utf8) ?? "oops, problem in listenToServer(): prefix is nil"
                 if prefix.contains("oops, problem in listenToServer(): prefix is nil") {
                     DbTableLogs.insertLog(log: prefix)
                     print(prefix)
@@ -132,9 +132,9 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 let typeID = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[0]
                 
                 if typeID.range(of:"MULTQ") != nil {
-                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data!)
+                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
                 } else if typeID.range(of:"SHRTA") != nil {
-                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data!)
+                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
                 } else if typeID.range(of:"QID") != nil {
                     ReceptionProtocol.receivedQID(prefix: prefix)
                 } else if typeID.elementsEqual("EVAL") {
@@ -310,12 +310,12 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         }
     }
 
-    public func readDataIntoArray(expectedSize: Int) -> [UInt8] {
+    public func readDataIntoArray(expectedSize: Int, timeout: Int = 300) -> [UInt8] {
         //read data
         var arrayToFill = [UInt8]()
         var ableToRead = true
         while self.client != nil && self.client?.fd != nil && ableToRead && arrayToFill.count < expectedSize {
-            let data = self.client!.read(expectedSize - arrayToFill.count, timeout: 300)
+            let data = self.client!.read(expectedSize - arrayToFill.count, timeout: timeout)
             if data != nil {
                 arrayToFill += data ?? [UInt8]()
             } else {
