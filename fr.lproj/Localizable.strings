@@ -52,3 +52,7 @@
 "Error Reading QR Code" = "Erreur lors du scan";
 
 "The scanned QR Code is not recognized by Koeko." = "Le QR Code scanné n'est pas reconnu par Koeko.";
+
+"Back to question" = "Retour à la Question";
+
+"Back to test" = "Retour au test";

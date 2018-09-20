@@ -156,11 +156,11 @@ class ClassroomActivityViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Question >", style: .plain, target: self, action: #selector(goBackToQuestionMultChoice))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to question", comment: "Back to question button") + " >", style: .plain, target: self, action: #selector(goBackToQuestionMultChoice))
         } else if ClassroomActivityViewController.navQuestionShortAnswerViewController != nil {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Question >", style: .plain, target: self, action: #selector(goBackToQuestionShortAnswer))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to question", comment: "Back to question button") + " >", style: .plain, target: self, action: #selector(goBackToQuestionShortAnswer))
         } else if ClassroomActivityViewController.navTestTableViewController != nil {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go back to Test >", style: .plain, target: self, action: #selector(goBackToTest))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to test", comment: "Back to test button") + " >", style: .plain, target: self, action: #selector(goBackToTest))
         } else {
             navigationItem.rightBarButtonItem = nil
         }
