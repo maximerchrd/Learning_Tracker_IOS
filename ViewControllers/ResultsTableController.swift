@@ -169,11 +169,11 @@ class ResultsTableController: UITableViewController {
                 cell.medalImage.image = nil
             }
         } else {
-            cell.QuestionLabel?.text = "Question"
+            cell.QuestionLabel?.text = NSLocalizedString("Question", comment: "Question label in list")
             cell.QuestionLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
-            cell.AnswerLabel?.text = "Your Answer"
+            cell.AnswerLabel?.text = NSLocalizedString("Your Answer", comment: "Answer label in list")
             cell.AnswerLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
-            cell.EvaluationLabel?.text = "Evaluation"
+            cell.EvaluationLabel?.text = NSLocalizedString("Evaluation", comment: "Evaluation label in list")
             cell.EvaluationLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
             var frame = cell.QuestionLabel?.frame
             frame?.origin = (cell.EvaluationLabel?.frame.origin)!
@@ -208,7 +208,7 @@ class ResultsTableController: UITableViewController {
     
     func OKButtonPressed() {
         reloadTable(subject: selectedSubject)
-        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject       
+        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
     }
     
     override func didReceiveMemoryWarning() {

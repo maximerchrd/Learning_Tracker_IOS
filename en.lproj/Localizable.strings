@@ -15,6 +15,8 @@
 
 "All subjects" = "All subjects";
 
+"All tests" = "All Tests";
+
 "Subject: " = "Subject: ";
 
 "Evaluation for each learning objective" = "Evaluation for each learning objective";
@@ -34,3 +36,21 @@
 "OK" = "OK";
 
 "AND CONNECT TO THE RIGHT WIFI NETWORK" = "AND CONNECT TO THE RIGHT WIFI NETWORK";
+
+"No name" = "No name";
+
+"Question" = "Question";
+
+"Your Answer" = "Your Answer";
+
+"Evaluation" = "Evaluation";
+
+"Start Connection" = "Start Connection";
+
+"Stop Connection" = "Stop Connection";
+
+"Automatic Connection Failed" = "Automatic connection failed. If it keeps failing, set the ip address of the teacher manually in \"Settings\"";
+
+"Error Reading QR Code" = "Error Reading QR Code";
+
+"The scanned QR Code is not recognized by Koeko." = "The scanned QR Code is not recognized by Koeko.";

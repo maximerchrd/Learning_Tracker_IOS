@@ -270,7 +270,7 @@ class ResultsCityRepresentationViewController: UIViewController {
         drawCity(subject: "All", testID: testID, test: selectedTest)
         (navigationItem.rightBarButtonItems![1].customView as! UIButton).titleLabel?.text = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
         selectedSubject = NSLocalizedString("All subjects", comment: "All subjects in the database")
-        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
+        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
     }
     @objc func addTapped() {
         activePickerType = 0
@@ -298,7 +298,7 @@ class ResultsCityRepresentationViewController: UIViewController {
     
     func OKButtonPressed() {
         drawCity(subject: selectedSubject, testID: 0)
-        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
+        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
         selectedTest = NSLocalizedString("All tests", comment: "All tests in the database")
         (navigationItem.rightBarButtonItems![1].customView as! UIButton).titleLabel?.text = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
     }

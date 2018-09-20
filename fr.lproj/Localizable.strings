@@ -15,13 +15,15 @@
 
 "All subjects" = "Tous les sujets";
 
+"All tests" = "Tous les tests";
+
 "Subject: " = "Sujet: ";
 
 "Evaluation for each learning objective" = "Evaluation pour chaque objectif d'apprentissage";
 
 "Choose a subject" = "Choisis un sujet";
 
-"You are quite good! You don\'t have any more questions needing practice." = "Bravo! Il n'y a plus de question que tu devrais encore exercer.";
+"You are quite good! You don\'t have any more questions needing practice." = "Bravo! Tu n'as plus de question à exercer.";
 
 "Correct!" = "C\'est juste!";
 
@@ -32,3 +34,21 @@
 "The right answer was: " = "La bonne réponse était: ";
 
 "OK" = "OK";
+
+"No name" = "Anonyme";
+
+"Question" = "Question";
+
+"Your Answer" = "Ta Réponse";
+
+"Evaluation" = "Evaluation";
+
+"Start Connection" = "Démarrer la Connection";
+
+"Stop Connection" = "Arrêter la Connection";
+
+"Automatic Connection Failed" = "La connection automatique a échoué. Si cela continue, entre manuellement l'adresse IP de l'ordinateur de l'enseignant dans les \"Paramètres\"";
+
+"Error Reading QR Code" = "Erreur lors du scan";
+
+"The scanned QR Code is not recognized by Koeko." = "Le QR Code scanné n'est pas reconnu par Koeko.";

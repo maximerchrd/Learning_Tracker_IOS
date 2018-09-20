@@ -189,7 +189,7 @@ class ResultsChartViewController: UIViewController {
         barChartUpdate(subject: "All", testID: testID)
         (navigationItem.rightBarButtonItems![1].customView as! UIButton).titleLabel?.text = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
         selectedSubject = NSLocalizedString("All subjects", comment: "All subjects in the database")
-        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
+        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
     }
     @objc func addTapped() {
         activePickerType = 0
@@ -217,7 +217,7 @@ class ResultsChartViewController: UIViewController {
     
     func OKButtonPressed() {
         barChartUpdate(subject: selectedSubject, testID: 0)
-        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
+        (navigationItem.rightBarButtonItems![0].customView as! UIButton).titleLabel?.text = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
         selectedTest = NSLocalizedString("All tests", comment: "All tests in the database")
         (navigationItem.rightBarButtonItems![1].customView as! UIButton).titleLabel?.text = NSLocalizedString("Test:", comment: "on button to chose subject") + selectedTest
     }

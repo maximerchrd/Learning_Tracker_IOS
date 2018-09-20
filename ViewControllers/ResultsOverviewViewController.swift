@@ -136,7 +136,7 @@ class ResultsOverviewViewController: UIPageViewController, UIPageViewControllerD
     func OKButtonPressed() {
         (orderedViewControllers[0] as! ResultsChartViewController).barChartUpdate(subject: selectedSubject, testID: 0)
         //(orderedViewControllers[1] as! ResultsTargetRepresentationViewController).updateTargetRepresentation(subject: selectedSubject)
-        navigationItem.rightBarButtonItem?.title = NSLocalizedString("Subject:", comment: "on button to chose subject") + selectedSubject
+        navigationItem.rightBarButtonItem?.title = NSLocalizedString("Subject: ", comment: "on button to chose subject") + selectedSubject
     }
     
     override func viewWillDisappear(_ animated: Bool) {

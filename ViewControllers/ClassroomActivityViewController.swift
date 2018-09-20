@@ -123,11 +123,11 @@ class ClassroomActivityViewController: UIViewController {
             if stopConnectionButton {
                 AppDelegate.wifiCommunicationSingleton!.stopConnection()
                 stopConnectionButton = false
-                RestartConnectionButton.setTitle("Start Connection", for: .normal)
+                RestartConnectionButton.setTitle(NSLocalizedString("Start Connection", comment: "Button in Class activity"), for: .normal)
             } else {
                 AppDelegate.wifiCommunicationSingleton!.startConnection()
                 stopConnectionButton = true
-                RestartConnectionButton.setTitle("Stop Connection", for: .normal)
+                RestartConnectionButton.setTitle(NSLocalizedString("Stop Connection", comment: "Button in Class activity"), for: .normal)
             }
         }
     }
@@ -135,7 +135,7 @@ class ClassroomActivityViewController: UIViewController {
     public func stopConnectionAlerting() {
         AppDelegate.wifiCommunicationSingleton!.stopConnection()
         stopConnectionButton = false
-        RestartConnectionButton.setTitle("Start Connection", for: .normal)
+        RestartConnectionButton.setTitle(NSLocalizedString("Start Connection", comment: "Button in Class activity"), for: .normal)
         let alert = UIAlertController(title: NSLocalizedString("Oops!", comment: "pop up if receiving problem"), message: "We had a problem receiving some data. Try to reconnect.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         self.present(alert, animated: true)
@@ -210,7 +210,7 @@ class ClassroomActivityViewController: UIViewController {
                     }
                 }
             } else {
-                let ac = UIAlertController(title: "Error Reading QR Code", message: "The scanned QR Code is not recognized by Koeko.", preferredStyle: .alert)
+                let ac = UIAlertController(title: NSLocalizedString("Error Reading QR Code", comment: "Error prompted when Reading QR Code"), message: NSLocalizedString("The scanned QR Code is not recognized by Koeko.", comment: "The scanned QR Code is not recognized by Koeko."), preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "OK", style: .default))
                 present(ac, animated: true)
             }

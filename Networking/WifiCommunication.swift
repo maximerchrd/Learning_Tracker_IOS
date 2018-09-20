@@ -150,7 +150,6 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 } else if typeID.elementsEqual("OEVAL") {
                     ReceptionProtocol.receivedOEVALFromServer(prefix: prefix)
                 } else {
-                    DbTableLogs.insertLog(log: "message received but prefix not supported: " + prefix)
                     print("message received but prefix not supported")
                 }
             } else {
@@ -288,7 +287,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
             case 2:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")
             case 3:
-                self.classroomActivityViewController?.InstructionsLabel.text = "Automatic connection failed. If it keeps failing, set the ip address of the teacher manually in \"Settings\""
+                self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("Automatic Connection Failed", comment: "instruction after the KEEP CALM if automatic connection failed")
             default:
                 print("Display instruction not recognized")
             }

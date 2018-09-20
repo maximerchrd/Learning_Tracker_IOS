@@ -36,7 +36,7 @@ class DbTableSettings {
             try dbQueue.write { db in
                 let settings = try Setting.fetchAll(db)
                 if (settings.count == 0) {
-                    let setting = Setting(name:"Anonymous", master:"192.168.1.100")
+                    let setting = Setting(name:NSLocalizedString("No name", comment: "Place holder for the name"), master:"192.168.1.100")
                     try setting.insert(db)
                 }
             }

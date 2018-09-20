@@ -14,9 +14,9 @@
 /* Class = "UIButton"; normalTitle = "Settings"; ObjectID = "wTl-bZ-Pc8"; */
 "wTl-bZ-Pc8.normalTitle" = "Paramètres";
 
-"AyV-YG-wrx.text" = "Nom:";
+"AyV-YG-wrx.text" = "Nom";
 
-"8lb-AH-pZh.text" = "Adresse IP de l'ordinateur de l'enseignant:";
+"8lb-AH-pZh.text" = "Adresse IP de l'ordinateur de l'enseignant";
 
 "9qp-6q-fvw.normalTitle" = "Sauver et revenir";
 
@@ -33,3 +33,19 @@
 "cYc-EF-bAw.normalTitle" = "Soumettre la Réponse";
 
 "ysh-wh-SMB.normalTitle" = "Soumettre la Réponse";
+
+"o7r-dC-Gch.text" = "Connection automatique";
+
+"fDQ-nL-0GO.normalTitle" = "Liste des Résultats";
+
+"5MG-pG-AJI.normalTitle" = "Diagramme des Résultats";
+
+"x4g-ZV-fne.normalTitle" = "Construis ta Ville";
+
+"mjU-2m-CrC.text" = "Question";
+
+"dCZ-PT-ZVF.text" = "Ta Réponse";
+
+"b2n-Dx-Jhq.text" = "Evaluation";
+
+"TVN-oP-TTU.normalTitle" = "Arrêter la Connection";
