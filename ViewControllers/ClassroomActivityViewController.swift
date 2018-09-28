@@ -117,7 +117,6 @@ class ClassroomActivityViewController: UIViewController {
                 AppDelegate.wifiCommunicationSingleton!.stopConnection()
                 Thread.sleep(forTimeInterval: 3)
                 AppDelegate.wifiCommunicationSingleton!.startConnection()
-                
             }
         } else {
             if stopConnectionButton {
@@ -136,7 +135,7 @@ class ClassroomActivityViewController: UIViewController {
         AppDelegate.wifiCommunicationSingleton!.stopConnection()
         stopConnectionButton = false
         RestartConnectionButton.setTitle(NSLocalizedString("Start Connection", comment: "Button in Class activity"), for: .normal)
-        let alert = UIAlertController(title: NSLocalizedString("Oops!", comment: "pop up if receiving problem"), message: "We had a problem receiving some data. Try to reconnect.", preferredStyle: .alert)
+        let alert = UIAlertController(title: NSLocalizedString("Oops!", comment: "pop up if receiving problem"), message: NSLocalizedString("We had a problem receiving some data. Try to reconnect.", comment: "error with data transfer"), preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         self.present(alert, animated: true)
     }

@@ -56,3 +56,7 @@
 "Back to question" = "Retour à la Question";
 
 "Back to test" = "Retour au test";
+
+"We had a problem receiving some data. Try to reconnect." = "On a un problème pour recevoir certaines données. Essaie de te reconnecter.";
+
+"Please change the user name in \"Settings\" before starting the classroom activity" = "Avant de commencer l'Activité en classe, change ton nom dans \"Paramètres\"";

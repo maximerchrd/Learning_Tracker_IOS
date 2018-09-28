@@ -17,6 +17,7 @@ class ViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        //code for testing
         if AppDelegate.testConnection != 0 {
             DispatchQueue.global(qos: .utility).async {
                 Thread.sleep(forTimeInterval: 1)
@@ -32,6 +33,27 @@ class ViewController: UIViewController {
                     }
                 }
             }
+        }
+    }
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        if identifier == "showClassroomActivity" {
+            do {
+            let name = try DbTableSettings.retrieveName()
+                if name == NSLocalizedString("No name", comment: "No name") {
+                    let alert = UIAlertController(title: "", message: NSLocalizedString("Please change the user name in \"Settings\" before starting the classroom activity", comment: "change username"), preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                    self.present(alert, animated: true)
+                    return false
+                } else {
+                    return true
+                }
+            } catch let error {
+                print(error)
+                return true
+            }
+        } else {
+            return true
         }
     }
     
