@@ -216,6 +216,14 @@ class ClassroomActivityViewController: UIViewController {
             AppDelegate.QRCode = ""
         }
     }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if self.isMovingFromParentViewController {
+            AppDelegate.wifiCommunicationSingleton!.stopConnection()
+        }
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
