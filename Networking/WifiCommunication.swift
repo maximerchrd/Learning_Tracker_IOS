@@ -149,6 +149,8 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     //ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
                 } else if typeID.elementsEqual("OEVAL") {
                     ReceptionProtocol.receivedOEVALFromServer(prefix: prefix)
+                } else if typeID.elementsEqual("FILE") {
+                    ReceptionProtocol.receivedFILEFromServer(prefix: prefix)
                 } else {
                     print("message received but prefix not supported")
                 }

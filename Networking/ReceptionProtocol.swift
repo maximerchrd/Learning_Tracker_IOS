@@ -178,4 +178,39 @@ class ReceptionProtocol {
             }
         }
     }
+    
+    static func receivedFILEFromServer(prefix: String) {
+        if prefix.components(separatedBy: "///").count != 3 {
+            let fileName = prefix.components(separatedBy: "///")[1]
+            let fileSize = Int(prefix.components(separatedBy: "///")[2]) ?? 0
+            
+            let fileData = AppDelegate.wifiCommunicationSingleton!.readDataIntoArray(expectedSize: fileSize)
+            print("expected fileSize: " + String(fileSize) + " actual textSize read: " + String(fileData.count))
+            
+            //insert question only if we received all the data
+            if fileSize == fileData.count {
+                let mediaData = Data(bytes: fileData);
+                guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
+                        appropriateFor: nil, create: false) as NSURL else {
+                    print("ERROR: unable to open directory when saving file")
+                    return
+                }
+                do {
+                    try mediaData.write(to: directory.appendingPathComponent(fileName)!)
+                } catch {
+                    print(error.localizedDescription)
+                }
+
+                //send back a signal that we got the question
+                let accuseReception = "OK///" + fileName + "///"
+                AppDelegate.wifiCommunicationSingleton!.client?.send(data: accuseReception.data(using: .utf8)!)
+            } else {
+                var errorMessage = "\n expected fileSize: " + String(fileSize) + "; actual fileSize: " + String(fileData.count)
+                print(errorMessage)
+            }
+        } else {
+            let errorMessage = "error reading questions: prefix not in correct format or buffer truncated"
+            print(errorMessage)
+        }
+    }
 }
