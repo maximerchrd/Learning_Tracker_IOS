@@ -1,0 +1,64 @@
+/* 
+  Localizable.strings
+  Learning_Tracker_IOS
+
+  Created by Maxime Richard on 07.03.18.
+  Copyright © 2018 Maxime Richard. All rights reserved.
+*/
+"Hello " = "Hello ";
+
+". Welcome to Learning Tracker. Check in parameters that you have the right ip address before starting a classroom activity." = ". Welcome to Learning Tracker. Check in Settings that you have the right ip address before starting a classroom activity.";
+
+"AND WAIT FOR NEXT QUESTION" = "ՍՊԱՍԻՐ ՀԱՋՈՐԴ ՀԱՐՑԻՆ";
+
+"AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)" =  "ԵՎ ՎԵՐՍԿՍԻՐ (մինչ այդ ստուգիր IP հասցեն)";
+
+"All subjects" = "Բոլոր առարկաները";
+
+"All tests" = "Բոլոր թեստերը";
+
+"Subject: " = "Առարկա: ";
+
+"Evaluation for each learning objective" = "Յուրաքանչյուր առարկայի գնահատումը";
+
+"Choose a subject" = "Ընտրել առարկան";
+
+"You are quite good! You don\'t have any more questions needing practice." = "You are quite good! You don\'t have any more questions needing practice.";
+
+"Correct!" = "Ճիշտ է!";
+
+"Incorrect :-(" = "Սխալ է :-(";
+
+"The right answer was for example: " = "Ճիշտ պատասխանն էր, օրինակ: ";
+
+"The right answer was: " = "Ճիշտ պատասխանն էր: ";
+
+"OK" = "Լավ";
+
+"AND CONNECT TO THE RIGHT WIFI NETWORK" = "ԵՎ ՄԻԱՑԻՐ wi fi -ին";
+
+"No name" = "Անանուն";
+
+"Question" = "Հարց";
+
+"Your Answer" = "Քո տարբերակը";
+
+"Evaluation" = "Գնահատական";
+
+"Start Connection" = "Սկսել կապը";
+
+"Stop Connection" = "Դադարեցնել կապը";
+
+"Automatic Connection Failed" = "Ավտոմատ միացումը չստացվեց";
+
+"Error Reading QR Code" = "QR ծածկագրի ընթերցման սխալ";
+
+"The scanned QR Code is not recognized by Koeko." = "QR ծածկագիրը չի ճանաչում";
+
+"Back to question" = "Վերադառնալ հարցին";
+
+"Back to test" = "Վերադառնալ թեստին";
+
+"We had a problem receiving some data. Try to reconnect." = "Որոշ տվյալների ստացման խնդիր ունենք, կրկին փորձեք";
+
+"Please change the user name in \"Settings\" before starting the classroom activity" = "Խնդրում եմ փոխել Ձեր անունը մինչև սկսելը";

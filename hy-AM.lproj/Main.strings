@@ -1,15 +1,53 @@
 
 /* Class = "UIButton"; normalTitle = "Start Classroom Activity"; ObjectID = "3GW-TH-Eq6"; */
-"3GW-TH-Eq6.normalTitle" = "Start Classroom Activity";
+"3GW-TH-Eq6.normalTitle" = "Սկսել";
 
 /* Class = "UIButton"; normalTitle = "Evaluation Results"; ObjectID = "QlR-oR-TPz"; */
-"QlR-oR-TPz.normalTitle" = "Evaluation Results";
+"QlR-oR-TPz.normalTitle" = "Արդյունքներ";
 
 /* Class = "UIButton"; normalTitle = "Practice"; ObjectID = "bWm-TL-NY6"; */
-"bWm-TL-NY6.normalTitle" = "Practice";
+"bWm-TL-NY6.normalTitle" = "Պարապել";
 
 /* Class = "UILabel"; text = "Hello "; ObjectID = "m7I-va-O77"; */
 "m7I-va-O77.text" = "Hello ";
 
 /* Class = "UIButton"; normalTitle = "Settings"; ObjectID = "wTl-bZ-Pc8"; */
-"wTl-bZ-Pc8.normalTitle" = "Settings";
+"wTl-bZ-Pc8.normalTitle" = "Կարգավորումներ";
+
+"AyV-YG-wrx.text" = "Անուն";
+
+"8lb-AH-pZh.text" = "IP հասցե";
+
+"9qp-6q-fvw.normalTitle" = "Պահպանել և ետ վերադառնալ";
+
+"F9Q-a8-fhe.text" = "Պարապել";
+
+"ffM-an-JpN.text" = "Առարկա:";
+
+"AXn-Mg-com.normalTitle" = "Սկսել Պարապել";
+
+"njN-aR-w3O.normalTitle" = "Ընտրել պատասխանը";
+
+"Fd8-7A-Sn6.normalTitle" = "Ընտրել պատասխանը";
+
+"cYc-EF-bAw.normalTitle" = "Ընտրել պատասխանը";
+
+"ysh-wh-SMB.normalTitle" = "Ընտրել պատասխանը";
+
+"o7r-dC-Gch.text" = "Ավտոմատ միացում";
+
+"fDQ-nL-0GO.normalTitle" = "Արդյունքների պատուհան";
+
+"5MG-pG-AJI.normalTitle" = "Գրաֆիկ";
+
+"x4g-ZV-fne.normalTitle" = "Քո քաղաքը";
+
+"mjU-2m-CrC.text" = "Հարց";
+
+"dCZ-PT-ZVF.text" = "Քո տարբերակը";
+
+"b2n-Dx-Jhq.text" = "Գնահատական";
+
+"TVN-oP-TTU.normalTitle" = "Ավարտել միացումը";
+
+"9fN-g8-tTM.text" =  "Միացում...";
