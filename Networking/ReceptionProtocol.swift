@@ -196,7 +196,7 @@ class ReceptionProtocol {
             let fileData = AppDelegate.wifiCommunicationSingleton!.readDataIntoArray(expectedSize: fileSize)
             print("expected fileSize: " + String(fileSize) + " actual textSize read: " + String(fileData.count))
             
-            //insert question only if we received all the data
+            //insert file only if we received all the data
             if fileSize == fileData.count {
                 let mediaData = Data(bytes: fileData);
                 guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
@@ -206,7 +206,7 @@ class ReceptionProtocol {
                 }
                 do {
                     try mediaData.write(to: directory.appendingPathComponent(fileName)!)
-                } catch {
+                } catch let error {
                     print(error.localizedDescription)
                 }
 

@@ -76,6 +76,15 @@ class ClassroomActivityViewController: UIViewController {
         }
     }
     
+    public func showHTML(url: URL) {
+        if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "displayWebContent") as? DisplayWebContentController {
+            if let navigator = navigationController {
+                newViewController.url = url
+                navigator.pushViewController(newViewController, animated: true)
+            }
+        }
+    }
+    
     @objc func goBackToQuestionMultChoice() {
         if let navigator = navigationController {
             if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {

@@ -63,10 +63,14 @@ class TestTableViewController: UITableViewController {
 
         //prepare media if exists
         loadMedia(from: AppDelegate.activeTest.mediaFileName)
+        print(AppDelegate.activeTest.mediaFileName)
         if AppDelegate.activeTest.mediaFileName.count == 0 {
             playerControllerView.frame.size.height = 0;
             playpauseButton.isHidden = true
             stopButton.isHidden = true
+        } else if NSURL(fileURLWithPath: AppDelegate.activeTest.mediaFileName).pathExtension ?? "" == "html" {
+            stopButton.isHidden = true
+            playpauseButton.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: playpauseButton.bounds.height)
         }
     }
     
@@ -92,16 +96,29 @@ class TestTableViewController: UITableViewController {
     }
     
     @IBAction func playPause(_ sender: Any) {
-        if player.rate == 0 {
-            playerLayer.frame = CGRect(x: 0, y: self.view.bounds.origin.y, width: self.view.bounds.width, height: self.view.bounds.height)
-            player.play()
-            if let image = UIImage(named: "play_icon.png") {
-                playpauseButton.setImage(image, for: [])
+        if NSURL(fileURLWithPath: AppDelegate.activeTest.mediaFileName).pathExtension ?? "" == "html" {
+            guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
+                    appropriateFor: nil, create: false) as NSURL else {
+                print("ERROR: unable to open directory when reading web file")
+                return
+            }
+            var fileUrl = directory.appendingPathComponent(AppDelegate.activeTest.mediaFileName)!
+            DispatchQueue.main.async {
+                AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showHTML(url: fileUrl)
+
             }
         } else {
-            player.pause()
-            if let image = UIImage(named: "pause_icon.png") {
-                playpauseButton.setImage(image, for: [])
+            if player.rate == 0 {
+                playerLayer.frame = CGRect(x: 0, y: self.view.bounds.origin.y, width: self.view.bounds.width, height: self.view.bounds.height)
+                player.play()
+                if let image = UIImage(named: "play_icon.png") {
+                    playpauseButton.setImage(image, for: [])
+                }
+            } else {
+                player.pause()
+                if let image = UIImage(named: "pause_icon.png") {
+                    playpauseButton.setImage(image, for: [])
+                }
             }
         }
     }
@@ -110,6 +127,9 @@ class TestTableViewController: UITableViewController {
         player.pause()
         player.seek(to: CMTimeMake(0, 10))
         playerLayer.frame = CGRect(x: 0, y: self.view.bounds.origin.y, width: self.view.bounds.width, height: 0)
+        if let image = UIImage(named: "play_icon.png") {
+            playpauseButton.setImage(image, for: [])
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
