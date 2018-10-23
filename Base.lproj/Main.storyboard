@@ -630,9 +630,35 @@ Connection</string>
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <view key="tableHeaderView" contentMode="scaleAspectFit" id="Le4-b7-ct6" userLabel="PlayerControllerView">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="119"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9JH-hh-gl1">
+                                    <rect key="frame" x="45" y="22" width="120" height="75"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                    <color key="backgroundColor" red="0.0" green="0.80000000000000004" blue="0.79607843140000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <inset key="imageEdgeInsets" minX="6" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                    <state key="normal" image="play_icon"/>
+                                    <connections>
+                                        <action selector="playPause:" destination="AwR-qi-RJ2" eventType="touchUpInside" id="dof-aL-kWb"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N46-7d-Atc">
+                                    <rect key="frame" x="195" y="22" width="120" height="75"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                    <color key="backgroundColor" red="0.0" green="0.80000000000000004" blue="0.79607843140000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <state key="normal" image="stop_icon"/>
+                                    <connections>
+                                        <action selector="stopPlayer:" destination="AwR-qi-RJ2" eventType="touchUpInside" id="UUL-vS-gT2"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="QuestionCell" id="ie3-Yh-2f4" customClass="TestTableViewCell" customModule="Learning_Tracker_IOS" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="147" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ie3-Yh-2f4" id="Cuh-Lg-sCq">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -666,6 +692,9 @@ Connection</string>
                         </connections>
                     </tableView>
                     <connections>
+                        <outlet property="playerControllerView" destination="Le4-b7-ct6" id="3Mp-Sj-sWT"/>
+                        <outlet property="playpauseButton" destination="9JH-hh-gl1" id="guZ-ho-94O"/>
+                        <outlet property="stopButton" destination="N46-7d-Atc" id="GEP-Im-Q1K"/>
                         <outlet property="testTableView" destination="TCK-gB-Li3" id="2Jn-F5-of0"/>
                         <segue destination="xQz-if-Mve" kind="show" identifier="segueTestShrtaq" id="tHw-Ws-cU0"/>
                         <segue destination="s1x-ZS-Gfr" kind="show" identifier="segueTestMCQ" id="qdo-RD-ELQ"/>
@@ -673,7 +702,7 @@ Connection</string>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1BZ-vu-BX1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1711.875" y="-1045"/>
+            <point key="canvasLocation" x="1711.2" y="-1045.7271364317842"/>
         </scene>
         <!--Question Short Answer View Controller-->
         <scene sceneID="IwT-Pj-0By">
@@ -958,13 +987,15 @@ Connection</string>
         <image name="class_activity" width="105" height="55"/>
         <image name="keepCalmCrown" width="600" height="600"/>
         <image name="list-icon" width="99" height="60"/>
+        <image name="play_icon" width="44" height="50"/>
         <image name="practice" width="55" height="55"/>
         <image name="qrImage" width="80" height="79"/>
         <image name="results" width="55" height="55"/>
         <image name="settings" width="55" height="55"/>
+        <image name="stop_icon" width="50" height="50"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="2FT-lJ-8Wd"/>
-        <segue reference="sAd-p5-4gd"/>
+        <segue reference="qdo-RD-ELQ"/>
+        <segue reference="tHw-Ws-cU0"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -11,6 +11,7 @@ import Foundation
 class Test {
     var testID = ""
     var testName = ""
+    var mediaFileName = ""
     var testMap = [[String]]()
     var questionIDs = [String]()
     var IDactive = [String: Bool]()

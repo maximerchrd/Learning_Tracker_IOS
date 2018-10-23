@@ -8,6 +8,8 @@
 
 import Foundation
 import UIKit
+import AVKit
+import AVFoundation
 
 var timer = Timer()
 var seconds = 0
@@ -29,7 +31,13 @@ class TestTableViewController: UITableViewController {
     //store all the questions view controllers
     var questionMultipleChoiceViewControllers = [QuestionMultipleChoiceViewController]()
     var questionShortAnswerViewControllers = [QuestionShortAnswerViewController]()
+
+    var player:AVPlayer = AVPlayer()
+    var playerLayer:AVPlayerLayer = AVPlayerLayer()
     
+    @IBOutlet weak var playpauseButton: UIButton!
+    @IBOutlet weak var stopButton: UIButton!
+    @IBOutlet weak var playerControllerView: UIView!
     @IBOutlet var testTableView: UITableView!
     
     
@@ -52,6 +60,14 @@ class TestTableViewController: UITableViewController {
             AppDelegate.activeTest.startTime = Date.timeIntervalSinceReferenceDate
         }
         reloadTable()
+
+        //prepare media if exists
+        loadMedia(from: AppDelegate.activeTest.mediaFileName)
+        if AppDelegate.activeTest.mediaFileName.count == 0 {
+            playerControllerView.frame.size.height = 0;
+            playpauseButton.isHidden = true
+            stopButton.isHidden = true
+        }
     }
     
     func startTimer(alert: UIAlertAction!) {
@@ -75,6 +91,27 @@ class TestTableViewController: UITableViewController {
         timerLabel.text = String(format: "%02d", min) + ":" + String(format: "%02d", sec)
     }
     
+    @IBAction func playPause(_ sender: Any) {
+        if player.rate == 0 {
+            playerLayer.frame = CGRect(x: 0, y: self.view.bounds.origin.y, width: self.view.bounds.width, height: self.view.bounds.height)
+            player.play()
+            if let image = UIImage(named: "play_icon.png") {
+                playpauseButton.setImage(image, for: [])
+            }
+        } else {
+            player.pause()
+            if let image = UIImage(named: "pause_icon.png") {
+                playpauseButton.setImage(image, for: [])
+            }
+        }
+    }
+
+    @IBAction func stopPlayer(_ sender: Any) {
+        player.pause()
+        player.seek(to: CMTimeMake(0, 10))
+        playerLayer.frame = CGRect(x: 0, y: self.view.bounds.origin.y, width: self.view.bounds.width, height: 0)
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         //update current test if exists
         if AppDelegate.activeTest.calculateScoreAndCheckIfOver() {
@@ -113,12 +150,35 @@ class TestTableViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
-    
+
+    private func loadMedia(from file:String) {
+        let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory
+        let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
+        let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
+        if let dirPath          = paths.first {
+            let fileURL = URL(fileURLWithPath: dirPath).appendingPathComponent(file)
+            player = AVPlayer(url: fileURL)
+            playerLayer = AVPlayerLayer(player: player)
+            let frameYCoord = self.view.bounds.origin.y
+            playerLayer.frame = CGRect(x: 0, y: self.view.bounds.origin.y, width: self.view.bounds.width, height: 0)
+            self.view.layer.addSublayer(playerLayer)
+        } else {
+            debugPrint( "\(file) not found")
+        }
+    }
+
+
+
     override func viewWillDisappear(_ animated: Bool) {
         ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
         ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
         if goingBack {
             timerLabel.text = ""
+        }
+
+        //stop media player
+        if (player.rate != 0) {
+            player.pause()
         }
     }
     

@@ -24,6 +24,7 @@ class ReceptionProtocol {
                 test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
                 test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
                 test.parseMedalsInstructions(instructions: DbTableTests.getMedalsInstructionsFromTestID(testID: -idGlobal))
+                test.mediaFileName = DbTableTests.getMediaFileNameFromTestID(testID: -idGlobal)
                 
                 DispatchQueue.main.async {
                     AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: directCorrection, testMode: 0)
@@ -98,7 +99,7 @@ class ReceptionProtocol {
                 DbTableLogs.insertLog(log: dataTextString)
             }
             do {
-                if dataTextString.components(separatedBy: "///").count > 3 {
+                if dataTextString.components(separatedBy: "///").count >= 5 {
                     let testID = Int64(dataTextString.components(separatedBy: "///")[0]) ?? 0
                     let test = dataTextString.components(separatedBy: "///")[1]
                     let objectivesArray = dataTextString.components(separatedBy: "///")[3].components(separatedBy: "|||")
@@ -131,11 +132,19 @@ class ReceptionProtocol {
                         }
                     }
                     
-                    ///get medals instructions
+                    //get medals instructions
                     let medalsInstructions = dataTextString.components(separatedBy: "///")[5]
+
+                    //get media file name
+                    var mediaFileName = ""
+                    if (dataTextString.components(separatedBy: "///").count >= 6) {
+                        mediaFileName = dataTextString.components(separatedBy: "///")[6]
+                    }
                     
                     //insert test in db after parsing questions
-                    try DbTableTests.insertTest(testID: testID, test: test, questionIDs: questionIdsForTest, objectiveIDs: objectiveIDS, objectives: objectives, medalsInstructions: medalsInstructions)
+                    try DbTableTests.insertTest(testID: testID, test: test, questionIDs: questionIdsForTest,
+                            objectiveIDs: objectiveIDS, objectives: objectives, medalsInstructions: medalsInstructions,
+                            mediaFileName: mediaFileName)
                 } else {
                     let error = "problem reading test: text array to short"
                     print(error)

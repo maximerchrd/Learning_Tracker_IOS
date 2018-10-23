@@ -17,6 +17,7 @@ class DbTableTests {
     static let KEY_QUESTION_IDS = "QUESTION_IDS"
     static let KEY_TEST_TYPE = "TEST_TYPE"
     static let KEY_MEDALS_INSTRUCTIONS = "MEDALS_INSTRUCTIONS"
+    static let KEY_MEDIA_FILE = "MEDIA_FILE"
     static var DBPath = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -30,15 +31,19 @@ class DbTableTests {
                 t.column(DbTableTests.KEY_QUESTION_IDS, .text)
                 t.column(DbTableTests.KEY_TEST_TYPE, .text)
                 t.column(DbTableTests.KEY_MEDALS_INSTRUCTIONS, .text)
+                t.column(DbTableTests.KEY_MEDIA_FILE, .text)
             }
         }
     }
     
-    static func insertTest(testID: Int64, test: String, questionIDs: String = "", objectiveIDs: [Int64] = [Int64](), objectives: [String] = [String](), testType: String = "FORMATIVE", medalsInstructions: String = "") throws {
+    static func insertTest(testID: Int64, test: String, questionIDs: String = "", objectiveIDs: [Int64] = [Int64](),
+                           objectives: [String] = [String](), testType: String = "FORMATIVE", medalsInstructions: String = "",
+                           mediaFileName: String = "") throws {
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.write { db in
             //insert the test
-            let testRecord = TestRecord(idGlobal: testID, test: test, questionIDs: questionIDs, testType: testType, medalsInstructions: medalsInstructions)
+            let testRecord = TestRecord(idGlobal: testID, test: test, questionIDs: questionIDs, testType: testType,
+                    medalsInstructions: medalsInstructions, mediaFileName: mediaFileName)
             try testRecord.insert(db)
             
             //insert the corresponding learning objectives
@@ -122,6 +127,28 @@ class DbTableTests {
             print(error)
         }
         
+        return ""
+    }
+
+    static func getMediaFileNameFromTestID(testID: Int64) -> String {
+        do {
+            var mediaFileName = "no media file found"
+            let dbQueue = try DatabaseQueue(path: DBPath)
+            var testsRecords = [TestRecord]()
+            var sql = "SELECT * FROM " + TABLE_NAME
+            sql += " WHERE " + KEY_ID_GLOBAL + " = " + String(testID)
+            try dbQueue.read { db in
+                testsRecords = try TestRecord.fetchAll(db, sql)
+                for singleRecord in testsRecords {
+                    mediaFileName = singleRecord.mediaFileName
+                }
+            }
+
+            return mediaFileName
+        } catch let error {
+            print(error)
+        }
+
         return ""
     }
     
@@ -229,13 +256,16 @@ class TestRecord : Record {
     var questionIDS: String
     var testType: String
     var medalsInstructions: String
+    var mediaFileName: String
     
-    init(idGlobal: Int64, test: String, questionIDs: String, testType: String, medalsInstructions: String) {
+    init(idGlobal: Int64, test: String, questionIDs: String, testType: String, medalsInstructions: String,
+         mediaFileName: String) {
         self.idGlobal = idGlobal
         self.test = test
         self.questionIDS = questionIDs
         self.testType = testType
         self.medalsInstructions = medalsInstructions
+        self.mediaFileName = mediaFileName
         super.init()
     }
     
@@ -246,6 +276,7 @@ class TestRecord : Record {
         self.questionIDS = row[DbTableTests.KEY_QUESTION_IDS]
         self.testType = row[DbTableTests.KEY_TEST_TYPE]
         self.medalsInstructions = row[DbTableTests.KEY_MEDALS_INSTRUCTIONS]
+        self.mediaFileName = row[DbTableTests.KEY_MEDIA_FILE]
         super.init()
     }
     
@@ -260,6 +291,7 @@ class TestRecord : Record {
         container[DbTableTests.KEY_QUESTION_IDS] = questionIDS
         container[DbTableTests.KEY_TEST_TYPE] = testType
         container[DbTableTests.KEY_MEDALS_INSTRUCTIONS] = medalsInstructions
+        container[DbTableTests.KEY_MEDIA_FILE] = mediaFileName
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {
