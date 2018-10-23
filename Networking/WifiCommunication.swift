@@ -153,6 +153,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     ReceptionProtocol.receivedFILEFromServer(prefix: prefix)
                 } else {
                     print("message received but prefix not supported")
+                    stopConnection()
                 }
             } else {
                 ableToRead = false
@@ -270,6 +271,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         if self.client != nil {
             sendDisconnectionSignal(additionalInformation: "close-connection")
             self.client!.close()            //sets the file descriptor to nil
+            displayInstructions(instructionIndex: 4)
         }
     }
     
@@ -290,6 +292,8 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")
             case 3:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("Automatic Connection Failed", comment: "instruction after the KEEP CALM if automatic connection failed")
+            case 4:
+                self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("We are not connected :-(", comment: "message appearing when we are not connected")
             default:
                 print("Display instruction not recognized")
             }
