@@ -78,6 +78,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     }
                     switch self.client!.send(data: dataConverter.connection()) {
                     case .success:
+                        self.sendResourceIdsOnDevice()
                         if automaticConnectionSuccess {
                             self.displayInstructions(instructionIndex: 1)
                         }
@@ -104,6 +105,39 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     print(error)
                 }
             }
+        }
+    }
+
+    private func sendResourceIdsOnDevice() {
+        do {
+            var idsString = ""
+            idsString += try DbTableQuestionMultipleChoice.getAllQuestionsMultipleChoiceIDs() + "|"
+            idsString += try DbTableQuestionShortAnswer.getAllQuestionsShortAnswersIDs() + "|"
+
+            let fileManager = FileManager.default
+            let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            do {
+                let fileURLs = try fileManager.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+                for var url in fileURLs {
+                    idsString += url.lastPathComponent + "|"
+                }
+            } catch {
+                print("Error while enumerating files \(documentsURL.path): \(error.localizedDescription)")
+            }
+
+            var arrayResIds = idsString.components(separatedBy: "|")
+            var stringToSend = "RESIDS///" + UIDevice.current.identifierForVendor!.uuidString + "///";
+            for var id in arrayResIds {
+                stringToSend += id + "|"
+                if stringToSend.data(using: .utf8)!.count > 900 {
+                    self.client!.send(data: stringToSend.data(using: .utf8)!)
+                    stringToSend = "RESIDS///" + UIDevice.current.identifierForVendor!.uuidString + "///";
+                }
+            }
+            stringToSend += "///ENDTRSM///"
+            self.client!.send(data: stringToSend.data(using: .utf8)!)
+        } catch let error {
+            print(error)
         }
     }
     

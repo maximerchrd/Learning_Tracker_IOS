@@ -14,12 +14,9 @@ class DataConversion {
     public func connection() -> Data {
         var input = "problem retrieving name from DB"
         do {
-            let MCQIDsList = try DbTableQuestionMultipleChoice.getAllQuestionsMultipleChoiceIDs()
-            let SHRTAQIDsList = try DbTableQuestionShortAnswer.getAllQuestionsShortAnswersIDs()
             try input = "CONN" + "///"
                 + UIDevice.current.identifierForVendor!.uuidString + "///"
                 + DbTableSettings.retrieveName() + "///"
-                + MCQIDsList + "|" + SHRTAQIDsList
         } catch let error {
             print(error)
             DbTableLogs.insertLog(log: error.localizedDescription)
