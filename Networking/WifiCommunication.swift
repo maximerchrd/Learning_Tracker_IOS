@@ -27,6 +27,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     }
     
     public func connectToServer() {
+        //change the thread priority if we come back from lock to be sure to send disconnection before user quits app if ever
         var threadProperty = DispatchQoS.QoSClass.utility
         if AppDelegate.locked {
             threadProperty = DispatchQoS.QoSClass.userInteractive

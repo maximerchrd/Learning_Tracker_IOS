@@ -61,6 +61,10 @@ class TestTableViewController: UITableViewController {
         }
         reloadTable()
 
+        //send receipt to server
+        let receipt = "ACTID///" + AppDelegate.activeTest.testID + "///"
+        AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
+
         //prepare media if exists
         loadMedia(from: AppDelegate.activeTest.mediaFileName)
         print(AppDelegate.activeTest.mediaFileName)
@@ -111,12 +115,12 @@ class TestTableViewController: UITableViewController {
             if player.rate == 0 {
                 playerLayer.frame = CGRect(x: 0, y: self.view.bounds.origin.y, width: self.view.bounds.width, height: self.view.bounds.height)
                 player.play()
-                if let image = UIImage(named: "play_icon.png") {
+                if let image = UIImage(named: "pause_icon.png") {
                     playpauseButton.setImage(image, for: [])
                 }
             } else {
                 player.pause()
-                if let image = UIImage(named: "pause_icon.png") {
+                if let image = UIImage(named: "play_icon.png") {
                     playpauseButton.setImage(image, for: [])
                 }
             }

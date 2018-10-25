@@ -51,6 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if AppDelegate.wifiCommunicationSingleton != nil {
                 AppDelegate.wifiCommunicationSingleton?.sendDisconnectionSignal(additionalInformation: "locked")
                 AppDelegate.locked = true
+                AppDelegate.wifiCommunicationSingleton?.client?.close()
             }
         } else {
             print("user pressed home button")

@@ -85,6 +85,10 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         
         //start timer
         startTime = Date.timeIntervalSinceReferenceDate
+
+        //send receipt to server
+        let receipt = "ACTID///" + String(questionShortAnswer.ID) + "///"
+        AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
     }
     
     override func viewDidAppear(_ animated: Bool) {

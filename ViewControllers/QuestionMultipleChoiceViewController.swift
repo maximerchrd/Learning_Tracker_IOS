@@ -162,6 +162,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
         
         //start the timer
         startTime = Date.timeIntervalSinceReferenceDate
+
+        //send receipt to server
+        let receipt = "ACTID///" + String(questionMultipleChoice.ID) + "///"
+        AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
         
         /**
          * START CODE USED FOR TESTING
