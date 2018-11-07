@@ -5,6 +5,7 @@
 
 class DataPrefix {
     static let multq = "MULTQ"
+    static let shrta = "SHRTA"
 
     var dataType = ""
     var dataLength = ""
@@ -16,6 +17,8 @@ class DataPrefix {
         dataType = stringPrefix.components(separatedBy: "///")[0]
         switch (dataType) {
         case DataPrefix.multq :
+            dataLength = stringPrefix.components(separatedBy: "///")[1]
+        case DataPrefix.shrta :
             dataLength = stringPrefix.components(separatedBy: "///")[1]
         default :
             dataType = "UNKNOWN"

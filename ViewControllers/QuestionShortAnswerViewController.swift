@@ -49,7 +49,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         screenHeight = Float(screenSize.height)
         
         // Set question text
-        QuestionTextView.text = questionShortAnswer.Question
+        QuestionTextView.text = questionShortAnswer.question
         QuestionTextView.isEditable = false
         
         // Display picture
@@ -57,7 +57,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
         let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
         if let dirPath          = paths.first {
-            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionShortAnswer.Image)
+            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionShortAnswer.image)
             PictureView.image    = UIImage(contentsOfFile: imageURL.path)
         }
         originaImageWidth = PictureView.frame.width
@@ -75,8 +75,8 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         //if in correction mode, give the answer and change button label
         if isCorrection {
             var exampleAnswer = NSLocalizedString("The right answer was for example: ", comment: "in short answer question text field")
-            if questionShortAnswer.Options.count > 0 {
-                exampleAnswer += questionShortAnswer.Options[0]
+            if questionShortAnswer.options.count > 0 {
+                exampleAnswer += questionShortAnswer.options[0]
             }
             self.AnswerTextField.text = exampleAnswer
             self.AnswerTextField.isEnabled = false
@@ -87,7 +87,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         startTime = Date.timeIntervalSinceReferenceDate
 
         //send receipt to server
-        let receipt = "ACTID///" + String(questionShortAnswer.ID) + "///"
+        let receipt = "ACTID///" + String(questionShortAnswer.id) + "///"
         AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
     }
     
@@ -131,14 +131,14 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         
         //first send answer to server
         if !isCorrection {
-            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.ID, questionType: "ANSW1", timeSpent: String(timeInterval))
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.id, questionType: "ANSW1", timeSpent: String(timeInterval))
         }
         
         //show correct/incorrect message if direct correction mode activated
         if (directCorrection == 1) {
             let studentAnswer = AnswerTextField.text!
             var rightAnswers = [String]()
-            let options = questionShortAnswer.Options
+            let options = questionShortAnswer.options
             for option in options {
                 rightAnswers.append(option)
             }

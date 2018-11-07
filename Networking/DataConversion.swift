@@ -90,19 +90,19 @@ class DataConversion {
         
         //prepares the question
         if wholeText.components(separatedBy: "///").count > 5 {
-            questionShortAnswer.Question = wholeText.components(separatedBy: "///")[0]
-            questionShortAnswer.ID = Int64(wholeText.components(separatedBy: "///")[1])!
-            questionShortAnswer.Options = wholeText.components(separatedBy: "///")[2].components(separatedBy: "|||")
-            let indexOfEmptyOption = questionShortAnswer.Options.index(of: "")
+            questionShortAnswer.question = wholeText.components(separatedBy: "///")[0]
+            questionShortAnswer.id = Int64(wholeText.components(separatedBy: "///")[1])!
+            questionShortAnswer.options = wholeText.components(separatedBy: "///")[2].components(separatedBy: "|||")
+            let indexOfEmptyOption = questionShortAnswer.options.index(of: "")
             if indexOfEmptyOption != nil {
-                questionShortAnswer.Options.remove(at: indexOfEmptyOption!)
+                questionShortAnswer.options.remove(at: indexOfEmptyOption!)
             }
-            questionShortAnswer.Image = wholeText.components(separatedBy: "///")[5]
+            questionShortAnswer.image = wholeText.components(separatedBy: "///")[5]
         
             //save the picture
             let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
             let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
-            saveImage(image: uiImage, fileName: questionShortAnswer.Image)
+            saveImage(image: uiImage, fileName: questionShortAnswer.image)
         
             do {
                 //deal with subjects
@@ -112,8 +112,8 @@ class DataConversion {
                     subjectsArray.remove(at: indexOfEmptySubject!)
                 }
                 for subject in subjectsArray {
-                    questionShortAnswer.Subjects.append(subject)
-                    try DbTableSubject.insertSubject(questionID: questionShortAnswer.ID, subject: subject)
+                    questionShortAnswer.subjects.append(subject)
+                    try DbTableSubject.insertSubject(questionID: questionShortAnswer.id, subject: subject)
                 }
                 //deal with objectives
                 var objectivesArray = wholeText.components(separatedBy: "///")[4].components(separatedBy: "|||")
@@ -122,15 +122,15 @@ class DataConversion {
                     objectivesArray.remove(at: indexOfEmptyObjective!)
                 }
                 for objective in objectivesArray {
-                    questionShortAnswer.Objectives.append(objective)
-                    try DbTableLearningObjective.insertLearningObjective(questionID: questionShortAnswer.ID, objective: objective, levelCognitiveAbility: 0)
+                    questionShortAnswer.objectives.append(objective)
+                    try DbTableLearningObjective.insertLearningObjective(questionID: questionShortAnswer.id, objective: objective, levelCognitiveAbility: 0)
                 }
             } catch let error {
                 print(error)
             }
         } else {
             NSLog("%@", "Problem converting bytes to question multiple choice: parsed array too short")
-            questionShortAnswer.Question = "error"
+            questionShortAnswer.question = "error"
         }
         return questionShortAnswer
     }

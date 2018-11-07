@@ -269,7 +269,7 @@ class TestTableViewController: UITableViewController {
         //first check if the view controller was already pushed (question was seen before)
         var controllerIndex = -1
         for i in 0..<questionShortAnswerViewControllers.count {
-            if questionShortAnswerViewControllers[i].questionShortAnswer.ID == question.ID {
+            if questionShortAnswerViewControllers[i].questionShortAnswer.id == question.id {
                 controllerIndex = i
             }
         }
@@ -305,7 +305,7 @@ class TestTableViewController: UITableViewController {
         let questionMultipleChoice = questionsMultipleChoice[questionIDs[indexPath.row]]
         if questionMultipleChoice == nil {
             let questionShortAnswer = questionsShortAnswer[questionIDs[indexPath.row]]
-            cell.QuestionLabel?.text = questionShortAnswer?.Question
+            cell.QuestionLabel?.text = questionShortAnswer?.question
         } else {
             cell.QuestionLabel?.text = questionMultipleChoice?.question
         }

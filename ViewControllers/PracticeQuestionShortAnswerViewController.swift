@@ -41,7 +41,7 @@ class PracticeQuestionShortAnswerViewController: UIViewController, UITextFieldDe
         screenHeight = Float(screenSize.height)
         
         // Set question text
-        QuestionTextView.text = questionShortAnswer.Question
+        QuestionTextView.text = questionShortAnswer.question
         QuestionTextView.isEditable = false
         
         // Display picture
@@ -49,7 +49,7 @@ class PracticeQuestionShortAnswerViewController: UIViewController, UITextFieldDe
         let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
         let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
         if let dirPath          = paths.first {
-            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionShortAnswer.Image)
+            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionShortAnswer.image)
             PictureView.image    = UIImage(contentsOfFile: imageURL.path)
         }
         originaImageWidth = PictureView.frame.width
@@ -87,7 +87,7 @@ class PracticeQuestionShortAnswerViewController: UIViewController, UITextFieldDe
         var evaluation = -1.0
         let studentAnswer = AnswerTextField.text!
         var rightAnswers = [String]()
-        let options = questionShortAnswer.Options
+        let options = questionShortAnswer.options
         for option in options {
             rightAnswers.append(option)
         }
@@ -111,7 +111,7 @@ class PracticeQuestionShortAnswerViewController: UIViewController, UITextFieldDe
             SubmitButton.alpha = 0.4
         }
         do {
-            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: questionShortAnswer.ID, quantitativeEval: String(evaluation))
+            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: questionShortAnswer.id, quantitativeEval: String(evaluation))
         } catch let error {
             print(error)
         }

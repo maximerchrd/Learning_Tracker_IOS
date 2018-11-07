@@ -130,7 +130,7 @@ class DbTableIndividualQuestionForResult {
                         results[i].append(questionMultipleChoice.question)
                     } else {
                         questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: resultRecord[i].idGlobal)
-                        results[i].append(questionShortAnswer!.Question)
+                        results[i].append(questionShortAnswer!.question)
                     }
                     results[i].append(resultRecord[i].answers)
                     results[i].append(String(resultRecord[i].quantitativeEval))
@@ -143,9 +143,9 @@ class DbTableIndividualQuestionForResult {
                             results[i].append(option)
                         }
                     } else {
-                        results[i].append(questionShortAnswer!.Image)
+                        results[i].append(questionShortAnswer!.image)
                         results[i].append("SHRTAQ")
-                        for option in questionShortAnswer!.Options {
+                        for option in questionShortAnswer!.options {
                             results[i].append(option)
                         }
                     }

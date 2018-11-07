@@ -42,13 +42,13 @@ class DbTableQuestionShortAnswer {
             
             //insert options for question Short Answer
             //first remove answer options if we are overriding a question
-            try DbTableAnswerOptions.deleteAnswerOptions(questionID: Question.ID)
-            for option in Question.Options {
-                try DbTableAnswerOptions.insertAnswerOption(questionID: Question.ID, option: option)
+            try DbTableAnswerOptions.deleteAnswerOptions(questionID: Question.id)
+            for option in Question.options {
+                try DbTableAnswerOptions.insertAnswerOption(questionID: Question.id, option: option)
             }
             
             //if id attributed to a multiple choice question, delete this one
-            let questionMultipleChoice = try QuestionMultipleChoiceRecord.fetchOne(db, "SELECT * FROM \(DbTableQuestionMultipleChoice.TABLE_QUESTIONMULTIPLECHOICE_NAME) WHERE \(DbTableQuestionMultipleChoice.KEY_ID_GLOBAL) = \(Question.ID)")
+            let questionMultipleChoice = try QuestionMultipleChoiceRecord.fetchOne(db, "SELECT * FROM \(DbTableQuestionMultipleChoice.TABLE_QUESTIONMULTIPLECHOICE_NAME) WHERE \(DbTableQuestionMultipleChoice.KEY_ID_GLOBAL) = \(Question.id)")
             if try questionMultipleChoice?.exists(db) ?? false {
                 try questionMultipleChoice?.delete(db)
             }
@@ -64,14 +64,14 @@ class DbTableQuestionShortAnswer {
             let dbQueue = try DatabaseQueue(path: DBPath)
             try dbQueue.read { db in
                 questionShortAnswerRec = (try QuestionShortAnswerRecord.fetchOne(db, key: [KEY_ID_GLOBAL: globalID])) ?? QuestionShortAnswerRecord(questionShortAnswerArg: QuestionShortAnswer())
-                optionsArray = try DbTableAnswerOptions.retrieveAnswerOptions(questionID: questionShortAnswerRec.questionShortAnswer.ID)
+                optionsArray = try DbTableAnswerOptions.retrieveAnswerOptions(questionID: questionShortAnswerRec.questionShortAnswer.id)
             }
         } catch let error {
             print(error)
             print(error.localizedDescription)
         }
         questionShortAnswerToReturn = questionShortAnswerRec.questionShortAnswer
-        questionShortAnswerToReturn.Options = optionsArray
+        questionShortAnswerToReturn.options = optionsArray
         return questionShortAnswerToReturn
     }
     
@@ -88,7 +88,7 @@ class DbTableQuestionShortAnswer {
         }
         var questionIDs = ""
         for singleRecord in questionShortAnswers {
-            questionIDs = questionIDs + String(singleRecord.questionShortAnswer.ID) + "|"
+            questionIDs = questionIDs + String(singleRecord.questionShortAnswer.id) + "|"
         }
         return questionIDs
     }
@@ -106,7 +106,7 @@ class DbTableQuestionShortAnswer {
         }
         var questionIDs = [String]()
         for singleRecord in questionShortAnswers {
-            questionIDs.append(String(singleRecord.questionShortAnswer.ID))
+            questionIDs.append(String(singleRecord.questionShortAnswer.id))
         }
         return questionIDs
     }
@@ -124,10 +124,10 @@ class QuestionShortAnswerRecord : Record {
     required init(row: Row) {
         questionShortAnswer = QuestionShortAnswer()
         id = row[DbTableQuestionShortAnswer.KEY_ID]
-        questionShortAnswer.Level = row[DbTableQuestionShortAnswer.KEY_Level]
-        questionShortAnswer.Question = row[DbTableQuestionShortAnswer.KEY_Question]
-        questionShortAnswer.Image = row[DbTableQuestionShortAnswer.KEY_IMAGE_PATH]
-        questionShortAnswer.ID = row[DbTableQuestionShortAnswer.KEY_ID_GLOBAL]
+        questionShortAnswer.level = row[DbTableQuestionShortAnswer.KEY_Level]
+        questionShortAnswer.question = row[DbTableQuestionShortAnswer.KEY_Question]
+        questionShortAnswer.image = row[DbTableQuestionShortAnswer.KEY_IMAGE_PATH]
+        questionShortAnswer.id = row[DbTableQuestionShortAnswer.KEY_ID_GLOBAL]
         super.init()
     }
     
@@ -137,10 +137,10 @@ class QuestionShortAnswerRecord : Record {
     
     override func encode(to container: inout PersistenceContainer) {
         container[DbTableQuestionShortAnswer.KEY_ID] = id
-        container[DbTableQuestionShortAnswer.KEY_Level] = questionShortAnswer.Level
-        container[DbTableQuestionShortAnswer.KEY_Question] = questionShortAnswer.Question
-        container[DbTableQuestionShortAnswer.KEY_IMAGE_PATH] = questionShortAnswer.Image
-        container[DbTableQuestionShortAnswer.KEY_ID_GLOBAL] = questionShortAnswer.ID
+        container[DbTableQuestionShortAnswer.KEY_Level] = questionShortAnswer.level
+        container[DbTableQuestionShortAnswer.KEY_Question] = questionShortAnswer.question
+        container[DbTableQuestionShortAnswer.KEY_IMAGE_PATH] = questionShortAnswer.image
+        container[DbTableQuestionShortAnswer.KEY_ID_GLOBAL] = questionShortAnswer.id
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {
