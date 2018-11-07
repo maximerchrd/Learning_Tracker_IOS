@@ -6,9 +6,10 @@
 class DataPrefix {
     static let multq = "MULTQ"
     static let shrta = "SHRTA"
+    static let subObj = "SUBOBJ"
 
     var dataType = ""
-    var dataLength = ""
+    var dataLength = 0
     var directCorrection = ""
     var dataName = ""
 
@@ -17,9 +18,11 @@ class DataPrefix {
         dataType = stringPrefix.components(separatedBy: "///")[0]
         switch (dataType) {
         case DataPrefix.multq :
-            dataLength = stringPrefix.components(separatedBy: "///")[1]
+            dataLength = Int(stringPrefix.components(separatedBy: "///")[1]) ?? 0
         case DataPrefix.shrta :
-            dataLength = stringPrefix.components(separatedBy: "///")[1]
+            dataLength = Int(stringPrefix.components(separatedBy: "///")[1]) ?? 0
+        case DataPrefix.subObj :
+            dataLength = Int(stringPrefix.components(separatedBy: "///")[1]) ?? 0
         default :
             dataType = "UNKNOWN"
         }

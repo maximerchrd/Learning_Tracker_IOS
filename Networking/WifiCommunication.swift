@@ -165,19 +165,20 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 }
                 print(prefix)
                 let typeID = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[0]
+                let dataPrefix = DataPrefix()
+                dataPrefix.stringToPrefix(stringPrefix: prefix)
                 
-                if typeID.range(of: DataPrefix.multq) != nil {
+                if dataPrefix.dataType == DataPrefix.multq {
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
-                } else if typeID.range(of: DataPrefix.shrta) != nil {
+                } else if dataPrefix.dataType == DataPrefix.shrta {
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
                 } else if typeID.range(of:"QID") != nil {
                     ReceptionProtocol.receivedQID(prefix: prefix)
                 } else if typeID.range(of:"SYNCIDS") != nil {
                     //TODO: Implement receiving SYNCIDS
                     readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
-                } else if typeID.range(of:"SUBOBJ") != nil {
-                    //TODO: Implement receiving SUBOBJ
-                    readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
+                } else if dataPrefix.dataType == DataPrefix.subObj {
+                    ReceptionProtocol.receivedSUBOBJ(prefix: dataPrefix, wifiCommunication: self)
                 } else if typeID.elementsEqual("EVAL") {
                     ReceptionProtocol.receivedEVAL(prefix: prefix)
                 } else if typeID.range(of:"UPDEV") != nil {
@@ -254,7 +255,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         var dataPrefix = DataPrefix()
         dataPrefix.stringToPrefix(stringPrefix: prefix)
 
-        let dataSize = Int(dataPrefix.dataLength) ?? 0
+        let dataSize = dataPrefix.dataLength
         let dataText = self.readDataIntoArray(expectedSize: dataSize)
         print (String(bytes: dataText, encoding: .utf8) ?? "error")
         if dataText.count == dataSize {

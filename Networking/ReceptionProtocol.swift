@@ -155,7 +155,26 @@ class ReceptionProtocol {
             }
         }
     }
-    
+
+    class func receivedSUBOBJ(prefix: DataPrefix, wifiCommunication: WifiCommunication) {
+        let subObjData = wifiCommunication.readDataIntoArray(expectedSize: prefix.dataLength)
+        let decoder = JSONDecoder()
+        do {
+            var subObj = try decoder.decode(SubjectsAndObjectivesForQuestion.self, from: Data(bytes: subObjData))
+            var questionId = Int64(subObj.questionId) ?? 0
+
+            for subject in subObj.subjects {
+                try DbTableSubject.insertSubject(questionID: questionId, subject: subject)
+            }
+
+            for objective in subObj.objectives {
+                try DbTableLearningObjective.insertLearningObjective(objectiveID: questionId, objective: objective, levelCognitiveAbility: -1)
+            }
+        } catch let error {
+            print(error)
+        }
+    }
+
     static func receivedOEVALFromServer(prefix: String) {
         if prefix.components(separatedBy: ":").count > 1 {
             let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
