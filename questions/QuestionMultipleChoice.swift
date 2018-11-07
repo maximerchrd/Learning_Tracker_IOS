@@ -1,34 +1,29 @@
 //
-//  MultipleChoiceQuestion.swift
-//  Learning_Tracker_IOS
+// Created by Maxime Richard on 05.11.18.
+// Copyright (c) 2018 Maxime Richard. All rights reserved.
 //
-//  Created by Maxime Richard on 24.02.18.
-//  Copyright © 2018 Maxime Richard. All rights reserved.
-//
-
-import Foundation
 
 class QuestionMultipleChoice {
-    var ID:Int64 = 0
-    var Subject = ""
-    var Level = ""
-    var Question = "none"
+    var id:Int64 = 0
+    var subject = ""
+    var level = ""
+    var question = "none"
     var OptionsNumer = 0
     var NbCorrectAnswers = 0
-    var Image = ""
-    var Options = [String]()
-    var Trials = [Int]()
+    var image = ""
+    var options = [String]()
     var Subjects = [String]()
     var Objectives = [String]()
-    
-    func removeEmptyOptions() {
-        var i = 0
-        for singleOption in Options {
-            if singleOption == " " {
-                Options.remove(at: i)
-                i = i - 1
-            }
-            i = i + 1
-        }
+
+    func initFromQuestionView (questionView: QuestionView) {
+        self.id = Int64(questionView.id) ?? 0
+        self.subject = questionView.subject
+        self.level = questionView.level
+        self.question = questionView.question
+        self.OptionsNumer = questionView.optionsnumber
+        self.NbCorrectAnswers = questionView.nb_CORRECT_ANS
+        self.image = questionView.image
+        self.options = [questionView.opt0, questionView.opt1, questionView.opt2, questionView.opt3, questionView.opt4,
+                questionView.opt5, questionView.opt6, questionView.opt7, questionView.opt8, questionView.opt9]
     }
 }

@@ -166,12 +166,18 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 print(prefix)
                 let typeID = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[0]
                 
-                if typeID.range(of:"MULTQ") != nil {
+                if typeID.range(of: DataPrefix.multq) != nil {
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
                 } else if typeID.range(of:"SHRTA") != nil {
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
                 } else if typeID.range(of:"QID") != nil {
                     ReceptionProtocol.receivedQID(prefix: prefix)
+                } else if typeID.range(of:"SYNCIDS") != nil {
+                    //TODO: Implement receiving SYNCIDS
+                    readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
+                } else if typeID.range(of:"SUBOBJ") != nil {
+                    //TODO: Implement receiving SUBOBJ
+                    readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
                 } else if typeID.elementsEqual("EVAL") {
                     ReceptionProtocol.receivedEVAL(prefix: prefix)
                 } else if typeID.range(of:"UPDEV") != nil {
@@ -204,7 +210,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
             var question = ""
             if questionType == "ANSW0" {
                 let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: globalID)
-                question = questionMultipleChoice.Question
+                question = questionMultipleChoice.question
             } else if questionType == "ANSW1" {
                 let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: globalID)
                 question = questionShortAnswer.Question
@@ -245,61 +251,95 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     }
     
     fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String, prefixData: [UInt8]) {
-        if prefix.components(separatedBy: ":").count > 1 {
-            let imageSize = Int(prefix.components(separatedBy: ":")[1]) ?? 0
-            var textSizeString = prefix.components(separatedBy: ":")[2]
-            textSizeString = String(textSizeString.filter { "01234567890.".contains($0) })
-            let textSize = Int(textSizeString) ?? 0
-            
-            let dataText = self.readDataIntoArray(expectedSize: textSize )
-            print("expected textSize: " + String(textSize) + " actual textSize read: " + String(dataText.count))
-            let dataImage = self.readDataIntoArray(expectedSize: imageSize)
-            print("expected imageSize: " + String(imageSize) + " actual imageSize read: " + String(dataImage.count))
-           
-            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"
-            if dataTextString.contains("oops") {
-                let errorMessage = dataTextString + ". The dataText size was: " + String(dataText.count)
-                print(errorMessage)
-            }
-            print(dataTextString + " and the data: " + String(describing: dataText))
-            var questionID:Int64 = -1
-            
-            //insert question only if we received all the data
-            if textSize == dataText.count && imageSize == dataImage.count {
-                do {
-                    if typeOfQuest.range(of: "MULTQ") != nil {
-                        let questionMult = DataConversion.bytesToMultq(textData: dataText, imageData: dataImage)
-                        questionID = questionMult.ID
-                        if questionMult.Question != "error" {
-                            try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
-                        }
-                        
-                        //code for functional testing
-                        if questionMult.Question.contains("7492qJfzdDSB") {
-                            self.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
-                        }
-                    } else if typeOfQuest.range(of: "SHRTA") != nil {
-                        let questionShrt = DataConversion.bytesToShrtaq(textData: dataText, imageData: dataImage)
-                        questionID = questionShrt.ID
-                        if questionShrt.Question != "error" {
-                            try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
-                        }
-                    }
-                } catch let error {
-                    print(error)
+        var questionID:Int64 = -1
+        var dataPrefix = DataPrefix()
+        dataPrefix.stringToPrefix(stringPrefix: prefix)
+
+        let dataSize = Int(dataPrefix.dataLength) ?? 0
+        let dataText = self.readDataIntoArray(expectedSize: dataSize)
+        print (String(bytes: dataText, encoding: .utf8) ?? "error")
+        if dataText.count == dataSize {
+            let decoder = JSONDecoder()
+            do {
+                var question = try decoder.decode(QuestionView.self, from: Data(bytes: dataText))
+                print(question)
+                var questionMultChoice = QuestionMultipleChoice()
+                questionMultChoice.initFromQuestionView(questionView: question)
+                questionID = questionMultChoice.id
+                if questionMultChoice.question != "error" {
+                    try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMultChoice)
                 }
+                //code for functional testing
+                if questionMultChoice.question.contains("7492qJfzdDSB") {
+                    self.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
+                }
+
                 //send back a signal that we got the question
                 let accuseReception = "OK///" + String(questionID) + "///"
                 self.client?.send(data: accuseReception.data(using: .utf8)!)
-            } else {
-                var errorMessage = "\n expected textsize: " + String(textSize) + "; actual textSize: " + String(dataText.count)
-                errorMessage += "\n expected imagesize: " + String(imageSize) + "; actual imageSize: " + String(dataImage.count)
-                print(errorMessage)
+            } catch let error {
+                print(error)
             }
         } else {
-            let errorMessage = "error reading questions: prefix not in correct format or buffer truncated"
-            print(errorMessage)
+            print("\n expected textsize: " + String(dataSize) + "; actual textSize: " + String(dataText.count))
         }
+
+
+//        if prefix.components(separatedBy: ":").count > 1 {
+//            let imageSize = Int(prefix.components(separatedBy: ":")[1]) ?? 0
+//            var textSizeString = prefix.components(separatedBy: ":")[2]
+//            textSizeString = String(textSizeString.filter { "01234567890.".contains($0) })
+//            let textSize = Int(textSizeString) ?? 0
+//
+//            let dataText = self.readDataIntoArray(expectedSize: textSize )
+//            print("expected textSize: " + String(textSize) + " actual textSize read: " + String(dataText.count))
+//            let dataImage = self.readDataIntoArray(expectedSize: imageSize)
+//            print("expected imageSize: " + String(imageSize) + " actual imageSize read: " + String(dataImage.count))
+//
+//            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem in readAndStoreQuestion: dataText to string yields nil"
+//            if dataTextString.contains("oops") {
+//                let errorMessage = dataTextString + ". The dataText size was: " + String(dataText.count)
+//                print(errorMessage)
+//            }
+//            print(dataTextString + " and the data: " + String(describing: dataText))
+//            var questionID:Int64 = -1
+//
+//            //insert question only if we received all the data
+//            if textSize == dataText.count && imageSize == dataImage.count {
+//                do {
+//                    if typeOfQuest.range(of: "MULTQ") != nil {
+//                        let questionMult = DataConversion.bytesToMultq(textData: dataText, imageData: dataImage)
+//                        questionID = questionMult.id
+//                        if questionMult.question != "error" {
+//                            try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMult)
+//                        }
+//
+//                        //code for functional testing
+//                        if questionMult.question.contains("7492qJfzdDSB") {
+//                            self.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
+//                        }
+//                    } else if typeOfQuest.range(of: "SHRTA") != nil {
+//                        let questionShrt = DataConversion.bytesToShrtaq(textData: dataText, imageData: dataImage)
+//                        questionID = questionShrt.ID
+//                        if questionShrt.Question != "error" {
+//                            try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShrt)
+//                        }
+//                    }
+//                } catch let error {
+//                    print(error)
+//                }
+//                //send back a signal that we got the question
+//                let accuseReception = "OK///" + String(questionID) + "///"
+//                self.client?.send(data: accuseReception.data(using: .utf8)!)
+//            } else {
+//                var errorMessage = "\n expected textsize: " + String(textSize) + "; actual textSize: " + String(dataText.count)
+//                errorMessage += "\n expected imagesize: " + String(imageSize) + "; actual imageSize: " + String(dataImage.count)
+//                print(errorMessage)
+//            }
+//        } else {
+//            let errorMessage = "error reading questions: prefix not in correct format or buffer truncated"
+//            print(errorMessage)
+//        }
     }
     
     func stopConnection() {

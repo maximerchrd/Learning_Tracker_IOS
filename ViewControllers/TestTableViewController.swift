@@ -211,7 +211,7 @@ class TestTableViewController: UITableViewController {
         do {
             for questionID in questionIDs {
                 let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: Int64(questionID) ?? 0)
-                if questionMultipleChoice.ID > 0 {
+                if questionMultipleChoice.id > 0 {
                     questionsMultipleChoice[questionID] = questionMultipleChoice
                 } else {
                     let questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: Int64(questionID) ?? 0)
@@ -243,7 +243,7 @@ class TestTableViewController: UITableViewController {
         //first check if the view controller was already pushed (question was seen before)
         var controllerIndex = -1
         for i in 0..<questionMultipleChoiceViewControllers.count {
-            if questionMultipleChoiceViewControllers[i].questionMultipleChoice.ID == question.ID {
+            if questionMultipleChoiceViewControllers[i].questionMultipleChoice.id == question.id {
                 controllerIndex = i
             }
         }
@@ -307,7 +307,7 @@ class TestTableViewController: UITableViewController {
             let questionShortAnswer = questionsShortAnswer[questionIDs[indexPath.row]]
             cell.QuestionLabel?.text = questionShortAnswer?.Question
         } else {
-            cell.QuestionLabel?.text = questionMultipleChoice?.Question
+            cell.QuestionLabel?.text = questionMultipleChoice?.question
         }
         
         //if the question isn't activated, color text in gray

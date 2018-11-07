@@ -35,47 +35,47 @@ class DataConversion {
         
         //prepares the question
         if wholeText.components(separatedBy: "///").count > 15 {
-            questionMultipleChoice.Question = wholeText.components(separatedBy: "///")[0]
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[1])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[2])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[3])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[4])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[5])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[6])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[7])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[8])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[9])
-            questionMultipleChoice.Options.append(wholeText.components(separatedBy: "///")[10])
+            questionMultipleChoice.question = wholeText.components(separatedBy: "///")[0]
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[1])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[2])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[3])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[4])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[5])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[6])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[7])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[8])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[9])
+            questionMultipleChoice.options.append(wholeText.components(separatedBy: "///")[10])
             let idString = wholeText.components(separatedBy: "///")[11]
             let intmax = Int.max
-            questionMultipleChoice.ID = Int64(wholeText.components(separatedBy: "///")[11])!
+            questionMultipleChoice.id = Int64(wholeText.components(separatedBy: "///")[11])!
             questionMultipleChoice.NbCorrectAnswers = Int(wholeText.components(separatedBy: "///")[12])!
-            questionMultipleChoice.Image = wholeText.components(separatedBy: "///")[15]
+            questionMultipleChoice.image = wholeText.components(separatedBy: "///")[15]
             
             //save the picture
             let imageNSData: NSData = NSData(bytes: imageData, length: imageData!.count)
             let uiImage: UIImage = UIImage(data: imageNSData as Data) ?? UIImage()
-            saveImage(image: uiImage, fileName: questionMultipleChoice.Image)
+            saveImage(image: uiImage, fileName: questionMultipleChoice.image)
             
             do {
                 //deal with subjects
                 let subjectsArray = wholeText.components(separatedBy: "///")[13].components(separatedBy: "|||")
                 for subject in subjectsArray {
                     questionMultipleChoice.Subjects.append(subject)
-                    try DbTableSubject.insertSubject(questionID: questionMultipleChoice.ID, subject: subject)
+                    try DbTableSubject.insertSubject(questionID: questionMultipleChoice.id, subject: subject)
                 }
                 //deal with objectives
                 let objectivesArray = wholeText.components(separatedBy: "///")[14].components(separatedBy: "|||")
                 for objective in objectivesArray {
                     questionMultipleChoice.Objectives.append(objective)
-                    try DbTableLearningObjective.insertLearningObjective(questionID: questionMultipleChoice.ID, objective: objective, levelCognitiveAbility: 0)
+                    try DbTableLearningObjective.insertLearningObjective(questionID: questionMultipleChoice.id, objective: objective, levelCognitiveAbility: 0)
                 }
             } catch let error {
                 print(error)
             }
         } else {
             NSLog("%@", "Problem converting bytes to question multiple choice: parsed array too short")
-            questionMultipleChoice.Question = "error"
+            questionMultipleChoice.question = "error"
         }
         return questionMultipleChoice
     }

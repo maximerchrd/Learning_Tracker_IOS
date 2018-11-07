@@ -126,8 +126,8 @@ class DbTableIndividualQuestionForResult {
                     let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: resultRecord[i].idGlobal)
                     var questionShortAnswer: QuestionShortAnswer?
                     questionShortAnswer = nil
-                    if questionMultipleChoice.Question != "none" {
-                        results[i].append(questionMultipleChoice.Question)
+                    if questionMultipleChoice.question != "none" {
+                        results[i].append(questionMultipleChoice.question)
                     } else {
                         questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: resultRecord[i].idGlobal)
                         results[i].append(questionShortAnswer!.Question)
@@ -136,10 +136,10 @@ class DbTableIndividualQuestionForResult {
                     results[i].append(String(resultRecord[i].quantitativeEval))
                     results[i].append(resultRecord[i].date)
                     if questionShortAnswer == nil {
-                        results[i].append(questionMultipleChoice.Image)
+                        results[i].append(questionMultipleChoice.image)
                         results[i].append("QMC")
                         results[i].append(String(questionMultipleChoice.NbCorrectAnswers))
-                        for option in questionMultipleChoice.Options {
+                        for option in questionMultipleChoice.options {
                             results[i].append(option)
                         }
                     } else {

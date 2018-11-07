@@ -62,7 +62,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         screenHeight = Float(screenSize.height)
         
         // Set question text
-        QuestionTextView.text = questionMultipleChoice.Question
+        QuestionTextView.text = questionMultipleChoice.question
         QuestionTextView.isEditable = false
         QuestionTextView.sizeToFit()
         
@@ -72,12 +72,12 @@ class QuestionMultipleChoiceViewController: UIViewController {
         let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
         let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
         if let dirPath          = paths.first {
-            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.Image)
+            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.image)
             PictureView.image    = UIImage(contentsOfFile: imageURL.path)
         }
         //get the answer options to adapt the size of the imageview
-        questionMultipleChoice.removeEmptyOptions()
-        var optionsArray = questionMultipleChoice.Options
+        questionMultipleChoice = QuestionsTools.removeEmptyOptions(question: questionMultipleChoice)
+        var optionsArray = questionMultipleChoice.options
         originaImageWidth = PictureView.frame.width
         originalImageHeight = PictureView.frame.height
         originalImageX = PictureView.frame.minX
@@ -164,14 +164,14 @@ class QuestionMultipleChoiceViewController: UIViewController {
         startTime = Date.timeIntervalSinceReferenceDate
 
         //send receipt to server
-        let receipt = "ACTID///" + String(questionMultipleChoice.ID) + "///"
+        let receipt = "ACTID///" + String(questionMultipleChoice.id) + "///"
         AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
         
         /**
          * START CODE USED FOR TESTING
          */
-        if questionMultipleChoice.Question.contains("*ç%&") {
-             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: optionsArray[0], globalID: questionMultipleChoice.ID, questionType: "ANSW0", timeSpent: "2.63")
+        if questionMultipleChoice.question.contains("*ç%&") {
+             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: optionsArray[0], globalID: questionMultipleChoice.id, questionType: "ANSW0", timeSpent: "2.63")
             if let navController = self.navigationController {
                 //set cached view controller to nil to prevent students answering several times to same question
                 isBackButton = false
@@ -256,11 +256,11 @@ class QuestionMultipleChoiceViewController: UIViewController {
                     answersArray.append((singleCheckBox.titleLabel?.text) ?? " ")
                 }
             }
-            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.ID, questionType: "ANSW0", timeSpent: String(timeInterval))
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.id, questionType: "ANSW0", timeSpent: String(timeInterval))
         }
         
         //add question ID to answered ids for the test
-        AppDelegate.activeTest.answeredIds.append(String(questionMultipleChoice.ID))
+        AppDelegate.activeTest.answeredIds.append(String(questionMultipleChoice.id))
         
         //show correct/incorrect message if direct correction mode activated
         if (directCorrection == 1) {
@@ -272,7 +272,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
                     answersArray.append((singleCheckBox.titleLabel?.text)!)
                 }
             }
-            var options = questionMultipleChoice.Options
+            var options = questionMultipleChoice.options
             var rightAnswers = [String]()
             for i in 0..<questionMultipleChoice.NbCorrectAnswers {
                 rightAnswers.append(options[i])

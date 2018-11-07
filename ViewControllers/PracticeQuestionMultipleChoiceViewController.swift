@@ -54,7 +54,7 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
         screenHeight = Float(screenSize.height)
         
         // Set question text
-        QuestionTextView.text = questionMultipleChoice.Question
+        QuestionTextView.text = questionMultipleChoice.question
         QuestionTextView.isEditable = false
         QuestionTextView.sizeToFit()
         
@@ -64,12 +64,12 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
         let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
         let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
         if let dirPath          = paths.first {
-            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.Image)
+            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.image)
             PictureView.image    = UIImage(contentsOfFile: imageURL.path)
         }
         //get the answer options to adapt the size of the imageview
-        questionMultipleChoice.removeEmptyOptions()
-        var optionsArray = questionMultipleChoice.Options
+        questionMultipleChoice = QuestionsTools.removeEmptyOptions(question: questionMultipleChoice)
+        var optionsArray = questionMultipleChoice.options
         originaImageWidth = PictureView.frame.width
         originalImageHeight = PictureView.frame.height
         originalImageX = PictureView.frame.minX
@@ -192,7 +192,7 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
             }
         }
         var evaluation = -1.0
-        var options = questionMultipleChoice.Options
+        var options = questionMultipleChoice.options
         var rightAnswers = [String]()
         for i in 0..<questionMultipleChoice.NbCorrectAnswers {
             rightAnswers.append(options[i])
@@ -217,7 +217,7 @@ class PracticeQuestionMultipleChoiceViewController: UIViewController {
             SubmitAnswerButton.alpha = 0.4
         }
         do {
-            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: questionMultipleChoice.ID, quantitativeEval: String(evaluation))
+            try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: questionMultipleChoice.id, quantitativeEval: String(evaluation))
         } catch let error {
             print(error)
         }

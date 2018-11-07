@@ -207,7 +207,7 @@ class ClassroomActivityViewController: UIViewController {
                     do {
                         questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: idGlobal)
                         
-                        if questionMultipleChoice.Question.count > 0 && questionMultipleChoice.Question != "none" {
+                        if questionMultipleChoice.question.count > 0 && questionMultipleChoice.question != "none" {
                             AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
                         } else {
                             questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: idGlobal)

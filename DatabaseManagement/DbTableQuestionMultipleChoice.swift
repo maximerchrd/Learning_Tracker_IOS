@@ -24,16 +24,6 @@ class DbTableQuestionMultipleChoice {
     static let KEY_OPTION7 = "OPTION7"
     static let KEY_OPTION8 = "OPTION8"
     static let KEY_OPTION9 = "OPTION9"
-    static let KEY_TRIAL0 = "TRIAL0"
-    static let KEY_TRIAL1 = "TRIAL0"
-    static let KEY_TRIAL2 = "TRIAL0"
-    static let KEY_TRIAL3 = "TRIAL0"
-    static let KEY_TRIAL4 = "TRIAL0"
-    static let KEY_TRIAL5 = "TRIAL0"
-    static let KEY_TRIAL6 = "TRIAL0"
-    static let KEY_TRIAL7 = "TRIAL0"
-    static let KEY_TRIAL8 = "TRIAL0"
-    static let KEY_TRIAL9 = "TRIAL0"
     static let KEY_NB_CORRECT_ANS = "NB_CORRECT_ANS"
     static let KEY_IMAGE_PATH = "IMAGE_PATH"
     static let KEY_ID_GLOBAL = "ID_GLOBAL"
@@ -73,7 +63,7 @@ class DbTableQuestionMultipleChoice {
             try questionMultChoice.insert(db)
             
             //if id attributed to a short answer question, delete this one
-            let questionShortAnswer = try QuestionShortAnswerRecord.fetchOne(db, "SELECT * FROM \(DbTableQuestionShortAnswer.TABLE_QUESTIONSHORTANSWER_NAME) WHERE \(DbTableQuestionShortAnswer.KEY_ID_GLOBAL) = \(Question.ID)")
+            let questionShortAnswer = try QuestionShortAnswerRecord.fetchOne(db, "SELECT * FROM \(DbTableQuestionShortAnswer.TABLE_QUESTIONSHORTANSWER_NAME) WHERE \(DbTableQuestionShortAnswer.KEY_ID_GLOBAL) = \(Question.id)")
             if try questionShortAnswer?.exists(db) ?? false {
                 try questionShortAnswer?.delete(db)
             }
@@ -109,7 +99,7 @@ class DbTableQuestionMultipleChoice {
         }
         var questionIDs = ""
         for singleRecord in questionMultipleChoice {
-            questionIDs = questionIDs + String(singleRecord.questionMultipleChoice.ID) + "|"
+            questionIDs = questionIDs + String(singleRecord.questionMultipleChoice.id) + "|"
         }
         return questionIDs
     }
@@ -127,7 +117,7 @@ class DbTableQuestionMultipleChoice {
         }
         var questionIDs = [String]()
         for singleRecord in questionMultipleChoice {
-            questionIDs.append(String(singleRecord.questionMultipleChoice.ID))
+            questionIDs.append(String(singleRecord.questionMultipleChoice.id))
         }
         return questionIDs
     }
@@ -145,21 +135,21 @@ class QuestionMultipleChoiceRecord : Record {
     required init(row: Row) {
         questionMultipleChoice = QuestionMultipleChoice()
         id = row[DbTableQuestionMultipleChoice.KEY_IDquestionMultipleChoice]
-        questionMultipleChoice.Level = row[DbTableQuestionMultipleChoice.KEY_Level]
-        questionMultipleChoice.Question = row[DbTableQuestionMultipleChoice.KEY_Question]
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION0])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION1])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION2])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION3])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION4])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION5])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION6])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION7])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION8])
-        questionMultipleChoice.Options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION9])
+        questionMultipleChoice.level = row[DbTableQuestionMultipleChoice.KEY_Level]
+        questionMultipleChoice.question = row[DbTableQuestionMultipleChoice.KEY_Question]
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION0])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION1])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION2])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION3])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION4])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION5])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION6])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION7])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION8])
+        questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION9])
         questionMultipleChoice.NbCorrectAnswers = row[DbTableQuestionMultipleChoice.KEY_NB_CORRECT_ANS]
-        questionMultipleChoice.Image = row[DbTableQuestionMultipleChoice.KEY_IMAGE_PATH]
-        questionMultipleChoice.ID = row[DbTableQuestionMultipleChoice.KEY_ID_GLOBAL]
+        questionMultipleChoice.image = row[DbTableQuestionMultipleChoice.KEY_IMAGE_PATH]
+        questionMultipleChoice.id = row[DbTableQuestionMultipleChoice.KEY_ID_GLOBAL]
         super.init()
     }
     
@@ -169,21 +159,21 @@ class QuestionMultipleChoiceRecord : Record {
     
     override func encode(to container: inout PersistenceContainer) {
         container[DbTableQuestionMultipleChoice.KEY_IDquestionMultipleChoice] = id
-        container[DbTableQuestionMultipleChoice.KEY_Level] = questionMultipleChoice.Level
-        container[DbTableQuestionMultipleChoice.KEY_Question] = questionMultipleChoice.Question
-        container[DbTableQuestionMultipleChoice.KEY_OPTION0] = questionMultipleChoice.Options[0]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION1] = questionMultipleChoice.Options[1]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION2] = questionMultipleChoice.Options[2]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION3] = questionMultipleChoice.Options[3]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION4] = questionMultipleChoice.Options[4]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION5] = questionMultipleChoice.Options[5]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION6] = questionMultipleChoice.Options[6]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION7] = questionMultipleChoice.Options[7]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION8] = questionMultipleChoice.Options[8]
-        container[DbTableQuestionMultipleChoice.KEY_OPTION9] = questionMultipleChoice.Options[9]
+        container[DbTableQuestionMultipleChoice.KEY_Level] = questionMultipleChoice.level
+        container[DbTableQuestionMultipleChoice.KEY_Question] = questionMultipleChoice.question
+        container[DbTableQuestionMultipleChoice.KEY_OPTION0] = questionMultipleChoice.options[0]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION1] = questionMultipleChoice.options[1]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION2] = questionMultipleChoice.options[2]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION3] = questionMultipleChoice.options[3]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION4] = questionMultipleChoice.options[4]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION5] = questionMultipleChoice.options[5]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION6] = questionMultipleChoice.options[6]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION7] = questionMultipleChoice.options[7]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION8] = questionMultipleChoice.options[8]
+        container[DbTableQuestionMultipleChoice.KEY_OPTION9] = questionMultipleChoice.options[9]
         container[DbTableQuestionMultipleChoice.KEY_NB_CORRECT_ANS] = questionMultipleChoice.NbCorrectAnswers
-        container[DbTableQuestionMultipleChoice.KEY_IMAGE_PATH] = questionMultipleChoice.Image
-        container[DbTableQuestionMultipleChoice.KEY_ID_GLOBAL] = questionMultipleChoice.ID
+        container[DbTableQuestionMultipleChoice.KEY_IMAGE_PATH] = questionMultipleChoice.image
+        container[DbTableQuestionMultipleChoice.KEY_ID_GLOBAL] = questionMultipleChoice.id
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {
