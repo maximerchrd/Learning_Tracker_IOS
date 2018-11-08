@@ -175,7 +175,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 } else if typeID.range(of:"QID") != nil {
                     ReceptionProtocol.receivedQID(prefix: prefix)
                 } else if typeID.range(of:"SYNCIDS") != nil {
-                    //TODO: Implement receiving SYNCIDS
+                    //TODO: prevent server to send SYNCIDS to IOS devices (only for nearby connections)
                     readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
                 } else if dataPrefix.dataType == DataPrefix.subObj {
                     ReceptionProtocol.receivedSUBOBJ(prefix: dataPrefix, wifiCommunication: self)
@@ -185,8 +185,8 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     ReceptionProtocol.receivedUPDEV(prefix: prefix)
                 } else if typeID.range(of:"CORR") != nil {
                     ReceptionProtocol.receivedCORR(prefix: prefix)
-                } else if typeID.range(of:"TEST") != nil {
-                    ReceptionProtocol.receivedTESTFromServer(prefix: prefix)
+                } else if dataPrefix.dataType == DataPrefix.test {
+                    ReceptionProtocol.receivedTESTFromServer(prefix: dataPrefix)
                 } else if typeID.range(of:"TESYN") != nil {
                     //ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
                 } else if typeID.elementsEqual("OEVAL") {

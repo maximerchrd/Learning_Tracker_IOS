@@ -90,69 +90,53 @@ class ReceptionProtocol {
         }
     }
     
-    static func receivedTESTFromServer(prefix: String) {
-        if prefix.components(separatedBy: ":").count > 1 {
-            let textSize = Int(prefix.components(separatedBy: ":")[1].trimmingCharacters(in: CharacterSet(charactersIn: "01234567890.").inverted)) ?? 0
-            var dataText = AppDelegate.wifiCommunicationSingleton?.readDataIntoArray(expectedSize: textSize) ?? [UInt8]()
-            let dataTextString = String(bytes: dataText, encoding: .utf8) ?? "oops, problem reading test: dataText to string yields nil"
-            if dataTextString.contains("oops") {
-                DbTableLogs.insertLog(log: dataTextString)
-            }
-            do {
-                if dataTextString.components(separatedBy: "///").count >= 5 {
-                    let testID = Int64(dataTextString.components(separatedBy: "///")[0]) ?? 0
-                    let test = dataTextString.components(separatedBy: "///")[1]
-                    let objectivesArray = dataTextString.components(separatedBy: "///")[3].components(separatedBy: "|||")
-                    var objectiveIDS = [Int64]()
-                    var objectives = [String]()
-                    for objectiveANDid in objectivesArray {
-                        if objectiveANDid.count > 0 {
-                            objectiveIDS.append(Int64(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
-                            if objectiveANDid.components(separatedBy: "/|/").count > 1 {
-                                objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
-                            } else {
-                                let error = "problem reading objectives for test: objective - ID pair not complete"
-                                print(error)
-                                DbTableLogs.insertLog(log: error)
-                            }
-                        }
-                    }
-                    
-                    
-                    //parse the test map and insert the corresponding question-question relations inside the database
-                    let testMapArray = dataTextString.components(separatedBy: "///")[2].components(separatedBy: "|||")
-                    var questionIdsForTest = ""
-                    for question in testMapArray {
-                        let relations = question.components(separatedBy: ";;;")
-                        let questionID = relations[0]
-                        questionIdsForTest += questionID + "///"
-                        for i in 1..<relations.count {
-                            DbTableRelationQuestionQuestion.insertRelationQuestionQuestion(idGlobal1: questionID, idGlobal2: relations[i].components(separatedBy: ":::")[0], test: test, condition: relations[i].components(separatedBy: ":::")[1])
-                            
-                        }
-                    }
-                    
-                    //get medals instructions
-                    let medalsInstructions = dataTextString.components(separatedBy: "///")[5]
+    static func receivedTESTFromServer(prefix: DataPrefix) {
+        let textSize = prefix.dataLength
+        var dataText = AppDelegate.wifiCommunicationSingleton?.readDataIntoArray(expectedSize: textSize) ?? [UInt8]()
+        let decoder = JSONDecoder()
 
-                    //get media file name
-                    var mediaFileName = ""
-                    if (dataTextString.components(separatedBy: "///").count >= 6) {
-                        mediaFileName = dataTextString.components(separatedBy: "///")[6]
+        do {
+            var testView = try decoder.decode(TestView.self, from: Data(bytes: dataText))
+
+            //extract objectives for certificative test
+            var objectivesArray = testView.objectives.components(separatedBy: "|||")
+            var objectiveIDS = [Int64]()
+            var objectives = [String]()
+            for objectiveANDid in objectivesArray {
+                if objectiveANDid.count > 0 {
+                    objectiveIDS.append(Int64(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
+                    if objectiveANDid.components(separatedBy: "/|/").count > 1 {
+                        objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
+                    } else {
+                        let error = "problem reading objectives for test: objective - ID pair not complete"
+                        print(error)
+                        DbTableLogs.insertLog(log: error)
                     }
-                    
-                    //insert test in db after parsing questions
-                    try DbTableTests.insertTest(testID: testID, test: test, questionIDs: questionIdsForTest,
-                            objectiveIDs: objectiveIDS, objectives: objectives, medalsInstructions: medalsInstructions,
-                            mediaFileName: mediaFileName)
-                } else {
-                    let error = "problem reading test: text array to short"
-                    print(error)
-                    DbTableLogs.insertLog(log: error)
                 }
-            } catch let error {
-                print(error)
             }
+
+            //parse the test map and insert the corresponding question-question relations inside the database
+            let testMapArray = testView.testMap.components(separatedBy: "|||")
+            var questionIdsForTest = ""
+            for question in testMapArray {
+                let relations = question.components(separatedBy: ";;;")
+                let questionID = relations[0]
+                questionIdsForTest += questionID + "///"
+                for i in 1..<relations.count {
+                    DbTableRelationQuestionQuestion.insertRelationQuestionQuestion(idGlobal1: questionID, idGlobal2:
+                    relations[i].components(separatedBy: ":::")[0], test: testView.testName,
+                            condition: relations[i].components(separatedBy: ":::")[1])
+
+                }
+            }
+
+
+            //insert test in db after parsing questions
+            try DbTableTests.insertTest(testID: Int64(testView.idTest) ?? 0, test: testView.testName, questionIDs: questionIdsForTest,
+                    objectiveIDs: objectiveIDS, objectives: objectives, medalsInstructions: testView.medalInstructions,
+                    mediaFileName: testView.mediaFileName ?? "")
+        } catch let error {
+            print(error)
         }
     }
 

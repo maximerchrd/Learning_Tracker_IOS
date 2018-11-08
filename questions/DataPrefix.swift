@@ -7,6 +7,7 @@ class DataPrefix {
     static let multq = "MULTQ"
     static let shrta = "SHRTA"
     static let subObj = "SUBOBJ"
+    static let test = "TEST"
 
     var dataType = ""
     var dataLength = 0
@@ -22,6 +23,8 @@ class DataPrefix {
         case DataPrefix.shrta :
             dataLength = Int(stringPrefix.components(separatedBy: "///")[1]) ?? 0
         case DataPrefix.subObj :
+            dataLength = Int(stringPrefix.components(separatedBy: "///")[1]) ?? 0
+        case DataPrefix.test :
             dataLength = Int(stringPrefix.components(separatedBy: "///")[1]) ?? 0
         default :
             dataType = "UNKNOWN"

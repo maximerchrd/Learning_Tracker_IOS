@@ -24,7 +24,7 @@ class DbTableRelationTestObjective {
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_TEST, .integer).notNull()
                 t.column(KEY_ID_OBJECTIVE, .integer).notNull()
-                t.uniqueKey([KEY_ID_TEST, KEY_ID_OBJECTIVE], onConflict: .ignore)
+                t.uniqueKey([KEY_ID_TEST, KEY_ID_OBJECTIVE], onConflict: .replace)
             }
         }
     }

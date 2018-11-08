@@ -23,7 +23,7 @@ class DbTableSubject {
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
-                t.column(KEY_SUBJECT, .text).notNull().unique(onConflict: .ignore)
+                t.column(KEY_SUBJECT, .text).notNull().unique(onConflict: .replace)
             }
         }
     }

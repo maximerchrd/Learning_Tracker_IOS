@@ -26,7 +26,7 @@ class DbTableTests {
         try dbQueue.write { db in
             try db.create(table: DbTableTests.TABLE_NAME, ifNotExists: true) { t in
                 t.column(DbTableTests.KEY_ID, .integer).primaryKey()
-                t.column(DbTableTests.KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .ignore)
+                t.column(DbTableTests.KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .replace)
                 t.column(DbTableTests.KEY_TEST_NAME, .text).notNull()
                 t.column(DbTableTests.KEY_QUESTION_IDS, .text)
                 t.column(DbTableTests.KEY_TEST_TYPE, .text)

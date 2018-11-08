@@ -40,7 +40,7 @@ class GlobalDBManager {
                 try db.create(table: DbTableAnswerOptions.TABLE_NAME, ifNotExists: true) { t in
                     t.column(DbTableAnswerOptions.KEY_ID, .integer).primaryKey()
                     t.column(DbTableAnswerOptions.KEY_ID_GLOBAL, .integer).notNull()
-                    t.column(DbTableAnswerOptions.KEY_OPTION, .text).notNull().unique(onConflict: .ignore)
+                    t.column(DbTableAnswerOptions.KEY_OPTION, .text).notNull().unique(onConflict: .replace)
                 }
                 print("migration to v1")
             }

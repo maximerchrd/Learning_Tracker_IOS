@@ -24,7 +24,7 @@ class DbTableLearningObjective {
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
-                t.column(KEY_OBJECTIVE, .text).notNull().unique(onConflict: .ignore)
+                t.column(KEY_OBJECTIVE, .text).notNull().unique(onConflict: .replace)
                 t.column(KEY_LEVEL_COGNITIVE_ABILITY, .integer).notNull()
             }
         }

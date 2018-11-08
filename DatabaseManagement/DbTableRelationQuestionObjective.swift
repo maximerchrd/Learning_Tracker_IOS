@@ -25,7 +25,7 @@ class DbTableRelationQuestionObjective {
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
                 t.column(KEY_OBJECTIVE, .text).notNull()
-                t.column(KEY_IDGLOBALOBJECTIVE, .text).notNull().unique(onConflict: .ignore)
+                t.column(KEY_IDGLOBALOBJECTIVE, .text).notNull().unique(onConflict: .replace)
             }
         }
     }
