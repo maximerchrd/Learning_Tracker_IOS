@@ -214,7 +214,7 @@ class ReceptionProtocol {
                 }
 
                 //send back a signal that we got the question
-                let accuseReception = "OK///" + fileName + "///"
+                let accuseReception = "OK:" + UIDevice.current.identifierForVendor!.uuidString + "///" + fileName + "///"
                 AppDelegate.wifiCommunicationSingleton!.client?.send(data: accuseReception.data(using: .utf8)!)
             } else {
                 var errorMessage = "\n expected fileSize: " + String(fileSize) + "; actual fileSize: " + String(fileData.count)

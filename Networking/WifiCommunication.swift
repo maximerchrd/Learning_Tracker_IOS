@@ -167,33 +167,34 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 let typeID = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[0]
                 let dataPrefix = DataPrefix()
                 dataPrefix.stringToPrefix(stringPrefix: prefix)
-                
-                if dataPrefix.dataType == DataPrefix.multq {
+
+                switch dataPrefix.dataType {
+                case DataPrefix.multq:
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
-                } else if dataPrefix.dataType == DataPrefix.shrta {
+                case DataPrefix.shrta:
                     self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
-                } else if typeID.range(of:"QID") != nil {
+                case "QID":
                     ReceptionProtocol.receivedQID(prefix: prefix)
-                } else if typeID.range(of:"SYNCIDS") != nil {
+                case "SYNCIDS":
                     //TODO: prevent server to send SYNCIDS to IOS devices (only for nearby connections)
                     readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
-                } else if dataPrefix.dataType == DataPrefix.subObj {
+                case DataPrefix.subObj:
                     ReceptionProtocol.receivedSUBOBJ(prefix: dataPrefix, wifiCommunication: self)
-                } else if typeID.elementsEqual("EVAL") {
+                case "EVAL":
                     ReceptionProtocol.receivedEVAL(prefix: prefix)
-                } else if typeID.range(of:"UPDEV") != nil {
+                case "UPDEV":
                     ReceptionProtocol.receivedUPDEV(prefix: prefix)
-                } else if typeID.range(of:"CORR") != nil {
+                case "CORR":
                     ReceptionProtocol.receivedCORR(prefix: prefix)
-                } else if dataPrefix.dataType == DataPrefix.test {
+                case DataPrefix.test:
                     ReceptionProtocol.receivedTESTFromServer(prefix: dataPrefix)
-                } else if typeID.range(of:"TESYN") != nil {
-                    //ReceptionProtocol.receivedTESYNFromServer(prefix: prefix)
-                } else if typeID.elementsEqual("OEVAL") {
+                case "OEVAL":
                     ReceptionProtocol.receivedOEVALFromServer(prefix: prefix)
-                } else if typeID.elementsEqual("FILE") {
+                case "FILE":
                     ReceptionProtocol.receivedFILEFromServer(prefix: prefix)
-                } else {
+                case "CONNECTED":
+                    print("Received CONNECTED")
+                default:
                     print("message received but prefix not supported")
                     stopConnection()
                 }
@@ -285,7 +286,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 }
 
                 //send back a signal that we got the question
-                let accuseReception = "OK///" + String(questionID) + "///"
+                let accuseReception = "OK:" + UIDevice.current.identifierForVendor!.uuidString + "///" + String(questionID) + "///"
                 self.client?.send(data: accuseReception.data(using: .utf8)!)
             } catch let error {
                 print(error)

@@ -16,7 +16,7 @@ class DataPrefix {
 
     func stringToPrefix(stringPrefix: String) {
         let length = stringPrefix.components(separatedBy: "///").count
-        dataType = stringPrefix.components(separatedBy: "///")[0]
+        dataType = stringPrefix.components(separatedBy: "///")[0].components(separatedBy: ":")[0]
         switch (dataType) {
         case DataPrefix.multq :
             dataLength = Int(stringPrefix.components(separatedBy: "///")[1]) ?? 0
@@ -27,7 +27,7 @@ class DataPrefix {
         case DataPrefix.test :
             dataLength = Int(stringPrefix.components(separatedBy: "///")[1]) ?? 0
         default :
-            dataType = "UNKNOWN"
+            print("stringToPrefix: Parsing of not yet implemented data type")
         }
     }
 }
