@@ -141,15 +141,20 @@ class TestTableViewController: UITableViewController {
         if AppDelegate.activeTest.calculateScoreAndCheckIfOver() {
             //test over
             var qualitativeEval = "none"
-            if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[2].1) ?? 0.0 && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[2].0) ?? 0.0 {
-                qualitativeEval = "gold-medal"
-                displayMedal(medalName: "gold-medal.png", message: "You got the GOLD MEDAL")
-            } else if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[1].1) ?? 0.0 && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[1].0) ?? 0.0 {
-                qualitativeEval = "silver-medal"
-                displayMedal(medalName: "silver-medal.png", message: "You got the SILVER MEDAL")
-            } else if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[0].1) ?? 0.0 && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[0].0) ?? 0.0 {
-                qualitativeEval = "bronze-medal"
-                displayMedal(medalName: "bronze-medal.png", message: "You got the BRONZE MEDAL")
+            if AppDelegate.activeTest.medalsInstructions.count == 3 {
+                if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[2].1) ?? 0.0
+                           && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[2].0) ?? 0.0 {
+                    qualitativeEval = "gold-medal"
+                    displayMedal(medalName: "gold-medal.png", message: "You got the GOLD MEDAL")
+                } else if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[1].1)
+                        ?? 0.0 && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[1].0) ?? 0.0 {
+                    qualitativeEval = "silver-medal"
+                    displayMedal(medalName: "silver-medal.png", message: "You got the SILVER MEDAL")
+                } else if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[0].1)
+                        ?? 0.0 && AppDelegate.activeTest.finishTime <= Double(AppDelegate.activeTest.medalsInstructions[0].0) ?? 0.0 {
+                    qualitativeEval = "bronze-medal"
+                    displayMedal(medalName: "bronze-medal.png", message: "You got the BRONZE MEDAL")
+                }
             }
             do {
                 try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(AppDelegate.activeTest.testID) ?? 0, quantitativeEval: String(AppDelegate.activeTest.score), qualitativeEval: qualitativeEval, testBelonging: AppDelegate.activeTest.testName, type: 3, timeForSolving: String(AppDelegate.activeTest.finishTime))

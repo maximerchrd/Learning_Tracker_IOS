@@ -67,7 +67,7 @@ class DbTableTests {
     
     static func getNameFromTestID(testID: Int64) -> String {
         do {
-            var testName = "no test found"
+            var testName = ""
             let dbQueue = try DatabaseQueue(path: DBPath)
             var testsRecords = [TestRecord]()
             var sql = "SELECT * FROM " + TABLE_NAME
@@ -89,7 +89,7 @@ class DbTableTests {
     
     static func getTypeFromTestID(testID: Int64) -> String {
         do {
-            var testType = "no test found"
+            var testType = ""
             let dbQueue = try DatabaseQueue(path: DBPath)
             var testsRecords = [TestRecord]()
             var sql = "SELECT * FROM " + TABLE_NAME
@@ -111,7 +111,7 @@ class DbTableTests {
     
     static func getMedalsInstructionsFromTestID(testID: Int64) -> String {
         do {
-            var medalsInstructions = "no test found"
+            var medalsInstructions = ""
             let dbQueue = try DatabaseQueue(path: DBPath)
             var testsRecords = [TestRecord]()
             var sql = "SELECT * FROM " + TABLE_NAME
