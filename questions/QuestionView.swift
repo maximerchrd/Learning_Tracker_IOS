@@ -24,6 +24,6 @@ class QuestionView: Decodable {
     var image = ""
     var type = 0
     var qcm_MUID: String? = ""
-    var qcm_UPD_TMS: Int64 = 0
+    var qcm_UPD_TMS: Int64? = 0
     var optionsnumber = 0
 }
