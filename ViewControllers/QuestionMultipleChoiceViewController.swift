@@ -160,14 +160,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
         if isCorrection {
             SubmitButton.setTitle(NSLocalizedString("OK", comment: "OK button"), for: .normal)
         }
-        
-        //start the timer
-        startTime = Date.timeIntervalSinceReferenceDate
 
         //send receipt to server
         let receipt = "ACTID///" + String(questionMultipleChoice.id) + "///"
         AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
-
 
         //start timer
         startTime = Date.timeIntervalSinceReferenceDate

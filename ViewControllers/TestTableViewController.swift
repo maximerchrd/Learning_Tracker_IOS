@@ -287,6 +287,7 @@ class TestTableViewController: UITableViewController {
                 newViewController.isCorrection = isCorr
                 newViewController.directCorrection = directCorrection
                 navigator.pushViewController(newViewController, animated: true)
+                questionShortAnswerViewControllers.append(newViewController)
             } else {
                 NSLog("%@", "Error trying to show Short answer question: the view controller wasn't pushed on a navigation controller")
             }

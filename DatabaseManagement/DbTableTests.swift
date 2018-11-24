@@ -202,6 +202,7 @@ class DbTableTests {
                 while questionIds.contains("") {
                     questionIds.remove(at: questionIds.index(of: "")!)
                 }
+                questionIds.remove(at: 0)
             }
         } catch let error {
             print(error)
