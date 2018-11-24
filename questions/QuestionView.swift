@@ -26,4 +26,5 @@ class QuestionView: Decodable {
     var qcm_MUID: String? = ""
     var qcm_UPD_TMS: Int64? = 0
     var optionsnumber = 0
+    var timerSeconds = 0
 }

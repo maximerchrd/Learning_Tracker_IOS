@@ -32,7 +32,8 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var scrollPosition: CGFloat
     var directCorrection = 0
     var isBackButton = true
-    var startTime: TimeInterval?
+    var startTime: TimeInterval = 0.0
+    var firstLabel:UILabel = UILabel()
     
     @IBOutlet weak var QuestionTextView: UITextView!
     @IBOutlet weak var PictureView: UIImageView!
@@ -166,6 +167,36 @@ class QuestionMultipleChoiceViewController: UIViewController {
         //send receipt to server
         let receipt = "ACTID///" + String(questionMultipleChoice.id) + "///"
         AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
+
+
+        //start timer
+        startTime = Date.timeIntervalSinceReferenceDate
+
+        //start timer if necessary
+        if questionMultipleChoice.timerSeconds > 0 {
+            if let navigationBar = self.navigationController?.navigationBar {
+                let firstFrame = CGRect(x: navigationBar.frame.width/2, y: 0, width: navigationBar.frame.width/2, height: navigationBar.frame.height)
+
+                firstLabel = UILabel(frame: firstFrame)
+                firstLabel.text = String(questionMultipleChoice.timerSeconds)
+
+                navigationBar.addSubview(firstLabel)
+            }
+            DispatchQueue.global(qos: .utility).async {
+                var timeInterval = Date.timeIntervalSinceReferenceDate - self.startTime
+                while (self.questionMultipleChoice.timerSeconds - Int(Date.timeIntervalSinceReferenceDate - self.startTime)) > 0 {
+                    sleep(1)
+                    DispatchQueue.main.async {
+                        self.firstLabel.text = String(self.questionMultipleChoice.timerSeconds - Int(Date.timeIntervalSinceReferenceDate - self.startTime))
+                    }
+                }
+                //disable button
+                DispatchQueue.main.async {
+                    self.SubmitButton.isEnabled = false
+                    self.SubmitButton.alpha = 0.4
+                }
+            }
+        }
         
         /**
          * START CODE USED FOR TESTING
@@ -192,6 +223,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
         //set scrolling size
         OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
         OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)
+
+        if SubmitButton.isEnabled {
+            self.firstLabel.isHidden = false
+        }
     }
     
     override func viewWillLayoutSubviews() {
@@ -210,6 +245,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
             ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
             ClassroomActivityViewController.navQuestionMultipleChoiceViewController = self
         }
+        self.firstLabel.isHidden = true
     }
     
     func shuffle(arrayArg: [String]) -> [String] {

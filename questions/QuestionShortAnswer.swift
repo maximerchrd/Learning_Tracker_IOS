@@ -17,6 +17,7 @@ class QuestionShortAnswer {
     var options = [String]()
     var subjects = [String]()
     var objectives = [String]()
+    var timerSeconds = 0
 
     func initFromQuestionView (questionView: QuestionView) {
         self.id = Int64(questionView.id) ?? 0
@@ -26,5 +27,6 @@ class QuestionShortAnswer {
         self.image = questionView.image
         self.options = [questionView.opt0, questionView.opt1, questionView.opt2, questionView.opt3, questionView.opt4,
                         questionView.opt5, questionView.opt6, questionView.opt7, questionView.opt8, questionView.opt9]
+        self.timerSeconds = questionView.timerSeconds
     }
 }

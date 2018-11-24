@@ -25,7 +25,8 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
     var newImageX:Float = 0
     var directCorrection = 0
     var isBackButton = true
-    var startTime: TimeInterval?
+    var startTime: TimeInterval = 0.0
+    var firstLabel:UILabel = UILabel()
     
     @IBOutlet weak var AnswerTextField: UITextField!
     @IBOutlet weak var QuestionTextView: UITextView!
@@ -82,18 +83,47 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
             self.AnswerTextField.isEnabled = false
             SubmitButton.setTitle(NSLocalizedString("OK", comment: "OK button"), for: .normal)
         }
-        
-        //start timer
-        startTime = Date.timeIntervalSinceReferenceDate
 
         //send receipt to server
         let receipt = "ACTID///" + String(questionShortAnswer.id) + "///"
         AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
+
+        //start timer
+        startTime = Date.timeIntervalSinceReferenceDate
+
+        //start timer if necessary
+        if questionShortAnswer.timerSeconds > 0 {
+            if let navigationBar = self.navigationController?.navigationBar {
+                let firstFrame = CGRect(x: navigationBar.frame.width/2, y: 0, width: navigationBar.frame.width/2, height: navigationBar.frame.height)
+
+                firstLabel = UILabel(frame: firstFrame)
+                firstLabel.text = String(questionShortAnswer.timerSeconds)
+
+                navigationBar.addSubview(firstLabel)
+            }
+            DispatchQueue.global(qos: .utility).async {
+                var timeInterval = Date.timeIntervalSinceReferenceDate - self.startTime
+                while (self.questionShortAnswer.timerSeconds - Int(Date.timeIntervalSinceReferenceDate - self.startTime)) > 0 {
+                    sleep(1)
+                    DispatchQueue.main.async {
+                        self.firstLabel.text = String(self.questionShortAnswer.timerSeconds - Int(Date.timeIntervalSinceReferenceDate - self.startTime))
+                    }
+                }
+                //disable button
+                DispatchQueue.main.async {
+                    self.SubmitButton.isEnabled = false
+                    self.SubmitButton.alpha = 0.4
+                }
+            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         //dismiss keyboard if we are coming back to question
         self.view.endEditing(true)
+        if SubmitButton.isEnabled {
+            self.firstLabel.isHidden = false
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -101,6 +131,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
             ClassroomActivityViewController.navQuestionShortAnswerViewController = self
             ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
         }
+        self.firstLabel.isHidden = true
     }
     
     

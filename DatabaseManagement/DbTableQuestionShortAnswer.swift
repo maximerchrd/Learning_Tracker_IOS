@@ -16,6 +16,7 @@ class DbTableQuestionShortAnswer {
     static let KEY_Question = "QUESTION"
     static let KEY_IMAGE_PATH = "IMAGE_PATH"
     static let KEY_ID_GLOBAL = "ID_GLOBAL"
+    static let KEY_TIMER_SECONDS = "TIMER_SECONDS"
     
     
     static var DBPath = "NoPATH"
@@ -30,6 +31,7 @@ class DbTableQuestionShortAnswer {
                 t.column(KEY_Question, .text).notNull()
                 t.column(KEY_IMAGE_PATH, .text).notNull()
                 t.column(KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .replace)
+                t.column(KEY_TIMER_SECONDS, .integer)
             }
         }
     }
@@ -128,6 +130,7 @@ class QuestionShortAnswerRecord : Record {
         questionShortAnswer.question = row[DbTableQuestionShortAnswer.KEY_Question]
         questionShortAnswer.image = row[DbTableQuestionShortAnswer.KEY_IMAGE_PATH]
         questionShortAnswer.id = row[DbTableQuestionShortAnswer.KEY_ID_GLOBAL]
+        questionShortAnswer.timerSeconds = row[DbTableQuestionShortAnswer.KEY_TIMER_SECONDS]
         super.init()
     }
     
@@ -141,6 +144,7 @@ class QuestionShortAnswerRecord : Record {
         container[DbTableQuestionShortAnswer.KEY_Question] = questionShortAnswer.question
         container[DbTableQuestionShortAnswer.KEY_IMAGE_PATH] = questionShortAnswer.image
         container[DbTableQuestionShortAnswer.KEY_ID_GLOBAL] = questionShortAnswer.id
+        container[DbTableQuestionShortAnswer.KEY_TIMER_SECONDS] = questionShortAnswer.timerSeconds
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {
