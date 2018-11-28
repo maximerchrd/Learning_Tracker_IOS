@@ -212,10 +212,10 @@ class ResultsCityRepresentationViewController: UIViewController {
                     imageView.image = UIImage(named: "building_worst")
                     qualitativeEvaluation = "Can do better :-|"
                 } else if result < 70 {
-                    imageView.image = UIImage(named: "building_worst")
+                    imageView.image = UIImage(named: "building_medium")
                     qualitativeEvaluation = "OK"
                 } else if result < 90 {
-                    imageView.image = UIImage(named: "building_best")
+                    imageView.image = UIImage(named: "building_good")
                     qualitativeEvaluation = "Good!"
                 } else {
                     imageView.image = UIImage(named: "building_best")

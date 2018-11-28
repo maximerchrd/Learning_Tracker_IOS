@@ -152,7 +152,7 @@ class ReceptionProtocol {
             }
 
             for objective in subObj.objectives {
-                try DbTableLearningObjective.insertLearningObjective(objectiveID: questionId, objective: objective, levelCognitiveAbility: -1)
+                try DbTableLearningObjective.insertLearningObjective(questionID: questionId, objective: objective, levelCognitiveAbility: -1)
             }
         } catch let error {
             print(error)
