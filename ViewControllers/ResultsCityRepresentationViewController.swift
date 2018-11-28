@@ -210,16 +210,16 @@ class ResultsCityRepresentationViewController: UIViewController {
                 
                 if result < 50 {
                     imageView.image = UIImage(named: "building_worst")
-                    qualitativeEvaluation = "Can do better :-|"
+                    qualitativeEvaluation = "😢"
                 } else if result < 70 {
                     imageView.image = UIImage(named: "building_medium")
-                    qualitativeEvaluation = "OK"
+                    qualitativeEvaluation = "😐"
                 } else if result < 90 {
                     imageView.image = UIImage(named: "building_good")
-                    qualitativeEvaluation = "Good!"
+                    qualitativeEvaluation = "😃"
                 } else {
                     imageView.image = UIImage(named: "building_best")
-                    qualitativeEvaluation = "Excellent!!! :-))"
+                    qualitativeEvaluation = "😍"
                 }
                 
                 scrollView.addSubview(imageView)
