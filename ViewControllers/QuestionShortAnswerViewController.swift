@@ -165,6 +165,9 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.id, questionType: "ANSW1", timeSpent: String(timeInterval))
         }
         
+        //add question ID to answered ids for the test
+        AppDelegate.activeTest.answeredIds.append(String(questionShortAnswer.id))
+        
         //show correct/incorrect message if direct correction mode activated
         if (directCorrection == 1) {
             let studentAnswer = AnswerTextField.text!
