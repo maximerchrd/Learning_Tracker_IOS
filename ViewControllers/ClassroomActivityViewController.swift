@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 
 class ClassroomActivityViewController: UIViewController {
-
     static var navQuestionMultipleChoiceViewController: QuestionMultipleChoiceViewController?
     static var navQuestionShortAnswerViewController: QuestionShortAnswerViewController?
     static var navTestTableViewController: TestTableViewController?
@@ -264,6 +263,11 @@ class ClassroomActivityViewController: UIViewController {
 
         if self.isMovingFromParentViewController {
             AppDelegate.wifiCommunicationSingleton!.stopConnection()
+            
+            if ClassroomActivityViewController.navTestTableViewController != nil {
+                timer.invalidate()
+                timerLabel.text = ""
+            }
         }
     }
 
@@ -282,7 +286,6 @@ extension UIImageView {
 }
 
 extension UIImage {
-
     func maskWithColor(color: UIColor) -> UIImage? {
         let maskImage = cgImage!
 
@@ -305,5 +308,4 @@ extension UIImage {
             return nil
         }
     }
-
 }
