@@ -30,15 +30,15 @@ class ReceptionProtocol {
                     AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: directCorrection, testMode: 0)
                 }
             } else if prefix.components(separatedBy: ":")[1].contains("MLT") {
-                let id_global = Int64(prefix.components(separatedBy: "///")[1])
+                let id_global = Int64(prefix.components(separatedBy: "///")[1]) ?? 0
                 let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
                 do {
-                    questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global!)
+                    questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global)
                     
                     if questionMultipleChoice.question.count > 0 && questionMultipleChoice.question != "none" {
                         AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
                     } else {
-                        questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global!)
+                        questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global)
                         AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false, directCorrection: directCorrection)
                     }
                 } catch let error {
