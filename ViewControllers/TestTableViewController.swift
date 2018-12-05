@@ -170,12 +170,9 @@ class TestTableViewController: UITableViewController {
     }
     
     func displayMedal(medalName: String, message: String) {
-        let alert = UIAlertController(title: NSLocalizedString("You are a Champ!", comment: ""), message: message + "\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
+        let alert = AlertControllerWithImage(title: NSLocalizedString("You are a Champ!", comment: ""), message: "", preferredStyle: .alert)
         let medalImage = UIImage(named: medalName)
-        let imageView = UIImageView(frame: CGRect(origin: CGPoint(x:self.view.frame.width * 0.3, y:self.view.frame.height * 0.2), size: CGSize(width: (medalImage?.size.width ?? 0.0) / (medalImage?.size.height ?? 1.0) * 100, height: 100)) )
-        imageView.image = medalImage
-        alert.view.addSubview(imageView)
-    
+        alert.setTitleImage(medalImage)
         alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
