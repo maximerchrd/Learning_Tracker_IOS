@@ -27,4 +27,8 @@ class QuestionView: Decodable {
     var qcm_UPD_TMS: Int64? = 0
     var optionsnumber = 0
     var timerSeconds = 0
+
+    static let multipleChoice = 0
+    static let shortAnswer = 1
+    static let test = 2
 }

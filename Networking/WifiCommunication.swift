@@ -37,7 +37,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
             self.host = "xxx.xxx.x.xxx"
             
             //first check if we are connected to a wifi network
-            if self.currentSSIDs().count == 0 {
+            if false {
                 self.displayInstructions(instructionIndex: 0)
             } else {
                 //try to connect automatically
@@ -168,35 +168,42 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 let dataPrefix = DataPrefix()
                 dataPrefix.stringToPrefix(stringPrefix: prefix)
 
-                switch dataPrefix.dataType {
-                case DataPrefix.multq:
-                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
-                case DataPrefix.shrta:
-                    self.readAndStoreQuestion(prefix: prefix, typeOfQuest: typeID, prefixData: data)
-                case "QID":
-                    ReceptionProtocol.receivedQID(prefix: prefix)
-                case "SYNCIDS":
-                    //TODO: prevent server to send SYNCIDS to IOS devices (only for nearby connections)
-                    readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
-                case DataPrefix.subObj:
-                    ReceptionProtocol.receivedSUBOBJ(prefix: dataPrefix, wifiCommunication: self)
-                case "EVAL":
-                    ReceptionProtocol.receivedEVAL(prefix: prefix)
-                case "UPDEV":
-                    ReceptionProtocol.receivedUPDEV(prefix: prefix)
-                case "CORR":
-                    ReceptionProtocol.receivedCORR(prefix: prefix)
-                case DataPrefix.test:
-                    ReceptionProtocol.receivedTESTFromServer(prefix: dataPrefix)
-                case "OEVAL":
-                    ReceptionProtocol.receivedOEVALFromServer(prefix: prefix)
-                case "FILE":
-                    ReceptionProtocol.receivedFILEFromServer(prefix: prefix)
-                case "CONNECTED":
-                    print("Received CONNECTED")
-                default:
-                    print("message received but prefix not supported")
-                    stopConnection()
+                var objectName = TransferPrefix.getObjectName(prefix: prefix)
+                let dataSize = TransferPrefix.getSize(prefix: prefix)
+
+                if (TransferPrefix.isResource(prefix: prefix)) {
+                    let resourceData = self.readDataIntoArray(expectedSize: dataSize)
+                    ReceptionProtocol.receivedResource(objectName: objectName, resourceData: resourceData)
+                } else if (TransferPrefix.isStateUpdate(prefix: prefix)) {
+                    let resourceData = self.readDataIntoArray(expectedSize: dataSize)
+                    ReceptionProtocol.receivedStateUpdate(objectName: objectName, resourceData: resourceData)
+                } else {
+                    switch dataPrefix.dataType {
+                    case "QID":
+                        ReceptionProtocol.receivedQID(prefix: prefix)
+                    case "SYNCIDS":
+                        //TODO: prevent server to send SYNCIDS to IOS devices (only for nearby connections)
+                        readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
+                    case DataPrefix.subObj:
+                        ReceptionProtocol.receivedSUBOBJ(prefix: dataPrefix, wifiCommunication: self)
+                    case "EVAL":
+                        ReceptionProtocol.receivedEVAL(prefix: prefix)
+                    case "UPDEV":
+                        ReceptionProtocol.receivedUPDEV(prefix: prefix)
+                    case "CORR":
+                        ReceptionProtocol.receivedCORR(prefix: prefix)
+                    case DataPrefix.test:
+                        ReceptionProtocol.receivedTESTFromServer(prefix: dataPrefix)
+                    case "OEVAL":
+                        ReceptionProtocol.receivedOEVALFromServer(prefix: prefix)
+                    case "FILE":
+                        ReceptionProtocol.receivedFILEFromServer(prefix: prefix)
+                    case "CONNECTED":
+                        print("Received CONNECTED")
+                    default:
+                        print("message received but prefix not supported")
+                        stopConnection()
+                    }
                 }
             } else {
                 ableToRead = false

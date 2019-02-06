@@ -1,16 +1,79 @@
-//
-//  ReceptionProtocol.swift
-//  Learning_Tracker_IOS
-//
-//  Created by Maxime Richard on 27.04.18.
-//  Copyright © 2018 Maxime Richard. All rights reserved.
-//
-
 import Foundation
 import MultipeerConnectivity
 import UIKit
 
 class ReceptionProtocol {
+    static func receivedResource(objectName: String, resourceData: [UInt8]) {
+        switch objectName {
+        case "QuestionView":
+            storeQuestion(resourceData: resourceData)
+            break
+        default:
+            print("Received Resource Type is Unknown")
+        }
+    }
+
+    static func storeQuestion(resourceData: [UInt8]) {
+        var questionID:Int64 = -1
+        let decoder = JSONDecoder()
+        do {
+            var question = try decoder.decode(QuestionView.self, from: Data(bytes: resourceData))
+            print(question)
+
+            if question.type == QuestionView.multipleChoice {
+                var questionMultChoice = QuestionMultipleChoice()
+                questionMultChoice.initFromQuestionView(questionView: question)
+                questionID = questionMultChoice.id
+                if questionMultChoice.question != "error" {
+                    try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMultChoice)
+                }
+                //code for functional testing
+                if questionMultChoice.question.contains("7492qJfzdDSB") {
+                    AppDelegate.wifiCommunicationSingleton!.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
+                }
+            } else if question.type == QuestionView.shortAnswer {
+                var questionShortAnswer = QuestionShortAnswer()
+                questionShortAnswer.initFromQuestionView(questionView: question)
+                questionID = questionShortAnswer.id
+                if questionShortAnswer.question != "error" {
+                    try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShortAnswer)
+                }
+            }
+
+            //send back a signal that we got the question
+            let accuseReception = "OK:" + UIDevice.current.identifierForVendor!.uuidString + "///" + String(questionID) + "///"
+            AppDelegate.wifiCommunicationSingleton!.client?.send(data: accuseReception.data(using: .utf8)!)
+        } catch let error {
+            print(error)
+        }
+    }
+
+    static func receivedStateUpdate(objectName: String, resourceData: [UInt8]) {
+        switch objectName {
+        case "ShortCommand":
+            receivedShortCommand(resourceData: resourceData)
+            break
+        default:
+            print("Received StateUpdate Type is Unknown")
+        }
+    }
+
+    static func receivedShortCommand(resourceData: [UInt8]) {
+        let decoder = JSONDecoder()
+        do {
+            var shortCommand = try decoder.decode(ShortCommand.self, from: Data(bytes: resourceData))
+            switch shortCommand.command {
+            case ShortCommand.connected:
+                print("Received Connected")
+                break
+            default:
+                print("Received Command is Unknown")
+            }
+        } catch let error {
+            print(error)
+        }
+    }
+
     static func receivedQID(prefix: String) {
         DispatchQueue.main.async {
             var questionMultipleChoice = QuestionMultipleChoice()
