@@ -4,13 +4,13 @@ class TransferableObject: Decodable {
     var objectId: String?
     var prefix: String
     var files: [String]
-    var fileBytes: String
+    var fileBytes: [UInt8]
 
     init(groupPrefix: String) {
         objectId = nil
         prefix = groupPrefix
         files = [String]()
-        fileBytes = ""
+        fileBytes = [UInt8]()
     }
 }
 

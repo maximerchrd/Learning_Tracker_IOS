@@ -164,9 +164,6 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     break
                 }
                 print(prefix)
-                let typeID = prefix.components(separatedBy: "///")[0].components(separatedBy: ":")[0]
-                let dataPrefix = DataPrefix()
-                dataPrefix.stringToPrefix(stringPrefix: prefix)
 
                 var objectName = TransferPrefix.getObjectName(prefix: prefix)
                 let dataSize = TransferPrefix.getSize(prefix: prefix)
