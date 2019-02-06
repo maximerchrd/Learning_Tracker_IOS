@@ -179,8 +179,6 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     ReceptionProtocol.receivedStateUpdate(objectName: objectName, resourceData: resourceData)
                 } else {
                     switch dataPrefix.dataType {
-                    case "QID":
-                        ReceptionProtocol.receivedQID(prefix: prefix)
                     case "SYNCIDS":
                         //TODO: prevent server to send SYNCIDS to IOS devices (only for nearby connections)
                         readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
@@ -198,8 +196,6 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                         ReceptionProtocol.receivedOEVALFromServer(prefix: prefix)
                     case "FILE":
                         ReceptionProtocol.receivedFILEFromServer(prefix: prefix)
-                    case "CONNECTED":
-                        print("Received CONNECTED")
                     default:
                         print("message received but prefix not supported")
                         stopConnection()

@@ -53,6 +53,9 @@ class ReceptionProtocol {
         case "ShortCommand":
             receivedShortCommand(resourceData: resourceData)
             break
+        case "QuestionIdentifier":
+            receivedQuestionIdentifier(resourceData: resourceData)
+            break
         default:
             print("Received StateUpdate Type is Unknown")
         }
@@ -74,40 +77,47 @@ class ReceptionProtocol {
         }
     }
 
-    static func receivedQID(prefix: String) {
-        DispatchQueue.main.async {
-            var questionMultipleChoice = QuestionMultipleChoice()
-            var questionShortAnswer = QuestionShortAnswer()
-            let idGlobal = Int64(prefix.components(separatedBy: "///")[1]) ?? 0
-            if idGlobal < 0 {
-                let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
-                let test = Test()
-                test.testID = String(-idGlobal)
-                test.testName = DbTableTests.getNameFromTestID(testID: -idGlobal)
-                test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
-                test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
-                test.parseMedalsInstructions(instructions: DbTableTests.getMedalsInstructionsFromTestID(testID: -idGlobal))
-                test.mediaFileName = DbTableTests.getMediaFileNameFromTestID(testID: -idGlobal)
-                
-                DispatchQueue.main.async {
-                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: directCorrection, testMode: 0)
-                }
-            } else if prefix.components(separatedBy: ":")[1].contains("MLT") {
-                let id_global = Int64(prefix.components(separatedBy: "///")[1]) ?? 0
-                let directCorrection = Int(prefix.components(separatedBy: "///")[2]) ?? 0
-                do {
-                    questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global)
-                    
-                    if questionMultipleChoice.question.count > 0 && questionMultipleChoice.question != "none" {
-                        AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
-                    } else {
-                        questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global)
-                        AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: false, directCorrection: directCorrection)
+    static func receivedQuestionIdentifier(resourceData: [UInt8]) {
+        let decoder = JSONDecoder()
+        do {
+            var questionIdentifier = try decoder.decode(QuestionIdentifier.self, from: Data(bytes: resourceData))
+
+            DispatchQueue.main.async {
+                var questionMultipleChoice = QuestionMultipleChoice()
+                var questionShortAnswer = QuestionShortAnswer()
+                let idGlobal = Int64(questionIdentifier.identifier) ?? 0
+                if idGlobal < 0 {
+                    let test = Test()
+                    test.testID = String(-idGlobal)
+                    test.testName = DbTableTests.getNameFromTestID(testID: -idGlobal)
+                    test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
+                    test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
+                    test.parseMedalsInstructions(instructions: DbTableTests.getMedalsInstructionsFromTestID(testID: -idGlobal))
+                    test.mediaFileName = DbTableTests.getMediaFileNameFromTestID(testID: -idGlobal)
+
+                    DispatchQueue.main.async {
+                        AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: questionIdentifier.correctionMode, testMode: 0)
                     }
-                } catch let error {
-                    print(error)
+                } else {
+                    let id_global = Int64(questionIdentifier.identifier) ?? 0
+                    do {
+                        questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global)
+
+                        if questionMultipleChoice.question.count > 0 && questionMultipleChoice.question != "none" {
+                            AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?
+                                    .showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: false, directCorrection: questionIdentifier.correctionMode)
+                        } else {
+                            questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global)
+                            AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?
+                                    .showShortAnswerQuestion(question: questionShortAnswer, isCorr: false, directCorrection: questionIdentifier.correctionMode)
+                        }
+                    } catch let error {
+                        print(error)
+                    }
                 }
             }
+        } catch let error {
+            print(error)
         }
     }
     
