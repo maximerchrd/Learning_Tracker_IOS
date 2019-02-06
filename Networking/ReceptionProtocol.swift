@@ -14,8 +14,58 @@ class ReceptionProtocol {
         case "SubjectTransferable":
             receivedSubject(resourceData: resourceData)
             break
+        case "TestView":
+            receivedTestView(resourceData: resourceData)
+            break
         default:
             print("Received Resource Type is Unknown")
+        }
+    }
+    
+    static func receivedTestView(resourceData: [UInt8]) {
+        let decoder = JSONDecoder()
+        do {
+            let testView = try decoder.decode(TestView.self, from: Data(bytes: resourceData))
+            
+            //extract objectives for certificative test
+            let objectivesArray = testView.objectives.components(separatedBy: "|||")
+            var objectiveIDS = [Int64]()
+            var objectives = [String]()
+            for objectiveANDid in objectivesArray {
+                if objectiveANDid.count > 0 {
+                    objectiveIDS.append(Int64(objectiveANDid.components(separatedBy: "/|/")[0]) ?? 0)
+                    if objectiveANDid.components(separatedBy: "/|/").count > 1 {
+                        objectives.append(objectiveANDid.components(separatedBy: "/|/")[1])
+                    } else {
+                        let error = "problem reading objectives for test: objective - ID pair not complete"
+                        print(error)
+                        DbTableLogs.insertLog(log: error)
+                    }
+                }
+            }
+            
+            //parse the test map and insert the corresponding question-question relations inside the database
+            let testMapArray = testView.testMap.components(separatedBy: "|||")
+            var questionIdsForTest = ""
+            for question in testMapArray {
+                let relations = question.components(separatedBy: ";;;")
+                let questionID = relations[0]
+                questionIdsForTest += questionID + "///"
+                for i in 1..<relations.count {
+                    DbTableRelationQuestionQuestion.insertRelationQuestionQuestion(idGlobal1: questionID, idGlobal2:
+                        relations[i].components(separatedBy: ":::")[0], test: testView.testName,
+                                                                        condition: relations[i].components(separatedBy: ":::")[1])
+                    
+                }
+            }
+            
+            
+            //insert test in db after parsing questions
+            try DbTableTests.insertTest(testID: Int64(testView.idTest) ?? 0, test: testView.testName, questionIDs: questionIdsForTest,
+                                        objectiveIDs: objectiveIDS, objectives: objectives, medalsInstructions: testView.medalInstructions,
+                                        mediaFileName: testView.mediaFileName ?? "")
+        } catch let error {
+            print(error)
         }
     }
     

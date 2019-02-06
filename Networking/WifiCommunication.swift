@@ -171,25 +171,21 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 var objectName = TransferPrefix.getObjectName(prefix: prefix)
                 let dataSize = TransferPrefix.getSize(prefix: prefix)
 
-                if (TransferPrefix.isResource(prefix: prefix)) {
+                if TransferPrefix.isResource(prefix: prefix) {
                     let resourceData = self.readDataIntoArray(expectedSize: dataSize)
                     ReceptionProtocol.receivedResource(objectName: objectName, resourceData: resourceData)
-                } else if (TransferPrefix.isStateUpdate(prefix: prefix)) {
+                } else if TransferPrefix.isStateUpdate(prefix: prefix) {
                     let resourceData = self.readDataIntoArray(expectedSize: dataSize)
                     ReceptionProtocol.receivedStateUpdate(dataSize: dataSize, objectName: objectName, resourceData: resourceData)
-                } else if (TransferPrefix.isFile(prefix: prefix)) {
+                } else if TransferPrefix.isFile(prefix: prefix) {
                     let resourceData = self.readDataIntoArray(expectedSize: dataSize)
                     ReceptionProtocol.receivedFile(fileSize: dataSize, objectName: objectName, resourceData: resourceData)
+                } else if TransferPrefix.isOther(prefix: prefix) {
+                    let resourceData = self.readDataIntoArray(expectedSize: dataSize)
+                    print("Received 'Other' Type of Data but it's not yet supported")
                 } else {
-                    switch dataPrefix.dataType {
-                    case DataPrefix.test:
-                        ReceptionProtocol.receivedTESTFromServer(prefix: dataPrefix)
-                    case "FILE":
-                        ReceptionProtocol.receivedFILEFromServer(prefix: prefix)
-                    default:
-                        print("message received but prefix not supported")
-                        stopConnection()
-                    }
+                    print("message received but prefix not supported")
+                    stopConnection()
                 }
             } else {
                 ableToRead = false

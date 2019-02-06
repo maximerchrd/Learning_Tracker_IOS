@@ -18,6 +18,7 @@ struct TransferPrefix {
     static let resource = "RESOURCE"
     static let stateUpdate = "STATEUPD"
     static let file = "FILE"
+    static let other = "OTHER"
     static let delimiter = "/"
     static let prefixSize = 80
 
@@ -55,5 +56,9 @@ struct TransferPrefix {
 
     public static func isFile(prefix: String) -> Bool {
         return (prefix.components(separatedBy: TransferPrefix.delimiter)[0] == TransferPrefix.file)
+    }
+    
+    public static func isOther(prefix: String) -> Bool {
+        return (prefix.components(separatedBy: TransferPrefix.delimiter)[0] == TransferPrefix.other)
     }
 }
