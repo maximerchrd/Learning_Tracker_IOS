@@ -48,13 +48,20 @@ class ReceptionProtocol {
         }
     }
 
-    static func receivedStateUpdate(objectName: String, resourceData: [UInt8]) {
+    static func receivedStateUpdate(dataSize: Int, objectName: String, resourceData: [UInt8]) {
         switch objectName {
         case "ShortCommand":
             receivedShortCommand(resourceData: resourceData)
             break
         case "QuestionIdentifier":
             receivedQuestionIdentifier(resourceData: resourceData)
+            break
+        case "SyncedIds":
+            //TODO: prevent server to send SYNCIDS to IOS devices (only for nearby connections)
+            AppDelegate.wifiCommunicationSingleton!.readDataIntoArray(expectedSize: dataSize)
+            break
+        case "Evaluation":
+            receivedEvaluation(resourceData: resourceData)
             break
         default:
             print("Received StateUpdate Type is Unknown")
@@ -116,8 +123,45 @@ class ReceptionProtocol {
                     }
                 }
             }
-        } catch let error {
-            print(error)
+        } catch let jsonError {
+            print(jsonError)
+        }
+    }
+
+    static func receivedEvaluation(resourceData: [UInt8]) {
+        let decoder = JSONDecoder()
+        do {
+            var evaluationObject = try decoder.decode(Evaluation.self, from: Data(bytes: resourceData))
+            if evaluationObject.evaluationType == Evaluation.questionEvaluation {
+                try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(evaluationObject.identifier) ?? 0,
+                        answer: (AppDelegate.wifiCommunicationSingleton?.pendingAnswer)!, quantitativeEval: String(evaluationObject.evaluation))
+                if ClassroomActivityViewController.navTestTableViewController != nil {
+                    AppDelegate.activeTest.IDresults[evaluationObject.identifier] = Float32(evaluationObject.evaluation) ?? -1.0
+                    DispatchQueue.main.async {
+                        ClassroomActivityViewController.navTestTableViewController?.reloadTable()
+                    }
+                }
+            } else if evaluationObject.evaluationType == Evaluation.objectiveEvaluation {
+                do {
+                    let testID = Int64(evaluationObject.testIdentifier) ?? 0
+                    let testName = evaluationObject.testName
+                    let objectiveID = Int64(evaluationObject.identifier) ?? 0
+                    let objective = evaluationObject.name
+                    let evaluation = String(evaluationObject.evaluation)
+                    
+                    //insert test in db after parsing questions
+                    try DbTableLearningObjective.insertLearningObjective(objectiveID: objectiveID, objective: objective, levelCognitiveAbility: 0)
+                    try DbTableRelationTestObjective.insertRelationTestObjective(idTest: testID, idObjective: objectiveID)
+                    try DbTableTests.insertTest(testID: testID, test: testName, testType: "CERTIF")
+                    try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: objectiveID, quantitativeEval: evaluation, testBelonging: testName, type: 2)
+                } catch let error {
+                    print(error)
+                }
+            } else {
+                print("Unknown Evaluation Type Received")
+            }
+        } catch let jsonError {
+            print(jsonError)
         }
     }
     

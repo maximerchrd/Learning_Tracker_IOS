@@ -176,12 +176,9 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     ReceptionProtocol.receivedResource(objectName: objectName, resourceData: resourceData)
                 } else if (TransferPrefix.isStateUpdate(prefix: prefix)) {
                     let resourceData = self.readDataIntoArray(expectedSize: dataSize)
-                    ReceptionProtocol.receivedStateUpdate(objectName: objectName, resourceData: resourceData)
+                    ReceptionProtocol.receivedStateUpdate(dataSize: dataSize, objectName: objectName, resourceData: resourceData)
                 } else {
                     switch dataPrefix.dataType {
-                    case "SYNCIDS":
-                        //TODO: prevent server to send SYNCIDS to IOS devices (only for nearby connections)
-                        readDataIntoArray(expectedSize: Int(prefix.components(separatedBy: "///")[1]) ?? 0)
                     case DataPrefix.subObj:
                         ReceptionProtocol.receivedSUBOBJ(prefix: dataPrefix, wifiCommunication: self)
                     case "EVAL":

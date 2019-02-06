@@ -32,13 +32,17 @@ struct TransferPrefix {
     }
 
     public static func getObjectName(prefix: String) -> String {
-        let objectName = prefix.components(separatedBy: TransferPrefix.delimiter)[1]
-        let nameArray = objectName.components(separatedBy: ".")
-        var nameIndex = nameArray.count - 1
-        if nameIndex < 0 {
-            nameIndex = 0
+        if (prefix.components(separatedBy: TransferPrefix.delimiter).count >= 3) {
+            let objectName = prefix.components(separatedBy: TransferPrefix.delimiter)[1]
+            let nameArray = objectName.components(separatedBy: ".")
+            var nameIndex = nameArray.count - 1
+            if nameIndex < 0 {
+                nameIndex = 0
+            }
+            return nameArray[nameIndex]
+        } else {
+            return ""
         }
-        return nameArray[nameIndex]
     }
 
     public static func isResource(prefix: String) -> Bool {
