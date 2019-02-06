@@ -177,10 +177,11 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 } else if (TransferPrefix.isStateUpdate(prefix: prefix)) {
                     let resourceData = self.readDataIntoArray(expectedSize: dataSize)
                     ReceptionProtocol.receivedStateUpdate(dataSize: dataSize, objectName: objectName, resourceData: resourceData)
+                } else if (TransferPrefix.isFile(prefix: prefix)) {
+                    let resourceData = self.readDataIntoArray(expectedSize: dataSize)
+                    ReceptionProtocol.receivedFile(fileSize: dataSize, objectName: objectName, resourceData: resourceData)
                 } else {
                     switch dataPrefix.dataType {
-                    case DataPrefix.subObj:
-                        ReceptionProtocol.receivedSUBOBJ(prefix: dataPrefix, wifiCommunication: self)
                     case DataPrefix.test:
                         ReceptionProtocol.receivedTESTFromServer(prefix: dataPrefix)
                     case "FILE":

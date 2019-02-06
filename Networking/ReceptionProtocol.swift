@@ -224,6 +224,30 @@ class ReceptionProtocol {
         }
     }
     
+    static func receivedFile(fileSize: Int, objectName: String, resourceData: [UInt8]) {
+        //insert file only if we received all the data
+        if fileSize == resourceData.count {
+            let mediaData = Data(bytes: resourceData);
+            guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
+                                                               appropriateFor: nil, create: false) as NSURL else {
+                                                                print("ERROR: unable to open directory when saving file")
+                                                                return
+            }
+            do {
+                try mediaData.write(to: directory.appendingPathComponent(objectName)!)
+            } catch let error {
+                print(error.localizedDescription)
+            }
+            
+            //send back a signal that we got the question
+            let accuseReception = "OK:" + UIDevice.current.identifierForVendor!.uuidString + "///" + objectName + "///"
+            AppDelegate.wifiCommunicationSingleton!.client?.send(data: accuseReception.data(using: .utf8)!)
+        } else {
+            let errorMessage = "\n expected fileSize: " + String(fileSize) + "; actual fileSize: " + String(resourceData.count)
+            print(errorMessage)
+        }
+    }
+    
     static func receivedEVAL(prefix: String) {
         do {
             try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(prefix.components(separatedBy: "///")[2]) ?? 0, answer: (AppDelegate.wifiCommunicationSingleton?.pendingAnswer)!, quantitativeEval: prefix.components(separatedBy: "///")[1])
