@@ -181,16 +181,8 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     switch dataPrefix.dataType {
                     case DataPrefix.subObj:
                         ReceptionProtocol.receivedSUBOBJ(prefix: dataPrefix, wifiCommunication: self)
-                    case "EVAL":
-                        ReceptionProtocol.receivedEVAL(prefix: prefix)
-                    case "UPDEV":
-                        ReceptionProtocol.receivedUPDEV(prefix: prefix)
-                    case "CORR":
-                        ReceptionProtocol.receivedCORR(prefix: prefix)
                     case DataPrefix.test:
                         ReceptionProtocol.receivedTESTFromServer(prefix: dataPrefix)
-                    case "OEVAL":
-                        ReceptionProtocol.receivedOEVALFromServer(prefix: prefix)
                     case "FILE":
                         ReceptionProtocol.receivedFILEFromServer(prefix: prefix)
                     default:

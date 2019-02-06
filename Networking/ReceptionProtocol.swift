@@ -76,11 +76,36 @@ class ReceptionProtocol {
             case ShortCommand.connected:
                 print("Received Connected")
                 break
+            case ShortCommand.correction:
+                receivedCorrection(resourceData: resourceData)
+                break
             default:
                 print("Received Command is Unknown")
             }
         } catch let error {
             print(error)
+        }
+    }
+    
+    static func receivedCorrection(resourceData: [UInt8]) {
+        
+        DispatchQueue.main.async {
+            var questionMultipleChoice = QuestionMultipleChoice()
+            var questionShortAnswer = QuestionShortAnswer()
+            do {
+                let decoder = JSONDecoder()
+                var shortCommand = try decoder.decode(ShortCommand.self, from: Data(bytes: resourceData))
+                let id_global = Int64(shortCommand.optionalArgument1) ?? 0
+                questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: id_global)
+                if questionMultipleChoice.question.count > 0 && questionMultipleChoice.question != "none" {
+                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showMultipleChoiceQuestion(question:  questionMultipleChoice, isCorr: true)
+                } else {
+                    questionShortAnswer = try DbTableQuestionShortAnswer.retrieveQuestionShortAnswerWithID(globalID: id_global)
+                    AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showShortAnswerQuestion(question: questionShortAnswer, isCorr: true)
+                }
+            } catch let error {
+                print(error)
+            }
         }
     }
 
@@ -131,14 +156,22 @@ class ReceptionProtocol {
     static func receivedEvaluation(resourceData: [UInt8]) {
         let decoder = JSONDecoder()
         do {
-            var evaluationObject = try decoder.decode(Evaluation.self, from: Data(bytes: resourceData))
+            let evaluationObject = try decoder.decode(Evaluation.self, from: Data(bytes: resourceData))
             if evaluationObject.evaluationType == Evaluation.questionEvaluation {
-                try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(evaluationObject.identifier) ?? 0,
-                        answer: (AppDelegate.wifiCommunicationSingleton?.pendingAnswer)!, quantitativeEval: String(evaluationObject.evaluation))
-                if ClassroomActivityViewController.navTestTableViewController != nil {
-                    AppDelegate.activeTest.IDresults[evaluationObject.identifier] = Float32(evaluationObject.evaluation) ?? -1.0
-                    DispatchQueue.main.async {
-                        ClassroomActivityViewController.navTestTableViewController?.reloadTable()
+                if evaluationObject.evalUpdate {
+                    do {
+                        try DbTableIndividualQuestionForResult.setEvalForQuestionAndStudentIDs(eval: String(evaluationObject.evaluation), idQuestion: evaluationObject.identifier)
+                    } catch let error {
+                        print(error)
+                    }
+                } else {
+                    try DbTableIndividualQuestionForResult.insertIndividualQuestionForResult(questionID: Int64(evaluationObject.identifier) ?? 0,
+                            answer: (AppDelegate.wifiCommunicationSingleton?.pendingAnswer)!, quantitativeEval: String(evaluationObject.evaluation))
+                    if ClassroomActivityViewController.navTestTableViewController != nil {
+                        AppDelegate.activeTest.IDresults[evaluationObject.identifier] = Float32(evaluationObject.evaluation)
+                        DispatchQueue.main.async {
+                            ClassroomActivityViewController.navTestTableViewController?.reloadTable()
+                        }
                     }
                 }
             } else if evaluationObject.evaluationType == Evaluation.objectiveEvaluation {
