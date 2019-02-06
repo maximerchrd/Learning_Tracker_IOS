@@ -184,7 +184,7 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
                 SubmitButton.alpha = 0.4
             } else {
                 var message = NSLocalizedString("There was no right answer.", comment: "pop up message if answer wrong and no answer right")
-                if rightAnswers.count > 0 {
+                if rightAnswers.count > 0 && rightAnswers[0] != "" {
                     message = NSLocalizedString("The right answer was for example: ", comment: "pop up message if answer wrong") + rightAnswers[0]
                 }
                 let alert = UIAlertController(title: NSLocalizedString("Incorrect :-(", comment: "pop up if answer wrong"), message: message, preferredStyle: .alert)
