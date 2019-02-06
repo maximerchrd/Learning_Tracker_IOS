@@ -8,8 +8,34 @@ class ReceptionProtocol {
         case "QuestionView":
             storeQuestion(resourceData: resourceData)
             break
+        case "ObjectiveTransferable":
+            receivedObjective(resourceData: resourceData)
+            break
+        case "SubjectTransferable":
+            receivedSubject(resourceData: resourceData)
+            break
         default:
             print("Received Resource Type is Unknown")
+        }
+    }
+    
+    static func receivedObjective(resourceData: [UInt8]) {
+        let decoder = JSONDecoder()
+        do {
+            let objective = try decoder.decode(ObjectiveTransferable.self, from: Data(bytes: resourceData))
+            try DbTableLearningObjective.insertLearningObjective(questionID: Int64(objective.questionId) ?? 0, objective: objective._objectiveName, levelCognitiveAbility: objective._objectiveLevel)
+        } catch let jsonError {
+            print(jsonError)
+        }
+    }
+    
+    static func receivedSubject(resourceData: [UInt8]) {
+        let decoder = JSONDecoder()
+        do {
+            let subject = try decoder.decode(SubjectTransferable.self, from: Data(bytes: resourceData))
+            try DbTableSubject.insertSubject(questionID: Int64(subject.questionId) ?? 0, subject: subject._subjectName)
+        } catch let jsonError {
+            print(jsonError)
         }
     }
 
