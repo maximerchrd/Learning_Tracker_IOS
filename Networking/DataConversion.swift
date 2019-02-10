@@ -12,16 +12,19 @@ import UIKit
 class DataConversion {
     
     public func connection() -> Data {
-        var input = "problem retrieving name from DB"
+        let connectionBytes = ClientToServerTransferable(prefix: ClientToServerTransferable.connectionPrefix)
+        var dictionary: [String: String]
+        let encodedDictionary: Data
         do {
-            try input = "CONN" + "///"
-                + UIDevice.current.identifierForVendor!.uuidString + "///"
-                + DbTableSettings.retrieveName() + "///"
+            dictionary = ["uuid" : UIDevice.current.identifierForVendor!.uuidString, "name": try DbTableSettings.retrieveName()]
+            let encoder = JSONEncoder()
+            encodedDictionary = try encoder.encode(dictionary)
+            connectionBytes.fileBytes = Array(encodedDictionary)
         } catch let error {
             print(error)
             DbTableLogs.insertLog(log: error.localizedDescription)
         }
-        let dataUTF8 = input.data(using: .utf8)!
+        let dataUTF8 = Data(connectionBytes.getTransferableBytes())
         return dataUTF8
     }
     

@@ -19,8 +19,8 @@ struct TransferPrefix {
     static let stateUpdate = "STATEUPD"
     static let file = "FILE"
     static let other = "OTHER"
-    static let delimiter = "/"
-    static let prefixSize = 80
+    public static let delimiter = "/"
+    public static let prefixSize = 80
 
     public static func getSize(prefix: String) -> Int {
         if (prefix.components(separatedBy: TransferPrefix.delimiter).count >= 3) {
