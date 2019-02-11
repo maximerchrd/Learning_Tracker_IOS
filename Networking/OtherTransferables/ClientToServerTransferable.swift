@@ -2,6 +2,7 @@ class ClientToServerTransferable {
     var prefix = -1
     var size = -1
     var optionalArgument1 = ""
+    var optionalArgument2 = ""
     var fileBytes = [UInt8]()
     
     init(prefix: Int, size:Int = 0, optionalArgument: String = "") {
@@ -32,6 +33,7 @@ class ClientToServerTransferable {
         size = fileBytes.count
         var prefixString = String(prefix) + TransferPrefix.delimiter + String(size)
         prefixString += TransferPrefix.delimiter + optionalArgument1 + TransferPrefix.delimiter
+        prefixString += optionalArgument2 + TransferPrefix.delimiter
         var prefixUsefulBytes = Array(prefixString.utf8)
         var prefixBytes = [UInt8](repeating: 0, count: TransferPrefix.prefixSize)
         for i in 0..<prefixUsefulBytes.count {

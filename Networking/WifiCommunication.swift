@@ -232,51 +232,6 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         }
     }
     
-    fileprivate func readAndStoreQuestion(prefix: String, typeOfQuest: String, prefixData: [UInt8]) {
-        var questionID:Int64 = -1
-        var dataPrefix = DataPrefix()
-        dataPrefix.stringToPrefix(stringPrefix: prefix)
-
-        let dataSize = dataPrefix.dataLength
-        let dataText = self.readDataIntoArray(expectedSize: dataSize)
-        print (String(bytes: dataText, encoding: .utf8) ?? "error")
-        if dataText.count == dataSize {
-            let decoder = JSONDecoder()
-            do {
-                var question = try decoder.decode(QuestionView.self, from: Data(bytes: dataText))
-                print(question)
-
-                if dataPrefix.dataType == DataPrefix.multq {
-                    var questionMultChoice = QuestionMultipleChoice()
-                    questionMultChoice.initFromQuestionView(questionView: question)
-                    questionID = questionMultChoice.id
-                    if questionMultChoice.question != "error" {
-                        try DbTableQuestionMultipleChoice.insertQuestionMultipleChoice(Question: questionMultChoice)
-                    }
-                    //code for functional testing
-                    if questionMultChoice.question.contains("7492qJfzdDSB") {
-                        self.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
-                    }
-                } else if dataPrefix.dataType == DataPrefix.shrta {
-                    var questionShortAnswer = QuestionShortAnswer()
-                    questionShortAnswer.initFromQuestionView(questionView: question)
-                    questionID = questionShortAnswer.id
-                    if questionShortAnswer.question != "error" {
-                        try DbTableQuestionShortAnswer.insertQuestionShortAnswer(Question: questionShortAnswer)
-                    }
-                }
-
-                //send back a signal that we got the question
-                let accuseReception = "OK:" + UIDevice.current.identifierForVendor!.uuidString + "///" + String(questionID) + "///"
-                self.client?.send(data: accuseReception.data(using: .utf8)!)
-            } catch let error {
-                print(error)
-            }
-        } else {
-            print("\n expected textsize: " + String(dataSize) + "; actual textSize: " + String(dataText.count))
-        }
-    }
-    
     func stopConnection() {
         if self.client != nil {
             sendDisconnectionSignal(additionalInformation: "close-connection")

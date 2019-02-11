@@ -105,7 +105,8 @@ class ReceptionProtocol {
                 }
                 //code for functional testing
                 if questionMultChoice.question.contains("7492qJfzdDSB") {
-                    AppDelegate.wifiCommunicationSingleton!.client?.send(data: "ACCUSERECEPTION///".data(using: .utf8)!)
+                    var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.accuserReceptionPrefix)
+                    AppDelegate.wifiCommunicationSingleton!.client?.send(data: transferable.getTransferableBytes())
                 }
             } else if question.type == QuestionView.shortAnswer {
                 var questionShortAnswer = QuestionShortAnswer()
@@ -117,8 +118,10 @@ class ReceptionProtocol {
             }
 
             //send back a signal that we got the question
-            let accuseReception = "OK:" + UIDevice.current.identifierForVendor!.uuidString + "///" + String(questionID) + "///"
-            AppDelegate.wifiCommunicationSingleton!.client?.send(data: accuseReception.data(using: .utf8)!)
+            var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.okPrefix)
+            transferable.optionalArgument1 = UIDevice.current.identifierForVendor!.uuidString
+            transferable.optionalArgument2 = String(questionID)
+            AppDelegate.wifiCommunicationSingleton!.client?.send(data: transferable.getTransferableBytes())
         } catch let error {
             print(error)
         }
