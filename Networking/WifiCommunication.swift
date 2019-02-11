@@ -111,32 +111,27 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
 
     private func sendResourceIdsOnDevice() {
         do {
-            var idsString = ""
-            idsString += try DbTableQuestionMultipleChoice.getAllQuestionsMultipleChoiceIDs() + "|"
-            idsString += try DbTableQuestionShortAnswer.getAllQuestionsShortAnswersIDs() + "|"
+            var idsString = try DbTableQuestionMultipleChoice.getAllQuestionsMultipleChoiceIDsAndHash()
+            idsString += try DbTableQuestionShortAnswer.getAllQuestionsShortAnswersIDsandHash()
 
             let fileManager = FileManager.default
             let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
             do {
                 let fileURLs = try fileManager.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
                 for var url in fileURLs {
-                    idsString += url.lastPathComponent + "|"
+                    idsString.append(url.lastPathComponent)
                 }
             } catch {
                 print("Error while enumerating files \(documentsURL.path): \(error.localizedDescription)")
             }
 
-            var arrayResIds = idsString.components(separatedBy: "|")
-            var stringToSend = "RESIDS///" + UIDevice.current.identifierForVendor!.uuidString + "///";
-            for var id in arrayResIds {
-                stringToSend += id + "|"
-                if stringToSend.data(using: .utf8)!.count > 900 {
-                    self.client!.send(data: stringToSend.data(using: .utf8)!)
-                    stringToSend = "RESIDS///" + UIDevice.current.identifierForVendor!.uuidString + "///";
-                }
-            }
-            stringToSend += "///ENDTRSM///"
-            self.client!.send(data: stringToSend.data(using: .utf8)!)
+            let jsonEncoder = JSONEncoder()
+            let encodedArray = try jsonEncoder.encode(idsString)
+            
+            let transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.resourceIdsPrefix, optionalArgument: UIDevice.current.identifierForVendor!.uuidString)
+            transferable.fileBytes = Array(encodedArray)
+            let transferableBytes = transferable.getTransferableBytes()
+            self.client!.send(data: transferableBytes)
         } catch let error {
             print(error)
         }

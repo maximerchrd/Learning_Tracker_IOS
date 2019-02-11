@@ -1,11 +1,3 @@
-//
-//  DbTableQuestionShortAnswer.swift
-//  Learning_Tracker_IOS
-//
-//  Created by Maxime Richard on 27.02.18.
-//  Copyright © 2018 Maxime Richard. All rights reserved.
-//
-
 import Foundation
 import GRDB
 
@@ -17,6 +9,7 @@ class DbTableQuestionShortAnswer {
     static let KEY_IMAGE_PATH = "IMAGE_PATH"
     static let KEY_ID_GLOBAL = "ID_GLOBAL"
     static let KEY_TIMER_SECONDS = "TIMER_SECONDS"
+    static let KEY_HASH = "HASH_CODE"
     
     
     static var DBPath = "NoPATH"
@@ -32,11 +25,13 @@ class DbTableQuestionShortAnswer {
                 t.column(KEY_IMAGE_PATH, .text).notNull()
                 t.column(KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .replace)
                 t.column(KEY_TIMER_SECONDS, .integer)
+                t.column(KEY_HASH, .text).notNull()
             }
         }
     }
     
     static func insertQuestionShortAnswer(Question: QuestionShortAnswer) throws {
+        Question.hashCode = DbTableQuestionShortAnswer.computeHashCode(question: Question)
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.write { db in
             let questionShortAnswer = QuestionShortAnswerRecord(questionShortAnswerArg: Question)
@@ -56,7 +51,7 @@ class DbTableQuestionShortAnswer {
             }
         }
     }
-    
+
     static func retrieveQuestionShortAnswerWithID (globalID: Int64) throws -> QuestionShortAnswer {
         var questionShortAnswerToReturn = QuestionShortAnswer()
         var optionsArray = [String]()
@@ -77,7 +72,7 @@ class DbTableQuestionShortAnswer {
         return questionShortAnswerToReturn
     }
     
-    static func getAllQuestionsShortAnswersIDs () throws -> String {
+    static func getAllQuestionsShortAnswersIDsandHash() throws -> [String] {
         var questionShortAnswers = [QuestionShortAnswerRecord(questionShortAnswerArg: QuestionShortAnswer())]
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
@@ -88,9 +83,9 @@ class DbTableQuestionShortAnswer {
             print(error)
             print(error.localizedDescription)
         }
-        var questionIDs = ""
+        var questionIDs = [String]()
         for singleRecord in questionShortAnswers {
-            questionIDs = questionIDs + String(singleRecord.questionShortAnswer.id) + "|"
+            questionIDs.append(String(singleRecord.questionShortAnswer.id) + ";" + singleRecord.questionShortAnswer.hashCode)
         }
         return questionIDs
     }
@@ -112,6 +107,20 @@ class DbTableQuestionShortAnswer {
         }
         return questionIDs
     }
+
+    private class func computeHashCode(question: QuestionShortAnswer) -> String {
+        var stringToHash = question.question + question.image + String(question.timerSeconds)
+        for answer in question.options {
+            stringToHash += answer
+        }
+        for subject in question.subjects {
+            stringToHash += subject
+        }
+        for objective in question.objectives {
+            stringToHash += objective
+        }
+        return GlobalDBManager.getHashCode(sequence: stringToHash)
+    }
 }
 
 class QuestionShortAnswerRecord : Record {
@@ -131,6 +140,7 @@ class QuestionShortAnswerRecord : Record {
         questionShortAnswer.image = row[DbTableQuestionShortAnswer.KEY_IMAGE_PATH]
         questionShortAnswer.id = row[DbTableQuestionShortAnswer.KEY_ID_GLOBAL]
         questionShortAnswer.timerSeconds = row[DbTableQuestionShortAnswer.KEY_TIMER_SECONDS]
+        questionShortAnswer.hashCode = row[DbTableQuestionShortAnswer.KEY_HASH]
         super.init()
     }
     
@@ -145,6 +155,7 @@ class QuestionShortAnswerRecord : Record {
         container[DbTableQuestionShortAnswer.KEY_IMAGE_PATH] = questionShortAnswer.image
         container[DbTableQuestionShortAnswer.KEY_ID_GLOBAL] = questionShortAnswer.id
         container[DbTableQuestionShortAnswer.KEY_TIMER_SECONDS] = questionShortAnswer.timerSeconds
+        container[DbTableQuestionShortAnswer.KEY_HASH] = questionShortAnswer.hashCode
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

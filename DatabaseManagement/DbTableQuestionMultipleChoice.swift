@@ -24,6 +24,7 @@ class DbTableQuestionMultipleChoice {
     static let KEY_OPTION7 = "OPTION7"
     static let KEY_OPTION8 = "OPTION8"
     static let KEY_OPTION9 = "OPTION9"
+    static let KEY_HASH = "HASH_CODE"
     static let KEY_NB_CORRECT_ANS = "NB_CORRECT_ANS"
     static let KEY_IMAGE_PATH = "IMAGE_PATH"
     static let KEY_ID_GLOBAL = "ID_GLOBAL"
@@ -50,6 +51,7 @@ class DbTableQuestionMultipleChoice {
                 t.column(KEY_OPTION7, .text).notNull()
                 t.column(KEY_OPTION8, .text).notNull()
                 t.column(KEY_OPTION9, .text).notNull()
+                t.column(KEY_HASH, .text).notNull()
                 t.column(KEY_NB_CORRECT_ANS, .text).notNull()
                 t.column(KEY_IMAGE_PATH, .text).notNull()
                 t.column(KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .replace)
@@ -59,6 +61,7 @@ class DbTableQuestionMultipleChoice {
     }
     
     static func insertQuestionMultipleChoice(Question: QuestionMultipleChoice) throws {
+        Question.hashCode = DbTableQuestionMultipleChoice.computeHashCode(question: Question)
         let dbQueue = try DatabaseQueue(path: DBPath)
         try dbQueue.write { db in
             let questionMultChoice = QuestionMultipleChoiceRecord(questionMultipleChoiceArg: Question)
@@ -88,7 +91,7 @@ class DbTableQuestionMultipleChoice {
         return questionMultipleChoiceToReturn
     }
     
-    static func getAllQuestionsMultipleChoiceIDs () throws -> String {
+    static func getAllQuestionsMultipleChoiceIDsAndHash() throws -> [String] {
         var questionMultipleChoice = [QuestionMultipleChoiceRecord(questionMultipleChoiceArg: QuestionMultipleChoice())]
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
@@ -97,11 +100,10 @@ class DbTableQuestionMultipleChoice {
             }
         } catch let error {
             print(error)
-            print(error.localizedDescription)
         }
-        var questionIDs = ""
+        var questionIDs = [String]()
         for singleRecord in questionMultipleChoice {
-            questionIDs = questionIDs + String(singleRecord.questionMultipleChoice.id) + "|"
+            questionIDs.append(String(singleRecord.questionMultipleChoice.id) + ";" + singleRecord.questionMultipleChoice.hashCode)
         }
         return questionIDs
     }
@@ -122,6 +124,21 @@ class DbTableQuestionMultipleChoice {
             questionIDs.append(String(singleRecord.questionMultipleChoice.id))
         }
         return questionIDs
+    }
+    
+    private static func computeHashCode(question: QuestionMultipleChoice) -> String {
+        var stringToHash = question.level + question.question + String(question.NbCorrectAnswers)
+        stringToHash += question.options[0] + question.options[1] + question.options[2]
+        stringToHash += question.options[3] + question.options[4] + question.options[5]
+        stringToHash += question.options[6] + question.options[7] + question.options[8]
+        stringToHash += question.options[9] + question.image + String(question.timerSeconds)
+        for subject in question.Subjects {
+            stringToHash += subject;
+        }
+        for objective in question.Objectives {
+            stringToHash += objective;
+        }
+        return GlobalDBManager.getHashCode(sequence: stringToHash)
     }
 }
 
@@ -149,6 +166,7 @@ class QuestionMultipleChoiceRecord : Record {
         questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION7])
         questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION8])
         questionMultipleChoice.options.append(row[DbTableQuestionMultipleChoice.KEY_OPTION9])
+        questionMultipleChoice.hashCode = row[DbTableQuestionMultipleChoice.KEY_HASH]
         questionMultipleChoice.NbCorrectAnswers = row[DbTableQuestionMultipleChoice.KEY_NB_CORRECT_ANS]
         questionMultipleChoice.image = row[DbTableQuestionMultipleChoice.KEY_IMAGE_PATH]
         questionMultipleChoice.id = row[DbTableQuestionMultipleChoice.KEY_ID_GLOBAL]
@@ -174,6 +192,7 @@ class QuestionMultipleChoiceRecord : Record {
         container[DbTableQuestionMultipleChoice.KEY_OPTION7] = questionMultipleChoice.options[7]
         container[DbTableQuestionMultipleChoice.KEY_OPTION8] = questionMultipleChoice.options[8]
         container[DbTableQuestionMultipleChoice.KEY_OPTION9] = questionMultipleChoice.options[9]
+        container[DbTableQuestionMultipleChoice.KEY_HASH] = questionMultipleChoice.hashCode
         container[DbTableQuestionMultipleChoice.KEY_NB_CORRECT_ANS] = questionMultipleChoice.NbCorrectAnswers
         container[DbTableQuestionMultipleChoice.KEY_IMAGE_PATH] = questionMultipleChoice.image
         container[DbTableQuestionMultipleChoice.KEY_ID_GLOBAL] = questionMultipleChoice.id

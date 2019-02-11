@@ -18,6 +18,7 @@ class QuestionShortAnswer {
     var subjects = [String]()
     var objectives = [String]()
     var timerSeconds = 0
+    var hashCode = ""
 
     func initFromQuestionView (questionView: QuestionView) {
         self.id = Int64(questionView.id) ?? 0

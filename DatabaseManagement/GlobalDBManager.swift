@@ -58,4 +58,12 @@ class GlobalDBManager {
             print(error.localizedDescription)
         }
     }
+    
+    static func getHashCode(sequence: String) -> String {
+        var hash:Int32 = 5381
+        for c in sequence {
+            hash = (hash % 60606060) * 33 + Int32(c.unicodeScalars.first?.value ?? 0)
+        }
+        return String(hash)
+    }
 }
