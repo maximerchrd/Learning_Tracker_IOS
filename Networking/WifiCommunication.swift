@@ -185,7 +185,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
         }
     }
     
-    public func sendAnswerToServer(answer: String, globalID: Int64, questionType: String, timeSpent: String) {
+    public func sendAnswerToServer(answers: [String], answer: String, globalID: Int64, questionType: String, timeSpent: Double) {
         pendingAnswer = answer
         var message = ""
         do {
@@ -198,13 +198,14 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 question = questionShortAnswer.question
             }
             let name = try DbTableSettings.retrieveName()
-            message = questionType + "///" + UIDevice.current.identifierForVendor!.uuidString + "///" + name + "///"
-            message += (answer + "///" + question + "///" + String(globalID)) + "///" + timeSpent;
-            if client != nil {
-                client!.send(string: message)
-            } else {
-                print("client is nil when trying to send the answer")
-            }
+            var answerObject = Answer(studenDeviceId: UIDevice.current.identifierForVendor!.uuidString,
+                    studentName: name, questionType: questionType, questionId: String(globalID), question: question,
+                    timeSpent: timeSpent, answers: answers)
+            var encoder = JSONEncoder()
+            var encodedData = try encoder.encode(answerObject)
+            var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.answerPrefix)
+            transferable.fileBytes = Array(encodedData)
+            sendData(data: transferable.getTransferableData())
         } catch let error {
             print(error)
         }
@@ -213,6 +214,8 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     public func sendData(data: Data) {
         if client != nil {
             client!.send(data: data)
+        } else {
+            print("client is nil when trying to send Data")
         }
     }
     

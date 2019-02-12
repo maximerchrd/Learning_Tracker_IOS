@@ -1,3 +1,5 @@
+import Foundation
+
 class ClientToServerTransferable {
     var prefix = -1
     var size = -1
@@ -40,5 +42,9 @@ class ClientToServerTransferable {
             prefixBytes[i] = prefixUsefulBytes[i]
         }
         return prefixBytes + fileBytes
+    }
+
+    public func getTransferableData() -> Data {
+        return Data(getTransferableBytes())
     }
 }

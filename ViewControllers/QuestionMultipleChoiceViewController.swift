@@ -162,8 +162,9 @@ class QuestionMultipleChoiceViewController: UIViewController {
         }
 
         //send receipt to server
-        let receipt = "ACTID///" + String(questionMultipleChoice.id) + "///"
-        AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
+        var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
+                optionalArgument: String(questionMultipleChoice.id))
+        AppDelegate.wifiCommunicationSingleton?.sendData(data: transferable.getTransferableData())
 
         //start timer
         startTime = Date.timeIntervalSinceReferenceDate
@@ -198,7 +199,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
          * START CODE USED FOR TESTING
          */
         if questionMultipleChoice.question.contains("*ç%&") {
-             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: optionsArray[0], globalID: questionMultipleChoice.id, questionType: "ANSW0", timeSpent: "2.63")
+             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answers: [optionsArray[0]], answer: optionsArray[0], globalID: questionMultipleChoice.id, questionType: "ANSW0", timeSpent: 2.63)
             if let navController = self.navigationController {
                 //set cached view controller to nil to prevent students answering several times to same question
                 isBackButton = false
@@ -288,7 +289,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
                     answersArray.append((singleCheckBox.titleLabel?.text) ?? " ")
                 }
             }
-            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: answers, globalID: questionMultipleChoice.id, questionType: "ANSW0", timeSpent: String(timeInterval))
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answers: answersArray, answer: answers, globalID: questionMultipleChoice.id, questionType: "ANSW0", timeSpent: timeInterval)
         }
         
         //add question ID to answered ids for the test

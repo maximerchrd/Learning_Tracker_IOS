@@ -62,8 +62,9 @@ class TestTableViewController: UITableViewController {
         reloadTable()
 
         //send receipt to server
-        let receipt = "ACTID///" + AppDelegate.activeTest.testID + "///"
-        AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
+        var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
+                optionalArgument: AppDelegate.activeTest.testID)
+        AppDelegate.wifiCommunicationSingleton?.sendData(data: transferable.getTransferableData())
 
         //prepare media if exists
         loadMedia(from: AppDelegate.activeTest.mediaFileName)

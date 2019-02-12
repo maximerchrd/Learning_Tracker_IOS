@@ -85,8 +85,9 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         }
 
         //send receipt to server
-        let receipt = "ACTID///" + String(questionShortAnswer.id) + "///"
-        AppDelegate.wifiCommunicationSingleton?.sendData(data: receipt.data(using: .utf8)!)
+        var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
+                optionalArgument: String(questionShortAnswer.id))
+        AppDelegate.wifiCommunicationSingleton?.sendData(data: transferable.getTransferableData())
 
         //start timer
         startTime = Date.timeIntervalSinceReferenceDate
@@ -162,7 +163,8 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         
         //first send answer to server
         if !isCorrection {
-            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answer: AnswerTextField.text!, globalID: questionShortAnswer.id, questionType: "ANSW1", timeSpent: String(timeInterval))
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answers: [AnswerTextField.text!], answer: AnswerTextField.text!,
+                    globalID: questionShortAnswer.id, questionType: "ANSW1", timeSpent: timeInterval)
         }
         
         //add question ID to answered ids for the test
