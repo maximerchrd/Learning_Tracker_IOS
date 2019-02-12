@@ -74,8 +74,8 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 //app crashes after around 250 connections in a row
                 switch self.client!.connect(timeout: 4) {
                 case .success:
-                    if AppDelegate.disconnectionSignalWithoutConnectionYet != "" {
-                        self.client!.send(data: AppDelegate.disconnectionSignalWithoutConnectionYet.data(using: .utf8)!)
+                    if AppDelegate.disconnectionSignalWithoutConnectionYet.optionalArgument1 != "" {
+                        self.client!.send(data: AppDelegate.disconnectionSignalWithoutConnectionYet.getTransferableData())
                     }
                     switch self.client!.send(data: dataConverter.connection()) {
                     case .success:
@@ -222,13 +222,15 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
     public func sendDisconnectionSignal(additionalInformation: String = "") {
         print("student is leaving the task")
         do {
-            let message = try "DISC///" + UIDevice.current.identifierForVendor!.uuidString + "///" + DbTableSettings.retrieveName() + "///" +
-            additionalInformation + "///"
-            AppDelegate.disconnectionSignalWithoutConnectionYet = message
+            var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.disconnectionPrefix)
+            transferable.optionalArgument1 = UIDevice.current.identifierForVendor!.uuidString
+            transferable.optionalArgument2 = additionalInformation
+            transferable.fileBytes = Array(try DbTableSettings.retrieveName().data(using: .utf8) ?? Data())
+            AppDelegate.disconnectionSignalWithoutConnectionYet = transferable
             if client != nil {
-                client!.send(string: message)
+                sendData(data: transferable.getTransferableData())
                 Thread.sleep(forTimeInterval: 0.7)
-                AppDelegate.disconnectionSignalWithoutConnectionYet = ""
+                AppDelegate.disconnectionSignalWithoutConnectionYet = ClientToServerTransferable(prefix: ClientToServerTransferable.disconnectionPrefix)
             }
         } catch let error {
             print(error)

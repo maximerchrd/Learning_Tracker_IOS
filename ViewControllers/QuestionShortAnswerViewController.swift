@@ -69,7 +69,6 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
         newImageHeight = Float(originalImageHeight) / Float(originaImageWidth) * screenWidth
         newImageX = 0
         
-        
         //set delegate to hide keyboard when return pressed
         self.AnswerTextField.delegate = self
         

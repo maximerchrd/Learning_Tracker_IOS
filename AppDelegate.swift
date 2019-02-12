@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var activeTest = Test()
     static var testMode = ""//testReconnection"
     var orientationLock = UIInterfaceOrientationMask.all
-    static var disconnectionSignalWithoutConnectionYet = ""
+    static var disconnectionSignalWithoutConnectionYet = ClientToServerTransferable(prefix: ClientToServerTransferable.disconnectionPrefix)
     static var locked = false
     static var testConnection = 0
     static var QRCode = ""
