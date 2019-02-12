@@ -220,9 +220,10 @@ class ClassroomActivityViewController: UIViewController {
                         }
                     }
                 } else {
-                    let request = "REQUEST///" + UIDevice.current.identifierForVendor!.uuidString + "///"
-                            + AppDelegate.QRCode.components(separatedBy: ":")[0] + "///"
-                    AppDelegate.wifiCommunicationSingleton?.sendData(data: request.data(using: .utf8) ?? Data())
+                    var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.requestPrefix)
+                    transferable.optionalArgument1 = UIDevice.current.identifierForVendor!.uuidString
+                    transferable.optionalArgument2 = AppDelegate.QRCode.components(separatedBy: ":")[0]
+                    AppDelegate.wifiCommunicationSingleton?.sendData(data: transferable.getTransferableData())
                 }
             } else {
                 let ac = UIAlertController(title: NSLocalizedString("Error Reading QR Code", comment: "Error prompted when Reading QR Code"), message: NSLocalizedString("The scanned QR Code is not recognized by Koeko.", comment: "The scanned QR Code is not recognized by Koeko."), preferredStyle: .alert)
