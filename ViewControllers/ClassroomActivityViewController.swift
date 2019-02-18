@@ -196,6 +196,10 @@ class ClassroomActivityViewController: UIViewController {
             }
         }
 
+        ClassroomActivityViewController.launchFromQrCode(viewController: self)
+    }
+    
+    static func launchFromQrCode(viewController: UIViewController) {
         if AppDelegate.QRCode != "" {
             if AppDelegate.QRCode.components(separatedBy: ":").count == 4 {
                 //launch question or test read by QR Code scanner
@@ -211,14 +215,14 @@ class ClassroomActivityViewController: UIViewController {
                         test.questionIDs = DbTableTests.getQuestionIds(testName: test.testName)
                         test.testMap = DbTableRelationQuestionQuestion.getTestMapForTest(test: test.testName)
                         test.parseMedalsInstructions(instructions: DbTableTests.getMedalsInstructionsFromTestID(testID: -idGlobal))
-
+                        
                         DispatchQueue.main.async {
                             AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showTest(test: test, directCorrection: directCorrection, testMode: 0)
                         }
                     } else {
                         do {
                             questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: idGlobal)
-
+                            
                             if questionMultipleChoice.question.count > 0 && questionMultipleChoice.question != "none" {
                                 AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showMultipleChoiceQuestion(question: questionMultipleChoice, isCorr: false, directCorrection: directCorrection)
                             } else {
@@ -238,13 +242,13 @@ class ClassroomActivityViewController: UIViewController {
             } else {
                 let ac = UIAlertController(title: NSLocalizedString("Error Reading QR Code", comment: "Error prompted when Reading QR Code"), message: NSLocalizedString("The scanned QR Code is not recognized by Koeko.", comment: "The scanned QR Code is not recognized by Koeko."), preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "OK", style: .default))
-                present(ac, animated: true)
+                viewController.present(ac, animated: true)
             }
             AppDelegate.QRCode = ""
         }
     }
 
-    fileprivate func checkIfResourceAvailable(resourceId: Int64) -> Bool {
+    fileprivate static func checkIfResourceAvailable(resourceId: Int64) -> Bool {
         do {
             if resourceId < 0 {
                 if DbTableTests.getNameFromTestID(testID: resourceId) == "" {

@@ -902,18 +902,21 @@ Connection</string>
                                 <color key="textColor" red="0.96862745100000003" green="0.13725490200000001" blue="0.047058823530000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J5r-oI-tu5">
-                                <rect key="frame" x="262" y="591" width="97" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J5r-oI-tu5">
+                                <rect key="frame" x="269" y="552" width="80" height="80"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button" image="qrImage"/>
                                 <connections>
                                     <action selector="qrCodeReading:" destination="x6U-Mj-SKm" eventType="touchUpInside" id="tAp-L0-WNl"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="akL-uK-eTH">
-                                <rect key="frame" x="18" y="591" width="115" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Ready"/>
+                                <rect key="frame" x="18" y="564" width="115" height="57"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.96862745100000003" green="0.13725490200000001" blue="0.047058823530000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="Ready">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
                                 <connections>
                                     <action selector="ready:" destination="x6U-Mj-SKm" eventType="touchUpInside" id="2zX-BZ-7Ip"/>
                                 </connections>
@@ -938,6 +941,7 @@ Connection</string>
                         <outlet property="blueClimber" destination="11B-PE-TRd" id="oBX-X1-f17"/>
                         <outlet property="blueScore" destination="QAM-VP-cM0" id="k2L-zB-Tvw"/>
                         <outlet property="celebration" destination="cL9-3g-xOX" id="W4u-FG-EHN"/>
+                        <outlet property="readyButton" destination="akL-uK-eTH" id="Omn-yp-nmw"/>
                         <outlet property="redClimber" destination="ffs-YZ-4Mf" id="0bV-eE-y3m"/>
                         <outlet property="redScore" destination="UxP-I1-CxP" id="S3d-gn-hI1"/>
                     </connections>

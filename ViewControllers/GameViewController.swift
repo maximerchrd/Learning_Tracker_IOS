@@ -8,6 +8,7 @@ class GameViewController: UIViewController {
     @IBOutlet weak var redClimber: UIImageView!
     @IBOutlet weak var backgroundImage: UIImageView!
     @IBOutlet weak var celebration: UIImageView!
+    @IBOutlet weak var readyButton: UIButton!
     
     var redCelebration = [#imageLiteral(resourceName: "red_celeb_frontleft"),#imageLiteral(resourceName: "red_celeb_rightback"),#imageLiteral(resourceName: "red_celeb_frontleft"),#imageLiteral(resourceName: "red_celeb_rightfront"),#imageLiteral(resourceName: "red_celeb_leftback"),#imageLiteral(resourceName: "red_celeb_rightfront")]
     var blueCelebration = [#imageLiteral(resourceName: "blue_celeb_1"),#imageLiteral(resourceName: "blue_celeb_2")]
@@ -43,12 +44,32 @@ class GameViewController: UIViewController {
             self.blueScore.text = "0"
             self.redScore.text = "Me: 0"
         }
+        
+        if gameView.gameType != GameView.orderedAutomaticSending && gameView.gameType != GameView.randomAutomaticSending {
+            readyButton.isHidden = true
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        readyButton.backgroundColor = #colorLiteral(red: 0.968627451, green: 0.307537024, blue: 0.2841172663, alpha: 1)
+        ClassroomActivityViewController.launchFromQrCode(viewController: self)
     }
     
     @IBAction func qrCodeReading(_ sender: Any) {
+        if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ScanQRCodeViewController") as? ScanQRCodeViewController {
+            if let navigator = self.navigationController {
+                navigator.pushViewController(newViewController, animated: true)
+            } else {
+                NSLog("%@", "Error trying to show Scan QR code: the view controller wasn't pushed on a navigation controller")
+            }
+        }
     }
     
     @IBAction func ready(_ sender: Any) {
+        let transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.readyPrefix)
+        transferable.optionalArgument1 = UIDevice.current.identifierForVendor!.uuidString
+        AppDelegate.wifiCommunicationSingleton?.sendData(data: transferable.getTransferableData())
+        readyButton.backgroundColor = #colorLiteral(red: 0.5843137503, green: 0.8235294223, blue: 0.4196078479, alpha: 1)
     }
     
     public func changeScore(teamOneScore: Double, teamTwoScore: Double) {
