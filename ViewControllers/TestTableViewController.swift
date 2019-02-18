@@ -1,11 +1,3 @@
-//
-//  TestTableViewController.swift
-//  Learning_Tracker_IOS
-//
-//  Created by Maxime Richard on 05.05.18.
-//  Copyright © 2018 Maxime Richard. All rights reserved.
-//
-
 import Foundation
 import UIKit
 import AVKit
@@ -27,6 +19,7 @@ class TestTableViewController: UITableViewController {
     var questionsMultipleChoice = [String: QuestionMultipleChoice]()
     var questionsShortAnswer = [String: QuestionShortAnswer]()
     var directCorrection = 0
+    var testFinished = false
     
     //store all the questions view controllers
     var questionMultipleChoiceViewControllers = [QuestionMultipleChoiceViewController]()
@@ -62,7 +55,7 @@ class TestTableViewController: UITableViewController {
         reloadTable()
 
         //send receipt to server
-        var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
+        let transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
                 optionalArgument: AppDelegate.activeTest.testID)
         AppDelegate.wifiCommunicationSingleton?.sendData(data: transferable.getTransferableData())
 
@@ -140,7 +133,10 @@ class TestTableViewController: UITableViewController {
     override func viewDidAppear(_ animated: Bool) {
         //update current test if exists
         if AppDelegate.activeTest.calculateScoreAndCheckIfOver() {
-            //test over
+            self.testFinished = true
+            questionIDs.append("0")
+            AppDelegate.activeTest.IDactive["0"] = true
+            reloadTable()
             var qualitativeEval = "none"
             if AppDelegate.activeTest.medalsInstructions.count == 3 {
                 if AppDelegate.activeTest.score >= Double(AppDelegate.activeTest.medalsInstructions[2].1) ?? 0.0
@@ -186,7 +182,6 @@ class TestTableViewController: UITableViewController {
             let fileURL = URL(fileURLWithPath: dirPath).appendingPathComponent(file)
             player = AVPlayer(url: fileURL)
             playerLayer = AVPlayerLayer(player: player)
-            let frameYCoord = self.view.bounds.origin.y
             playerLayer.frame = CGRect(x: 0, y: self.view.bounds.origin.y, width: self.view.bounds.width, height: 0)
             self.view.layer.addSublayer(playerLayer)
         } else {
@@ -304,12 +299,24 @@ class TestTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "QuestionCell", for: indexPath) as! TestTableViewCell
         
-        cell.IndexLabel?.text = String(indexPath.row + 1)
+        if !self.testFinished {
+            cell.IndexLabel?.text = String(indexPath.row + 1)
+        } else {
+            if indexPath.row != questionIDs.count - 1 {
+                cell.IndexLabel?.text = String(indexPath.row + 1)
+            } else {
+                cell.IndexLabel?.text = ""
+            }
+        }
         
         let questionMultipleChoice = questionsMultipleChoice[questionIDs[indexPath.row]]
         if questionMultipleChoice == nil {
             let questionShortAnswer = questionsShortAnswer[questionIDs[indexPath.row]]
-            cell.QuestionLabel?.text = questionShortAnswer?.question
+            if questionShortAnswer?.question == "none" {
+                cell.QuestionLabel?.text = "Overall Evaluation: " + String(AppDelegate.activeTest.score)
+            } else {
+                cell.QuestionLabel?.text = questionShortAnswer?.question
+            }
         } else {
             cell.QuestionLabel?.text = questionMultipleChoice?.question
         }
@@ -321,6 +328,13 @@ class TestTableViewController: UITableViewController {
             let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: cell.QuestionLabel.text ?? "")
             attributeString.addAttribute(NSAttributedStringKey.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
             cell.QuestionLabel.attributedText = attributeString
+            if self.testFinished {
+                if AppDelegate.activeTest.IDresults[questionIDs[indexPath.row]] ?? Float(-1.0) >= Float(100.0) {
+                    cell.QuestionLabel.textColor = #colorLiteral(red: 0.5843137503, green: 0.8235294223, blue: 0.4196078479, alpha: 1)
+                } else if  AppDelegate.activeTest.IDresults[questionIDs[indexPath.row]] ?? Float(-1.0) >= Float(0.0) {
+                    cell.QuestionLabel.textColor = #colorLiteral(red: 0.968627451, green: 0.137254902, blue: 0.04705882353, alpha: 1)
+                }
+            }
         } else {
             cell.QuestionLabel.textColor = UIColor.black
         }
