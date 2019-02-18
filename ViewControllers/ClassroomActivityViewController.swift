@@ -13,6 +13,7 @@ class ClassroomActivityViewController: UIViewController {
     static var navQuestionMultipleChoiceViewController: QuestionMultipleChoiceViewController?
     static var navQuestionShortAnswerViewController: QuestionShortAnswerViewController?
     static var navTestTableViewController: TestTableViewController?
+    static var navGameViewController: GameViewController?
 
     @IBOutlet weak var InstructionsLabel: UILabel!
     @IBOutlet weak var RestartConnectionButton: UIButton!
@@ -79,6 +80,15 @@ class ClassroomActivityViewController: UIViewController {
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "displayWebContent") as? DisplayWebContentController {
             if let navigator = navigationController {
                 newViewController.url = url
+                navigator.pushViewController(newViewController, animated: true)
+            }
+        }
+    }
+    
+    public func showGame(gameView: GameView) {
+        if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "gameViewStoryboard") as? GameViewController {
+            if let navigator = navigationController {
+                newViewController.gameView = gameView
                 navigator.pushViewController(newViewController, animated: true)
             }
         }

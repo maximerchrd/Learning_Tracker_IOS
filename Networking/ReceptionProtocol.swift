@@ -17,8 +17,24 @@ class ReceptionProtocol {
         case "TestView":
             receivedTestView(resourceData: resourceData)
             break
+        case "GameView":
+            receivedGameView(resourceData: resourceData)
+            break
         default:
             print("Received Resource Type is Unknown")
+        }
+    }
+    
+    static func receivedGameView(resourceData: [UInt8]) {
+        let decoder = JSONDecoder()
+        do {
+            let gameView = try decoder.decode(GameView.self, from: Data(bytes: resourceData))
+            DispatchQueue.main.async {
+                AppDelegate.wifiCommunicationSingleton?.classroomActivityViewController?.showGame(gameView: gameView)
+            }
+            
+        } catch let error {
+            print(error)
         }
     }
     
@@ -93,11 +109,11 @@ class ReceptionProtocol {
         var questionID:Int64 = -1
         let decoder = JSONDecoder()
         do {
-            var question = try decoder.decode(QuestionView.self, from: Data(bytes: resourceData))
+            let question = try decoder.decode(QuestionView.self, from: Data(bytes: resourceData))
             print(question)
 
             if question.type == QuestionView.multipleChoice {
-                var questionMultChoice = QuestionMultipleChoice()
+                let questionMultChoice = QuestionMultipleChoice()
                 questionMultChoice.initFromQuestionView(questionView: question)
                 questionID = questionMultChoice.id
                 if questionMultChoice.question != "error" {
@@ -105,11 +121,11 @@ class ReceptionProtocol {
                 }
                 //code for functional testing
                 if questionMultChoice.question.contains("7492qJfzdDSB") {
-                    var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.accuserReceptionPrefix)
+                    let transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.accuserReceptionPrefix)
                     AppDelegate.wifiCommunicationSingleton!.client?.send(data: transferable.getTransferableBytes())
                 }
             } else if question.type == QuestionView.shortAnswer {
-                var questionShortAnswer = QuestionShortAnswer()
+                let questionShortAnswer = QuestionShortAnswer()
                 questionShortAnswer.initFromQuestionView(questionView: question)
                 questionID = questionShortAnswer.id
                 if questionShortAnswer.question != "error" {
@@ -118,7 +134,7 @@ class ReceptionProtocol {
             }
 
             //send back a signal that we got the question
-            var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.okPrefix)
+            let transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.okPrefix)
             transferable.optionalArgument1 = UIDevice.current.identifierForVendor!.uuidString
             transferable.optionalArgument2 = String(questionID)
             AppDelegate.wifiCommunicationSingleton!.client?.send(data: transferable.getTransferableBytes())
@@ -157,6 +173,13 @@ class ReceptionProtocol {
                 break
             case ShortCommand.correction:
                 receivedCorrection(resourceData: resourceData)
+                break
+            case ShortCommand.gameScore:
+                let scoreTeamOne = Double(shortCommand.optionalArgument1) ?? 0
+                let scoreTeamTwo = Double(shortCommand.optionalArgument2) ?? 0
+                if ClassroomActivityViewController.navGameViewController != nil {
+                    ClassroomActivityViewController.navGameViewController?.changeScore(teamOneScore: scoreTeamOne, teamTwoScore: scoreTeamTwo)
+                }
                 break
             default:
                 print("Received Command is Unknown")

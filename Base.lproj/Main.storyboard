@@ -874,6 +874,78 @@ Connection</string>
             </objects>
             <point key="canvasLocation" x="2631" y="-185"/>
         </scene>
+        <!--Game View Controller-->
+        <scene sceneID="Tne-wg-gQW">
+            <objects>
+                <viewController storyboardIdentifier="gameViewStoryboard" useStoryboardIdentifierAsRestorationIdentifier="YES" id="x6U-Mj-SKm" customClass="GameViewController" customModule="Learning_Tracker_IOS" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="o47-MN-PDe">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="landscape" translatesAutoresizingMaskIntoConstraints="NO" id="bjC-So-sr0">
+                                <rect key="frame" x="0.0" y="121" width="375" height="347"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="redclimber" translatesAutoresizingMaskIntoConstraints="NO" id="ffs-YZ-4Mf">
+                                <rect key="frame" x="262" y="296" width="28" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="blueclimber" translatesAutoresizingMaskIntoConstraints="NO" id="11B-PE-TRd">
+                                <rect key="frame" x="86" y="296" width="28" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <edgeInsets key="layoutMargins" top="8" left="8" bottom="8" right="8"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="red Score" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UxP-I1-CxP">
+                                <rect key="frame" x="239" y="92" width="120" height="39"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.96862745100000003" green="0.13725490200000001" blue="0.047058823530000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J5r-oI-tu5">
+                                <rect key="frame" x="262" y="591" width="97" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="qrCodeReading:" destination="x6U-Mj-SKm" eventType="touchUpInside" id="tAp-L0-WNl"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="akL-uK-eTH">
+                                <rect key="frame" x="18" y="591" width="115" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Ready"/>
+                                <connections>
+                                    <action selector="ready:" destination="x6U-Mj-SKm" eventType="touchUpInside" id="2zX-BZ-7Ip"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="blue Score" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QAM-VP-cM0">
+                                <rect key="frame" x="18" y="92" width="120" height="39"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cL9-3g-xOX">
+                                <rect key="frame" x="169" y="163" width="36" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <viewLayoutGuide key="safeArea" id="EEf-aE-gHl"/>
+                    </view>
+                    <connections>
+                        <outlet property="backgroundImage" destination="bjC-So-sr0" id="daG-Cc-8m6"/>
+                        <outlet property="blueClimber" destination="11B-PE-TRd" id="oBX-X1-f17"/>
+                        <outlet property="blueScore" destination="QAM-VP-cM0" id="k2L-zB-Tvw"/>
+                        <outlet property="celebration" destination="cL9-3g-xOX" id="W4u-FG-EHN"/>
+                        <outlet property="redClimber" destination="ffs-YZ-4Mf" id="0bV-eE-y3m"/>
+                        <outlet property="redScore" destination="UxP-I1-CxP" id="S3d-gn-hI1"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Rca-8A-2lL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3645.5999999999999" y="-1873.313343328336"/>
+        </scene>
         <!--Practice Question Multiple Choice View Controller-->
         <scene sceneID="pZ3-gE-XjB">
             <objects>
@@ -997,14 +1069,17 @@ Connection</string>
         </scene>
     </scenes>
     <resources>
+        <image name="blueclimber" width="85" height="150"/>
         <image name="chart-icon" width="54" height="60"/>
         <image name="city-icon" width="73" height="60"/>
         <image name="class_activity" width="105" height="55"/>
         <image name="keepCalmCrown" width="600" height="600"/>
+        <image name="landscape" width="700" height="648"/>
         <image name="list-icon" width="99" height="60"/>
         <image name="play_icon" width="44" height="50"/>
         <image name="practice" width="55" height="55"/>
         <image name="qrImage" width="80" height="79"/>
+        <image name="redclimber" width="85" height="150"/>
         <image name="results" width="55" height="55"/>
         <image name="settings" width="55" height="55"/>
         <image name="stop_icon" width="50" height="50"/>
