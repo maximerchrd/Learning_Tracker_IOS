@@ -51,6 +51,16 @@ class GameViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to question", comment: "Back to question button") + " >", style: .plain, target: self, action: #selector(goBackToQuestionMultChoice))
+        } else if ClassroomActivityViewController.navQuestionShortAnswerViewController != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to question", comment: "Back to question button") + " >", style: .plain, target: self, action: #selector(goBackToQuestionShortAnswer))
+        } else if ClassroomActivityViewController.navTestTableViewController != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to test", comment: "Back to test button") + " >", style: .plain, target: self, action: #selector(goBackToTest))
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
+        
         readyButton.backgroundColor = #colorLiteral(red: 0.968627451, green: 0.307537024, blue: 0.2841172663, alpha: 1)
         ClassroomActivityViewController.launchFromQrCode(viewController: self)
     }
@@ -107,6 +117,42 @@ class GameViewController: UIViewController {
             } else {
                 self.blueScore.text = String(teamOneScore)
                 self.redScore.text = "Me: " + String(teamTwoScore)
+            }
+        }
+    }
+    
+    @objc func goBackToQuestionMultChoice() {
+        if let navigator = navigationController {
+            if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
+                navigator.pushViewController(ClassroomActivityViewController.navQuestionMultipleChoiceViewController!, animated: true)
+            } else {
+                let error = "Problem going back to question MC: View Controller is unexpectedly nil"
+                print(error)
+                DbTableLogs.insertLog(log: error)
+            }
+        }
+    }
+    
+    @objc func goBackToQuestionShortAnswer() {
+        if let navigator = navigationController {
+            if ClassroomActivityViewController.navQuestionShortAnswerViewController != nil {
+                navigator.pushViewController(ClassroomActivityViewController.navQuestionShortAnswerViewController!, animated: true)
+            } else {
+                let error = "Problem going back to SHRTAQ: View Controller is unexpectedly nil"
+                print(error)
+                DbTableLogs.insertLog(log: error)
+            }
+        }
+    }
+    
+    @objc func goBackToTest() {
+        if let navigator = navigationController {
+            if ClassroomActivityViewController.navTestTableViewController != nil {
+                navigator.pushViewController(ClassroomActivityViewController.navTestTableViewController!, animated: true)
+            } else {
+                let error = "Problem going back to TEST: View Controller is unexpectedly nil"
+                print(error)
+                DbTableLogs.insertLog(log: error)
             }
         }
     }

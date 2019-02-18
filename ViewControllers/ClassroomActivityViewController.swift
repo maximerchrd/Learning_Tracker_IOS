@@ -14,6 +14,8 @@ class ClassroomActivityViewController: UIViewController {
     static var navQuestionShortAnswerViewController: QuestionShortAnswerViewController?
     static var navTestTableViewController: TestTableViewController?
     static var navGameViewController: GameViewController?
+    
+    static var classroomActivityIsVisible = false
 
     @IBOutlet weak var InstructionsLabel: UILabel!
     @IBOutlet weak var RestartConnectionButton: UIButton!
@@ -32,7 +34,9 @@ class ClassroomActivityViewController: UIViewController {
     }
 
     public func showMultipleChoiceQuestion(question: QuestionMultipleChoice, isCorr: Bool, directCorrection: Int = 0) {
-        // Safe Push VC
+        if ClassroomActivityViewController.classroomActivityIsVisible {
+            ClassroomActivityViewController.navGameViewController = nil
+        }
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionMultipleChoiceViewController") as? QuestionMultipleChoiceViewController {
             if let navigator = self.navigationController {
                 newViewController.questionMultipleChoice = question
@@ -46,7 +50,9 @@ class ClassroomActivityViewController: UIViewController {
     }
 
     public func showShortAnswerQuestion(question: QuestionShortAnswer, isCorr: Bool, directCorrection: Int = 0) {
-        // Safe Push VC
+        if ClassroomActivityViewController.classroomActivityIsVisible {
+            ClassroomActivityViewController.navGameViewController = nil
+        }
         if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "QuestionShortAnswerViewController") as? QuestionShortAnswerViewController {
             if let navigator = navigationController {
                 newViewController.questionShortAnswer = question
@@ -60,6 +66,9 @@ class ClassroomActivityViewController: UIViewController {
     }
 
     public func showTest(test: Test, directCorrection: Int = 0, testMode: Int = 0) {
+        if ClassroomActivityViewController.classroomActivityIsVisible {
+            ClassroomActivityViewController.navGameViewController = nil
+        }
         if test.testMap.count > 0 {
             if let newViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "testTable") as? TestTableViewController {
                 AppDelegate.activeTest = test
@@ -68,7 +77,6 @@ class ClassroomActivityViewController: UIViewController {
                     navigator.pushViewController(newViewController, animated: true)
                 }
             }
-
         } else {
             let error = "Problem trying to display test: no question ID received"
             print(error)
@@ -90,6 +98,18 @@ class ClassroomActivityViewController: UIViewController {
             if let navigator = navigationController {
                 newViewController.gameView = gameView
                 navigator.pushViewController(newViewController, animated: true)
+            }
+        }
+    }
+    
+    @objc func goBackToGame() {
+        if let navigator = navigationController {
+            if ClassroomActivityViewController.navGameViewController != nil {
+                navigator.pushViewController(ClassroomActivityViewController.navGameViewController!, animated: true)
+            } else {
+                let error = "Problem going back to question MC: View Controller is unexpectedly nil"
+                print(error)
+                DbTableLogs.insertLog(log: error)
             }
         }
     }
@@ -175,7 +195,9 @@ class ClassroomActivityViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
+        if ClassroomActivityViewController.navGameViewController != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to game", comment: "Back to game button") + " >", style: .plain, target: self, action: #selector(goBackToGame))
+        } else if ClassroomActivityViewController.navQuestionMultipleChoiceViewController != nil {
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to question", comment: "Back to question button") + " >", style: .plain, target: self, action: #selector(goBackToQuestionMultChoice))
         } else if ClassroomActivityViewController.navQuestionShortAnswerViewController != nil {
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Back to question", comment: "Back to question button") + " >", style: .plain, target: self, action: #selector(goBackToQuestionShortAnswer))
@@ -197,6 +219,8 @@ class ClassroomActivityViewController: UIViewController {
         }
 
         ClassroomActivityViewController.launchFromQrCode(viewController: self)
+        
+        ClassroomActivityViewController.classroomActivityIsVisible = true
     }
     
     static func launchFromQrCode(viewController: UIViewController) {
@@ -284,6 +308,8 @@ class ClassroomActivityViewController: UIViewController {
                 timerLabel.text = ""
             }
         }
+        
+        ClassroomActivityViewController.classroomActivityIsVisible = false
     }
 
     override func didReceiveMemoryWarning() {
