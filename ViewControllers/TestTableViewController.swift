@@ -90,7 +90,9 @@ class TestTableViewController: UITableViewController {
         seconds += 1
         let sec = seconds % 60
         let min: Int = seconds / 60
-        timerLabel.text = String(format: "%02d", min) + ":" + String(format: "%02d", sec)
+        if timerLabel.text != " " {
+            timerLabel.text = String(format: "%02d", min) + ":" + String(format: "%02d", sec)
+        }
     }
     
     @IBAction func playPause(_ sender: Any) {
@@ -131,6 +133,11 @@ class TestTableViewController: UITableViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
+        //reenable the timer
+        if timerLabel.text == " " {
+            timerLabel.text = ""
+        }
+        
         //update current test if exists
         if AppDelegate.activeTest.calculateScoreAndCheckIfOver() {
             self.testFinished = true
@@ -195,7 +202,7 @@ class TestTableViewController: UITableViewController {
         ClassroomActivityViewController.navQuestionShortAnswerViewController = nil
         ClassroomActivityViewController.navQuestionMultipleChoiceViewController = nil
         if goingBack {
-            timerLabel.text = ""
+            timerLabel.text = " "
         }
 
         //stop media player

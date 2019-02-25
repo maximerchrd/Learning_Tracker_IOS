@@ -212,9 +212,15 @@ class ReceptionProtocol {
     }
 
     static func receivedQuestionIdentifier(resourceData: [UInt8]) {
+        //remove timerLabel if we had a test with timer before (otherwise, will overlap)
+        DispatchQueue.main.async {
+            timer.invalidate()
+            timerLabel.removeFromSuperview()
+        }
+        
         let decoder = JSONDecoder()
         do {
-            var questionIdentifier = try decoder.decode(QuestionIdentifier.self, from: Data(bytes: resourceData))
+            let questionIdentifier = try decoder.decode(QuestionIdentifier.self, from: Data(bytes: resourceData))
 
             DispatchQueue.main.async {
                 var questionMultipleChoice = QuestionMultipleChoice()
