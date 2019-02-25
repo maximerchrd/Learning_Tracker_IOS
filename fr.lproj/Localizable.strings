@@ -17,6 +17,8 @@
 
 "All tests" = "Tous les tests";
 
+"Test:" = "Test:";
+
 "Subject: " = "Sujet: ";
 
 "Evaluation for each learning objective" = "Evaluation pour chaque objectif d'apprentissage";
@@ -64,3 +66,7 @@
 "We are not connected :-(" = "Nous ne sommes pas connectés :-(";
 
 "Back to game" = "Retour au Jeu";
+
+"Right Answer(s)" = "Réponse(s) Correcte(s)";
+
+"Wrong Option(s)" = "Réponse(s) Incorrecte(s)";

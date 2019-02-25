@@ -16,6 +16,7 @@ class QuestionMultipleChoice {
     var Objectives = [String]()
     var timerSeconds = 0
     var hashCode = ""
+    var modifDate = ""
 
     func initFromQuestionView (questionView: QuestionView) {
         self.id = Int64(questionView.id) ?? 0

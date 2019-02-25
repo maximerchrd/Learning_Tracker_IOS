@@ -45,6 +45,14 @@ struct TransferPrefix {
             return ""
         }
     }
+    
+    public static func getWholeObjectName(prefix: String) -> String {
+        if (prefix.components(separatedBy: TransferPrefix.delimiter).count >= 3) {
+            return prefix.components(separatedBy: TransferPrefix.delimiter)[1]
+        } else {
+            return ""
+        }
+    }
 
     public static func isResource(prefix: String) -> Bool {
         return (prefix.components(separatedBy: TransferPrefix.delimiter)[0] == TransferPrefix.resource)

@@ -29,6 +29,7 @@ class DbTableQuestionMultipleChoice {
     static let KEY_IMAGE_PATH = "IMAGE_PATH"
     static let KEY_ID_GLOBAL = "ID_GLOBAL"
     static let KEY_TIMER_SECONDS = "TIMER_SECONDS"
+    static let KEY_MODIF_DATE = "MODIF_DATE"
     
 
     static var DBPath = "NoPATH"
@@ -56,6 +57,7 @@ class DbTableQuestionMultipleChoice {
                 t.column(KEY_IMAGE_PATH, .text).notNull()
                 t.column(KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .replace)
                 t.column(KEY_TIMER_SECONDS, .integer)
+                t.column(KEY_MODIF_DATE, .text)
             }
         }
     }
@@ -170,7 +172,8 @@ class QuestionMultipleChoiceRecord : Record {
         questionMultipleChoice.NbCorrectAnswers = row[DbTableQuestionMultipleChoice.KEY_NB_CORRECT_ANS]
         questionMultipleChoice.image = row[DbTableQuestionMultipleChoice.KEY_IMAGE_PATH]
         questionMultipleChoice.id = row[DbTableQuestionMultipleChoice.KEY_ID_GLOBAL]
-        questionMultipleChoice.timerSeconds = row[DbTableQuestionShortAnswer.KEY_TIMER_SECONDS]
+        questionMultipleChoice.timerSeconds = row[DbTableQuestionMultipleChoice.KEY_TIMER_SECONDS]
+        questionMultipleChoice.modifDate = row[DbTableQuestionMultipleChoice.KEY_MODIF_DATE]
         super.init()
     }
     
@@ -196,7 +199,8 @@ class QuestionMultipleChoiceRecord : Record {
         container[DbTableQuestionMultipleChoice.KEY_NB_CORRECT_ANS] = questionMultipleChoice.NbCorrectAnswers
         container[DbTableQuestionMultipleChoice.KEY_IMAGE_PATH] = questionMultipleChoice.image
         container[DbTableQuestionMultipleChoice.KEY_ID_GLOBAL] = questionMultipleChoice.id
-        container[DbTableQuestionShortAnswer.KEY_TIMER_SECONDS] = questionMultipleChoice.timerSeconds
+        container[DbTableQuestionMultipleChoice.KEY_TIMER_SECONDS] = questionMultipleChoice.timerSeconds
+        container[DbTableQuestionMultipleChoice.KEY_MODIF_DATE] = questionMultipleChoice.modifDate
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

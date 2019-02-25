@@ -17,6 +17,8 @@
 
 "All tests" = "Բոլոր թեստերը";
 
+"Test:" = "Թեստ.";
+
 "Subject: " = "Առարկա: ";
 
 "Evaluation for each learning objective" = "Յուրաքանչյուր առարկայի գնահատումը";
@@ -62,3 +64,7 @@
 "We had a problem receiving some data. Try to reconnect." = "Որոշ տվյալների ստացման խնդիր ունենք, կրկին փորձեք";
 
 "Please change the user name in \"Settings\" before starting the classroom activity" = "Խնդրում եմ փոխել Ձեր անունը մինչև սկսելը";
+
+"Right Answer(s)" = "Ճիշտ պատասխան (ներ)";
+
+"Wrong Option(s)" = "Սխալ տարբերակ (ներ)";

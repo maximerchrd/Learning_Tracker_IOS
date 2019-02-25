@@ -17,6 +17,8 @@
 
 "All tests" = "All Tests";
 
+"Test:" = "Test:";
+
 "Subject: " = "Subject: ";
 
 "Evaluation for each learning objective" = "Evaluation for each learning objective";
@@ -66,3 +68,7 @@
 "We are not connected :-(" = "We are not connected :-(";
 
 "Back to game" = "Go back to Game";
+
+"Right Answer(s)" = "Right Answer(s)";
+
+"Wrong Option(s)" = "Wrong Option(s)";

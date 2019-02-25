@@ -160,7 +160,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                 }
                 print(prefix)
 
-                var objectName = TransferPrefix.getObjectName(prefix: prefix)
+                let objectName = TransferPrefix.getObjectName(prefix: prefix)
                 let dataSize = TransferPrefix.getSize(prefix: prefix)
 
                 if TransferPrefix.isResource(prefix: prefix) {
@@ -171,7 +171,8 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
                     ReceptionProtocol.receivedStateUpdate(dataSize: dataSize, objectName: objectName, resourceData: resourceData)
                 } else if TransferPrefix.isFile(prefix: prefix) {
                     let resourceData = self.readDataIntoArray(expectedSize: dataSize)
-                    ReceptionProtocol.receivedFile(fileSize: dataSize, objectName: objectName, resourceData: resourceData)
+                    let wholeObjectName = TransferPrefix.getWholeObjectName(prefix: prefix)
+                    ReceptionProtocol.receivedFile(fileSize: dataSize, objectName: wholeObjectName, resourceData: resourceData)
                 } else if TransferPrefix.isOther(prefix: prefix) {
                     let resourceData = self.readDataIntoArray(expectedSize: dataSize)
                     print("Received 'Other' Type of Data but it's not yet supported")

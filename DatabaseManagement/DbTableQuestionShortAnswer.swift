@@ -10,6 +10,7 @@ class DbTableQuestionShortAnswer {
     static let KEY_ID_GLOBAL = "ID_GLOBAL"
     static let KEY_TIMER_SECONDS = "TIMER_SECONDS"
     static let KEY_HASH = "HASH_CODE"
+    static let KEY_MODIF_DATE = "MODIF_DATE"
     
     
     static var DBPath = "NoPATH"
@@ -26,6 +27,7 @@ class DbTableQuestionShortAnswer {
                 t.column(KEY_ID_GLOBAL, .integer).notNull().unique(onConflict: .replace)
                 t.column(KEY_TIMER_SECONDS, .integer)
                 t.column(KEY_HASH, .text).notNull()
+                t.column(KEY_MODIF_DATE, .text)
             }
         }
     }
@@ -56,7 +58,6 @@ class DbTableQuestionShortAnswer {
         var questionShortAnswerToReturn = QuestionShortAnswer()
         var optionsArray = [String]()
         var questionShortAnswerRec = QuestionShortAnswerRecord(questionShortAnswerArg: questionShortAnswerToReturn)
-        var answerOptionRecord = [AnswerOptionRecord]()
         do {
             let dbQueue = try DatabaseQueue(path: DBPath)
             try dbQueue.read { db in
@@ -141,6 +142,7 @@ class QuestionShortAnswerRecord : Record {
         questionShortAnswer.id = row[DbTableQuestionShortAnswer.KEY_ID_GLOBAL]
         questionShortAnswer.timerSeconds = row[DbTableQuestionShortAnswer.KEY_TIMER_SECONDS]
         questionShortAnswer.hashCode = row[DbTableQuestionShortAnswer.KEY_HASH]
+        questionShortAnswer.modifDate = row[DbTableQuestionShortAnswer.KEY_MODIF_DATE]
         super.init()
     }
     
@@ -156,6 +158,7 @@ class QuestionShortAnswerRecord : Record {
         container[DbTableQuestionShortAnswer.KEY_ID_GLOBAL] = questionShortAnswer.id
         container[DbTableQuestionShortAnswer.KEY_TIMER_SECONDS] = questionShortAnswer.timerSeconds
         container[DbTableQuestionShortAnswer.KEY_HASH] = questionShortAnswer.hashCode
+        container[DbTableQuestionShortAnswer.KEY_MODIF_DATE] = questionShortAnswer.modifDate
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

@@ -1,11 +1,3 @@
-//
-//  DbTableIndividualQuestionForStudentResult.swift
-//  Learning_Tracker_IOS
-//
-//  Created by Maxime Richard on 27.02.18.
-//  Copyright © 2018 Maxime Richard. All rights reserved.
-//
-
 import Foundation
 import GRDB
 
@@ -13,6 +5,8 @@ class DbTableIndividualQuestionForResult {
     static let TABLE_NAME = "individual_question_for_result"
     static let KEY_ID = "id"
     static let KEY_ID_GLOBAL = "ID_GLOBAL"
+    static let KEY_TYPE1 = "TYPE1"      //0: Question Multiple Choice; 1: Question Short Answer; 2: ObjectiveTransferable, 3: test
+    static let KEY_TYPE2 = "TYPE2"      //0: Classroom activity; 1: homework not synced; 2: homework synced; 3: free practice
     static let KEY_DATE = "DATE"
     static let KEY_ANSWERS = "ANSWERS"
     static let KEY_TIME_FOR_SOLVING = "TIME_FOR_SOLVING"
@@ -22,7 +16,6 @@ class DbTableIndividualQuestionForResult {
     static let KEY_QUALITATIVE_EVAL = "QUALITATIVE_EVAL"
     static let KEY_TEST_BELONGING = "TEST_BELONGING"
     static let KEY_WEIGHTS_OF_ANSWERS = "WEIGHTS_OF_ANSWERS"
-    static let KEY_TYPE = "TYPE"        //0: Question Multiple Choice; 1: Question Short Answer; 2: Objective, 3: Test
     static var DBPath = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -32,6 +25,8 @@ class DbTableIndividualQuestionForResult {
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_ID, .integer).primaryKey()
                 t.column(KEY_ID_GLOBAL, .integer).notNull()
+                t.column(KEY_TYPE1, .integer)
+                t.column(KEY_TYPE2, .integer)
                 t.column(KEY_DATE, .text).notNull()
                 t.column(KEY_ANSWERS, .text).notNull()
                 t.column(KEY_TIME_FOR_SOLVING, .text).notNull()
@@ -41,7 +36,6 @@ class DbTableIndividualQuestionForResult {
                 t.column(KEY_QUALITATIVE_EVAL, .text).notNull()
                 t.column(KEY_TEST_BELONGING, .text).notNull()
                 t.column(KEY_WEIGHTS_OF_ANSWERS, .text).notNull()
-                t.column(KEY_TYPE, .integer)
             }
         }
     }
@@ -115,13 +109,13 @@ class DbTableIndividualQuestionForResult {
             var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request)
             for i in 0..<resultRecord.count {
                 results.append([String]())
-                if resultRecord[i].type == 3 {
+                if resultRecord[i].type1 == 3 {
                     results[i].append(resultRecord[i].testBelonging)
                     results[i].append(resultRecord[i].answers)
                     results[i].append(String(resultRecord[i].quantitativeEval))
                     results[i].append(resultRecord[i].date)
                     results[i].append(resultRecord[i].qualitativeEval + ".png")
-                    results[i].append(String(resultRecord[i].type))
+                    results[i].append(String(resultRecord[i].type1))
                 } else {
                     let questionMultipleChoice = try DbTableQuestionMultipleChoice.retrieveQuestionMultipleChoiceWithID(globalID: resultRecord[i].idGlobal)
                     var questionShortAnswer: QuestionShortAnswer?
@@ -163,7 +157,7 @@ class DbTableIndividualQuestionForResult {
         var resultsForEachObjective = [[String]]()
         
         try dbQueue.read { db in
-            let request = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_TYPE + " = ? AND " + KEY_TEST_BELONGING + " = ?"
+            let request = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_TYPE1 + " = ? AND " + KEY_TEST_BELONGING + " = ?"
             
             var resultRecord = try IndividualQuestionForResultRecord.fetchAll(db, request, arguments: [2, test])
             for i in 0..<resultRecord.count {
@@ -199,6 +193,8 @@ class DbTableIndividualQuestionForResult {
 class IndividualQuestionForResultRecord : Record {
     var id: Int64?
     var idGlobal: Int64
+    var type1: Int
+    var type2: Int
     var date: String
     var answers: String
     var timeForSolving: String
@@ -208,10 +204,11 @@ class IndividualQuestionForResultRecord : Record {
     var qualitativeEval: String
     var testBelonging: String
     var weightsOfAnswers: String
-    var type: Int
     
     init(idGlobal: Int64, date: String, answers: String, timeForSolving: String, questionWeight: Double, evalType: String, quantitativeEval: String, qualitativeEval: String, testBelonging: String, weightsOfAnswers: String, type: Int = -1) {
         self.idGlobal = idGlobal
+        self.type1 = type
+        self.type2 = -1
         self.date = date
         self.answers = answers
         self.timeForSolving = timeForSolving
@@ -221,13 +218,14 @@ class IndividualQuestionForResultRecord : Record {
         self.qualitativeEval = qualitativeEval
         self.testBelonging = testBelonging
         self.weightsOfAnswers = weightsOfAnswers
-        self.type = type
         super.init()
     }
     
     required init(row: Row) {
         self.id = row[DbTableIndividualQuestionForResult.KEY_ID]
         self.idGlobal = row[DbTableIndividualQuestionForResult.KEY_ID_GLOBAL]
+        self.type1 = row[DbTableIndividualQuestionForResult.KEY_TYPE1]
+        self.type2 = row[DbTableIndividualQuestionForResult.KEY_TYPE2]
         self.date = row[DbTableIndividualQuestionForResult.KEY_DATE]
         self.answers = row[DbTableIndividualQuestionForResult.KEY_ANSWERS]
         self.timeForSolving = row[DbTableIndividualQuestionForResult.KEY_TIME_FOR_SOLVING]
@@ -237,7 +235,6 @@ class IndividualQuestionForResultRecord : Record {
         self.qualitativeEval = row[DbTableIndividualQuestionForResult.KEY_QUALITATIVE_EVAL]
         self.testBelonging = row[DbTableIndividualQuestionForResult.KEY_TEST_BELONGING]
         self.weightsOfAnswers = row[DbTableIndividualQuestionForResult.KEY_WEIGHTS_OF_ANSWERS]
-        self.type = row[DbTableIndividualQuestionForResult.KEY_TYPE]
         super.init()
     }
     
@@ -248,6 +245,8 @@ class IndividualQuestionForResultRecord : Record {
     override func encode(to container: inout PersistenceContainer) {
         container[DbTableIndividualQuestionForResult.KEY_ID] = id
         container[DbTableIndividualQuestionForResult.KEY_ID_GLOBAL] = idGlobal
+        container[DbTableIndividualQuestionForResult.KEY_TYPE1] = type1
+        container[DbTableIndividualQuestionForResult.KEY_TYPE2] = type2
         container[DbTableIndividualQuestionForResult.KEY_DATE] = date
         container[DbTableIndividualQuestionForResult.KEY_ANSWERS] = answers
         container[DbTableIndividualQuestionForResult.KEY_TIME_FOR_SOLVING] = timeForSolving
@@ -257,7 +256,6 @@ class IndividualQuestionForResultRecord : Record {
         container[DbTableIndividualQuestionForResult.KEY_QUALITATIVE_EVAL] = qualitativeEval
         container[DbTableIndividualQuestionForResult.KEY_TEST_BELONGING] = testBelonging
         container[DbTableIndividualQuestionForResult.KEY_WEIGHTS_OF_ANSWERS] = weightsOfAnswers
-        container[DbTableIndividualQuestionForResult.KEY_TYPE] = type
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

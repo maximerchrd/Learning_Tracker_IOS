@@ -316,8 +316,10 @@ class ReceptionProtocol {
             }
             
             //send back a signal that we got the question
-            let accuseReception = "OK:" + UIDevice.current.identifierForVendor!.uuidString + "///" + objectName + "///"
-            AppDelegate.wifiCommunicationSingleton!.client?.send(data: accuseReception.data(using: .utf8)!)
+            let transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.okPrefix)
+            transferable.optionalArgument1 = UIDevice.current.identifierForVendor!.uuidString
+            transferable.optionalArgument2 = objectName
+            AppDelegate.wifiCommunicationSingleton!.client?.send(data: transferable.getTransferableBytes())
         } else {
             let errorMessage = "\n expected fileSize: " + String(fileSize) + "; actual fileSize: " + String(resourceData.count)
             print(errorMessage)
