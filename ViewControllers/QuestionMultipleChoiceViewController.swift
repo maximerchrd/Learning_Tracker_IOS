@@ -9,27 +9,13 @@
 import Foundation
 import UIKit
 
-class QuestionMultipleChoiceViewController: UIViewController {
+class QuestionMultipleChoiceViewController: UITableViewController {
     var isSyncTest: Bool
     var isCorrection: Bool
     var questionMultipleChoice: QuestionMultipleChoice
-    var screenHeight: Float
-    var screenWidth: Float
-    var imageMagnified = false
-    var originaImageWidth:CGFloat = 0
-    var originalImageHeight:CGFloat = 0
-    var originalImageX:CGFloat = 0
-    var originalImageY:CGFloat = 0
-    var newImageWidth:Float = 0
-    var newImageHeight:Float = 0
-    var newImageX:Float = 0
+
     var checkBoxArray: [CheckBox]
     var stackView: UIStackView!
-    var scrollViewWidth: CGFloat
-    var scrollViewHeight: CGFloat
-    var scrollViewX: CGFloat
-    var scrollViewY: CGFloat
-    var scrollPosition: CGFloat
     var directCorrection = 0
     var isBackButton = true
     var startTime: TimeInterval = 0.0
@@ -37,19 +23,16 @@ class QuestionMultipleChoiceViewController: UIViewController {
     
     @IBOutlet weak var QuestionTextView: UITextView!
     @IBOutlet weak var PictureView: UIImageView!
-    @IBOutlet weak var OptionsScrollView: UIScrollView!
     @IBOutlet weak var SubmitButton: UIButton!
+    @IBOutlet weak var OptionsView: UIView!
+    @IBOutlet weak var QuestionCell: UITableViewCell!
+    @IBOutlet weak var ImageCell: UITableViewCell!
+    @IBOutlet weak var OptionsCell: UITableViewCell!
+    @IBOutlet weak var ButtonCell: UITableViewCell!
     
     required init?(coder aDecoder: NSCoder) {
         questionMultipleChoice = QuestionMultipleChoice()
-        screenHeight = 0
-        screenWidth = 0
         checkBoxArray = [CheckBox]()
-        scrollViewWidth = 0
-        scrollViewHeight = 0
-        scrollViewX = 0
-        scrollViewY = 0
-        scrollPosition = 0
         isCorrection = false
         isSyncTest = false
         super.init(coder: aDecoder)
@@ -57,104 +40,25 @@ class QuestionMultipleChoiceViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        let screenSize = UIScreen.main.bounds
-        screenWidth = Float(screenSize.width)
-        screenHeight = Float(screenSize.height)
         
         // Set question text
         QuestionTextView.text = questionMultipleChoice.question
-        QuestionTextView.isEditable = false
         QuestionTextView.sizeToFit()
+        print("questionTextView height: " + String(describing: QuestionTextView.frame.height))
         
         
         // Display picture
-        let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory
-        let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
-        let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
-        if let dirPath          = paths.first {
-            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.image)
-            PictureView.image    = UIImage(contentsOfFile: imageURL.path)
-        }
-        //get the answer options to adapt the size of the imageview
-        questionMultipleChoice = QuestionsTools.removeEmptyOptions(question: questionMultipleChoice)
-        var optionsArray = questionMultipleChoice.options
-        originaImageWidth = PictureView.frame.width
-        originalImageHeight = PictureView.frame.height
-        originalImageX = PictureView.frame.minX
-        originalImageY = PictureView.frame.minY
-        newImageWidth = screenWidth
-        newImageHeight = Float(originalImageHeight) / Float(originaImageWidth) * screenWidth
-        newImageX = 0
-        
-        // DISPLAY OPTIONS
-        //First implements stackview inside scrollview
-        scrollViewWidth = OptionsScrollView.frame.size.width
-        scrollViewHeight = OptionsScrollView.frame.size.height
-        scrollViewX = OptionsScrollView.frame.minX
-        scrollViewY = OptionsScrollView.frame.minY
-        OptionsScrollView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(OptionsScrollView)
-        
-        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[OptionsScrollView]|", options: .alignAllCenterX, metrics: nil, views: ["OptionsScrollView": OptionsScrollView]))
-        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[OptionsScrollView]|", options: .alignAllCenterX, metrics: nil, views: ["OptionsScrollView": OptionsScrollView]))
-        
-        
-        stackView = UIStackView()
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.axis = .vertical
-        OptionsScrollView.addSubview(stackView)
-        
-        OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[stackView]|", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
-        OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stackView]", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
-        
-        if !isCorrection {
-            optionsArray = shuffle(arrayArg: optionsArray)
-        }
-        var i = 1
-        for singleOption in optionsArray {
-            let checkBox = CheckBox()
-            checkBox.isChecked = false
-            if isCorrection {
-                if i <= questionMultipleChoice.NbCorrectAnswers {
-                    checkBox.isChecked = true
-                }
-                checkBox.isEnabled = false
+        if questionMultipleChoice.image != "none" {
+            let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory
+            let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
+            let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
+            if let dirPath          = paths.first {
+                let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.image)
+                PictureView.image    = UIImage(contentsOfFile: imageURL.path)
             }
-            checkBox.setTitle(singleOption, for: .normal)
-            checkBox.addTarget(checkBox, action: #selector(checkBox.buttonClicked(sender:)), for: .touchUpInside)
-            checkBox.setTitleColor(.black, for: .normal)
-            checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-            checkBox.widthAnchor.constraint(equalToConstant: scrollViewWidth - checkBox.checkedImage.size.width * 1.3).isActive = true
-            checkBox.contentEdgeInsets = UIEdgeInsetsMake(0,10,0,0)
-            
-            //make some tweaks to put more space above and below longer answer options
-            var factorAccordingTextLength = 1
-            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-                factorAccordingTextLength = Int(((checkBox.titleLabel?.text?.count) ?? 200) / 200)
-            } else {
-                factorAccordingTextLength = Int(((checkBox.titleLabel?.text?.count) ?? 75) / 75)
-            }
-            for _ in 0..<factorAccordingTextLength {
-                let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
-                ghostButton.setTitle(" ", for: .normal)
-                ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
-                stackView.addArrangedSubview(ghostButton)
-            }
-            stackView.addArrangedSubview(checkBox)
-            for _ in 0..<factorAccordingTextLength {
-                let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
-                ghostButton.setTitle(" ", for: .normal)
-                ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
-                stackView.addArrangedSubview(ghostButton)
-            }
-            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-                stackView.spacing = checkBox.checkedImage.size.height * 0.5
-            } else {
-                stackView.spacing = checkBox.checkedImage.size.height * 1.7
-            }
-            checkBoxArray.append(checkBox)
-            i = i + 1
+        } else {
+            PictureView.frame = CGRect(x: 0, y:0, width: 0, height: 0)
+            ImageCell.isHidden = true
         }
         
         if isCorrection {
@@ -162,7 +66,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         }
 
         //send receipt to server
-        var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
+        let transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
                 optionalArgument: String(questionMultipleChoice.id))
         AppDelegate.wifiCommunicationSingleton?.sendData(data: transferable.getTransferableData())
 
@@ -194,12 +98,76 @@ class QuestionMultipleChoiceViewController: UIViewController {
                 }
             }
         }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        //get the answer options to adapt the size of the imageview
+        questionMultipleChoice = QuestionsTools.removeEmptyOptions(question: questionMultipleChoice)
+        var optionsArray = questionMultipleChoice.options
+        
+        // DISPLAY OPTIONS
+        //First implements stackview inside scrollview
+        stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        OptionsView.addSubview(stackView)
+        
+        if !isCorrection {
+            optionsArray = shuffle(arrayArg: optionsArray)
+        }
+        var i = 1
+        for singleOption in optionsArray {
+            let checkBox = CheckBox()
+            checkBox.isChecked = false
+            if isCorrection {
+                if i <= questionMultipleChoice.NbCorrectAnswers {
+                    checkBox.isChecked = true
+                }
+                checkBox.isEnabled = false
+            }
+            checkBox.setTitle(singleOption, for: .normal)
+            checkBox.addTarget(checkBox, action: #selector(checkBox.buttonClicked(sender:)), for: .touchUpInside)
+            checkBox.setTitleColor(.black, for: .normal)
+            checkBox.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+            checkBox.widthAnchor.constraint(equalToConstant: OptionsView.frame.width - checkBox.checkedImage.size.width * 1).isActive = true
+            checkBox.contentEdgeInsets = UIEdgeInsetsMake(0,OptionsView.frame.width / 30,0,0)
+            
+            //make some tweaks to put more space above and below longer answer options
+            var factorAccordingTextLength = 1
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                factorAccordingTextLength = Int(((checkBox.titleLabel?.text?.count) ?? 200) / 200)
+            } else {
+                factorAccordingTextLength = Int(((checkBox.titleLabel?.text?.count) ?? 75) / 75)
+            }
+            for _ in 0..<factorAccordingTextLength {
+                let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
+                ghostButton.setTitle(" ", for: .normal)
+                ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
+                stackView.addArrangedSubview(ghostButton)
+            }
+            stackView.addArrangedSubview(checkBox)
+            for _ in 0..<factorAccordingTextLength {
+                let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 2))
+                ghostButton.setTitle(" ", for: .normal)
+                ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
+                stackView.addArrangedSubview(ghostButton)
+            }
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                stackView.spacing = checkBox.checkedImage.size.height * 0.5
+            } else {
+                stackView.spacing = checkBox.checkedImage.size.height * 1.7
+            }
+            checkBoxArray.append(checkBox)
+            i = i + 1
+        }
         
         /**
          * START CODE USED FOR TESTING
          */
         if questionMultipleChoice.question.contains("*ç%&") {
-             AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answers: [optionsArray[0]], answer: optionsArray[0], globalID: questionMultipleChoice.id, questionType: "ANSW0", timeSpent: 2.63)
+            AppDelegate.wifiCommunicationSingleton?.sendAnswerToServer(answers: [optionsArray[0]], answer: optionsArray[0], globalID: questionMultipleChoice.id, questionType: "ANSW0", timeSpent: 2.63)
             if let navController = self.navigationController {
                 //set cached view controller to nil to prevent students answering several times to same question
                 isBackButton = false
@@ -212,14 +180,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
         /**
          * END CODE USED FOR TESTING
          */
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         
         //set scrolling size
-        OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
-        OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)
+        /*OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
+        OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)*/
 
         if SubmitButton.isEnabled {
             self.firstLabel.isHidden = false
@@ -228,14 +192,14 @@ class QuestionMultipleChoiceViewController: UIViewController {
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        scrollPosition = OptionsScrollView.contentOffset.y
+        //scrollPosition = OptionsScrollView.contentOffset.y
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
+        /*OptionsScrollView.frame = CGRect(x: scrollViewX, y: scrollViewY, width: scrollViewWidth, height: scrollViewHeight)
         OptionsScrollView.contentSize = CGSize(width: stackView.frame.width, height: stackView.frame.height)
         OptionsScrollView.contentOffset.y = scrollPosition
-        OptionsScrollView.flashScrollIndicators()
+        OptionsScrollView.flashScrollIndicators()*/
     }
     override func viewWillDisappear(_ animated: Bool) {
         if isBackButton {
@@ -259,20 +223,10 @@ class QuestionMultipleChoiceViewController: UIViewController {
         return array
     }
     
-    @IBAction func imageTouched(_ sender: Any) {
-        if imageMagnified {
-            PictureView.frame = CGRect(x: originalImageX, y: originalImageY, width: originaImageWidth, height: originalImageHeight)
-            imageMagnified = false
-        } else {
-            PictureView.frame = CGRect(x: CGFloat(newImageX), y: originalImageY, width: CGFloat(newImageWidth), height: CGFloat(newImageHeight))
-            self.view.bringSubview(toFront: PictureView)
-            imageMagnified = true
-        }
-    }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
         //stop timer
-        var timeInterval = Date.timeIntervalSinceReferenceDate - (startTime ?? 0)
+        var timeInterval = Date.timeIntervalSinceReferenceDate - startTime
         timeInterval = Double(round(10*timeInterval)/10)
         
         //disable button
@@ -350,6 +304,14 @@ class QuestionMultipleChoiceViewController: UIViewController {
             SubmitButton.isEnabled = false
             SubmitButton.alpha = 0.4
         }
+    }
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
+    }
+    
+    func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
     }
     
     override func didReceiveMemoryWarning() {
