@@ -37,7 +37,7 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
             self.host = "xxx.xxx.x.xxx"
             
             //first check if we are connected to a wifi network
-            if false {
+            if self.currentSSIDs().count == 0 {
                 self.displayInstructions(instructionIndex: 0)
             } else {
                 //try to connect automatically
@@ -257,14 +257,18 @@ class WifiCommunication: NSObject, GCDAsyncUdpSocketDelegate {
             switch instructionIndex {
             case 0:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND CONNECT TO THE RIGHT WIFI NETWORK", comment: "instruction NO NETWORK after the KEEP CALM")
+                self.classroomActivityViewController?.setButtonToStart()
             case 1:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND WAIT FOR NEXT QUESTION", comment: "instruction after the KEEP CALM")
             case 2:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("AND RESTART THE CLASSROOM ACTIVITY (but before, check that you have the right IP address in settings)", comment: "instruction after the KEEP CALM if connection failed")
+                self.classroomActivityViewController?.setButtonToStart()
             case 3:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("Automatic Connection Failed", comment: "instruction after the KEEP CALM if automatic connection failed")
+                self.classroomActivityViewController?.setButtonToStart()
             case 4:
                 self.classroomActivityViewController?.InstructionsLabel.text = NSLocalizedString("We are not connected :-(", comment: "message appearing when we are not connected")
+                self.classroomActivityViewController?.setButtonToStart()
             default:
                 print("Display instruction not recognized")
             }

@@ -171,6 +171,13 @@ class ClassroomActivityViewController: UIViewController {
             }
         }
     }
+    
+    public func setButtonToStart() {
+        if stopConnectionButton {
+            stopConnectionButton = false
+            RestartConnectionButton.setTitle(NSLocalizedString("Start Connection", comment: "Button in Class activity"), for: .normal)
+        }
+    }
 
     public func stopConnectionAlerting() {
         AppDelegate.wifiCommunicationSingleton!.stopConnection()
