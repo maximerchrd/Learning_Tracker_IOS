@@ -809,33 +809,15 @@ Connection</string>
                                 </connections>
                             </button>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="58F-UC-oXn">
-                                <rect key="frame" x="0.0" y="292" width="375" height="272"/>
+                                <rect key="frame" x="0.0" y="89" width="375" height="475"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                             </scrollView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="4Bj-T4-YrA">
-                                <rect key="frame" x="13" y="64" width="345" height="71"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                            <imageView contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7pa-5j-lUU">
-                                <rect key="frame" x="134" y="168" width="103" height="115"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <gestureRecognizers/>
-                                <connections>
-                                    <outletCollection property="gestureRecognizers" destination="tAQ-x1-abe" appends="YES" id="OY2-ul-duL"/>
-                                </connections>
-                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="SoW-wH-RF2"/>
                     </view>
                     <connections>
                         <outlet property="OptionsScrollView" destination="58F-UC-oXn" id="dSt-t7-JgH"/>
-                        <outlet property="PictureView" destination="7pa-5j-lUU" id="bAb-Fm-IZM"/>
-                        <outlet property="QuestionTextView" destination="4Bj-T4-YrA" id="fct-rx-OxY"/>
                         <outlet property="SubmitButton" destination="njN-aR-w3O" id="Z4W-NM-zH0"/>
                     </connections>
                 </viewController>
@@ -846,7 +828,7 @@ Connection</string>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="2708" y="-2303"/>
+            <point key="canvasLocation" x="2707.5" y="-2303.75"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="WwT-6X-PyC">

@@ -13,16 +13,8 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var isSyncTest: Bool
     var isCorrection: Bool
     var questionMultipleChoice: QuestionMultipleChoice
-    var screenHeight: Float
-    var screenWidth: Float
-    var imageMagnified = false
-    var originaImageWidth:CGFloat = 0
-    var originalImageHeight:CGFloat = 0
-    var originalImageX:CGFloat = 0
-    var originalImageY:CGFloat = 0
-    var newImageWidth:Float = 0
-    var newImageHeight:Float = 0
-    var newImageX:Float = 0
+    var screenHeight: CGFloat
+    var screenWidth: CGFloat
     var checkBoxArray: [CheckBox]
     var stackView: UIStackView!
     var scrollViewWidth: CGFloat
@@ -35,8 +27,6 @@ class QuestionMultipleChoiceViewController: UIViewController {
     var startTime: TimeInterval = 0.0
     var firstLabel:UILabel = UILabel()
     
-    @IBOutlet weak var QuestionTextView: UITextView!
-    @IBOutlet weak var PictureView: UIImageView!
     @IBOutlet weak var OptionsScrollView: UIScrollView!
     @IBOutlet weak var SubmitButton: UIButton!
     
@@ -59,33 +49,12 @@ class QuestionMultipleChoiceViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         let screenSize = UIScreen.main.bounds
-        screenWidth = Float(screenSize.width)
-        screenHeight = Float(screenSize.height)
+        screenWidth = screenSize.width
+        screenHeight = screenSize.height
         
-        // Set question text
-        QuestionTextView.text = questionMultipleChoice.question
-        QuestionTextView.isEditable = false
-        QuestionTextView.sizeToFit()
-        
-        
-        // Display picture
-        let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory
-        let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
-        let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
-        if let dirPath          = paths.first {
-            let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.image)
-            PictureView.image    = UIImage(contentsOfFile: imageURL.path)
-        }
         //get the answer options to adapt the size of the imageview
         questionMultipleChoice = QuestionsTools.removeEmptyOptions(question: questionMultipleChoice)
         var optionsArray = questionMultipleChoice.options
-        originaImageWidth = PictureView.frame.width
-        originalImageHeight = PictureView.frame.height
-        originalImageX = PictureView.frame.minX
-        originalImageY = PictureView.frame.minY
-        newImageWidth = screenWidth
-        newImageHeight = Float(originalImageHeight) / Float(originaImageWidth) * screenWidth
-        newImageX = 0
         
         // DISPLAY OPTIONS
         //First implements stackview inside scrollview
@@ -108,6 +77,28 @@ class QuestionMultipleChoiceViewController: UIViewController {
         OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[stackView]|", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
         OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stackView]", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
         
+        let label = UILabel()
+        label.text = questionMultipleChoice.question
+        label.numberOfLines = 0
+        label.sizeToFit()
+        stackView.addArrangedSubview(label)
+        
+        // Display picture
+        if questionMultipleChoice.image != "none" {
+            let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory
+            let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
+            let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
+            if let dirPath          = paths.first {
+                let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionMultipleChoice.image)
+                let image = UIImage(contentsOfFile: imageURL.path) ?? UIImage()
+                let ratio = image.size.height / image.size.width
+                let PictureView = UIImageView()
+                PictureView.image = UIImage(contentsOfFile: imageURL.path) ?? UIImage()
+                PictureView.contentMode = .scaleAspectFit
+                PictureView.heightAnchor.constraint(equalToConstant: screenWidth * ratio).isActive = true
+                stackView.addArrangedSubview(PictureView)
+            }
+        }
         if !isCorrection {
             optionsArray = shuffle(arrayArg: optionsArray)
         }
@@ -156,13 +147,17 @@ class QuestionMultipleChoiceViewController: UIViewController {
             checkBoxArray.append(checkBox)
             i = i + 1
         }
+        let ghostButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 1))
+        ghostButton.setTitle(" ", for: .normal)
+        ghostButton.titleLabel?.font =  UIFont(name: "Times New Roman", size: 1)
+        stackView.addArrangedSubview(ghostButton)
         
         if isCorrection {
             SubmitButton.setTitle(NSLocalizedString("OK", comment: "OK button"), for: .normal)
         }
 
         //send receipt to server
-        var transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
+        let transferable = ClientToServerTransferable(prefix: ClientToServerTransferable.activeIdPrefix,
                 optionalArgument: String(questionMultipleChoice.id))
         AppDelegate.wifiCommunicationSingleton?.sendData(data: transferable.getTransferableData())
 
@@ -257,17 +252,6 @@ class QuestionMultipleChoiceViewController: UIViewController {
             array[i] = a;
         }
         return array
-    }
-    
-    @IBAction func imageTouched(_ sender: Any) {
-        if imageMagnified {
-            PictureView.frame = CGRect(x: originalImageX, y: originalImageY, width: originaImageWidth, height: originalImageHeight)
-            imageMagnified = false
-        } else {
-            PictureView.frame = CGRect(x: CGFloat(newImageX), y: originalImageY, width: CGFloat(newImageWidth), height: CGFloat(newImageHeight))
-            self.view.bringSubview(toFront: PictureView)
-            imageMagnified = true
-        }
     }
     
     @IBAction func submitAnswerButtonTouched(_ sender: Any) {
