@@ -12,9 +12,11 @@ import GRDB
 class DbTableSettings {
     static let TABLE_NAME = "settings"
     static let KEY_IDsettings = "id"
-    static let KEY_NAME = "name"
-    static let KEY_MASTER = "master"
-    static let KEY_AUTOMATIC_CONNECTION = "automatic_connection"
+    static let KEY_SETTING_NAME = "setting_name"
+    static let KEY_SETTING_VALUE = "setting_value"
+    static let key_name = "name"
+    static let key_master = "master"
+    static let key_automatic_connection = "automatic_connection"
     static var DBName = "NoName"
     
     static func createTable(DatabaseName: String) throws {
@@ -23,9 +25,8 @@ class DbTableSettings {
         try dbQueue.write { db in
             try db.create(table: TABLE_NAME, ifNotExists: true) { t in
                 t.column(KEY_IDsettings, .integer).primaryKey()
-                t.column(KEY_NAME, .text).notNull()
-                t.column(KEY_MASTER, .text).notNull()
-                t.column(KEY_AUTOMATIC_CONNECTION, .text).notNull()
+                t.column(KEY_SETTING_NAME, .text).notNull()
+                t.column(KEY_SETTING_VALUE, .text).notNull()
             }
         }
     }
@@ -36,7 +37,11 @@ class DbTableSettings {
             try dbQueue.write { db in
                 let settings = try Setting.fetchAll(db)
                 if (settings.count == 0) {
-                    let setting = Setting(name:NSLocalizedString("No name", comment: "Place holder for the name"), master:"192.168.1.100")
+                    var setting = Setting(setting_name:DbTableSettings.key_name, setting_value:NSLocalizedString("No name", comment: "Place holder for the name"))
+                    try setting.insert(db)
+                    setting = Setting(setting_name:DbTableSettings.key_master, setting_value:"192.168.1.100")
+                    try setting.insert(db)
+                    setting = Setting(setting_name:DbTableSettings.key_automatic_connection, setting_value:"1")
                     try setting.insert(db)
                 }
             }
@@ -52,8 +57,8 @@ class DbTableSettings {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
             try dbQueue.read { db in
-               let setting = try Setting.fetchOne(db)
-                name = setting!.name
+               let setting = try Setting.fetchOne(db, "SELECT * FROM " + DbTableSettings.TABLE_NAME + " WHERE " + DbTableSettings.KEY_SETTING_NAME + " = ?", arguments: [DbTableSettings.key_name])
+                name = setting!.setting_value
             }
         } catch let error {
             print(error)
@@ -67,8 +72,8 @@ class DbTableSettings {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
             try dbQueue.read { db in
-                let setting = try Setting.fetchOne(db)
-                master = setting!.master
+                let setting = try Setting.fetchOne(db, "SELECT * FROM " + DbTableSettings.TABLE_NAME + " WHERE " + DbTableSettings.KEY_SETTING_NAME + " = ?", arguments: [DbTableSettings.key_master])
+                master = setting!.setting_value
             }
         } catch let error {
             print(error)
@@ -82,8 +87,8 @@ class DbTableSettings {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
             try dbQueue.write { db in
-                let setting = try Setting.fetchOne(db)
-                automaticConnection = setting!.automaticConnection
+                let setting = try Setting.fetchOne(db, "SELECT * FROM " + DbTableSettings.TABLE_NAME + " WHERE " + DbTableSettings.KEY_SETTING_NAME + " = ?", arguments: [DbTableSettings.key_automatic_connection])
+                automaticConnection = Int(setting!.setting_value) ?? 0
             }
         } catch let error {
             print(error)
@@ -93,48 +98,25 @@ class DbTableSettings {
     }
     
     static func setNameAndMaster(name: String, master: String) {
-        do {
-            let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.write { db in
-                let setting = try Setting.fetchOne(db)
-                let old_name = setting!.name
-                let old_master = setting!.master
-                try db.execute(
-                    "UPDATE " + TABLE_NAME + " SET name = ?, master = ? WHERE name = ? AND master = ?",
-                    arguments: [name, master, old_name, old_master])
-            }
-        } catch let error {
-            print(error)
-            print(error.localizedDescription)
-        }
+        setSetting(name: key_master, value: master)
+        setSetting(name: key_name, value: name)
     }
     
     static func setMaster(master: String) {
-        do {
-            let dbQueue = try DatabaseQueue(path: DBName)
-            try dbQueue.write { db in
-                let setting = try Setting.fetchOne(db)
-                let name = setting!.name
-                try db.execute(
-                    "UPDATE " + TABLE_NAME + " SET master = ? WHERE name = ?",
-                    arguments: [master, name])
-            }
-        } catch let error {
-            print(error)
-            print(error.localizedDescription)
-        }
+        setSetting(name: DbTableSettings.key_master, value: master)
     }
     
     static func setAutomaticConnection(automaticConnection: Int) {
+        setSetting(name: DbTableSettings.key_automatic_connection, value: String(automaticConnection))
+    }
+    
+    static func setSetting(name: String, value: String) {
         do {
             let dbQueue = try DatabaseQueue(path: DBName)
             try dbQueue.write { db in
-                let setting = try Setting.fetchOne(db)
-                let name = setting!.name
-
                 try db.execute(
-                    "UPDATE " + TABLE_NAME + " SET " + KEY_AUTOMATIC_CONNECTION + " = ? WHERE name = ?",
-                    arguments: [automaticConnection, name])
+                    "UPDATE " + TABLE_NAME + " SET " + KEY_SETTING_VALUE + " = ? WHERE " + KEY_SETTING_NAME + " = ?",
+                    arguments: [value, name])
             }
         } catch let error {
             print(error)
@@ -145,22 +127,19 @@ class DbTableSettings {
 
 class Setting : Record {
     var id: Int64?
-    var name: String
-    var master: String
-    var automaticConnection: Int
+    var setting_name: String
+    var setting_value: String
     
-    init(name: String, master: String) {
-        self.name = name
-        self.master = master
-        self.automaticConnection = 1
+    init(setting_name: String, setting_value: String) {
+        self.setting_name = setting_name
+        self.setting_value = setting_value
         super.init()
     }
     
     required init(row: Row) {
         id = row["id"]
-        name = row[DbTableSettings.KEY_NAME]
-        master = row[DbTableSettings.KEY_MASTER]
-        automaticConnection = row[DbTableSettings.KEY_AUTOMATIC_CONNECTION]
+        setting_name = row[DbTableSettings.KEY_SETTING_NAME]
+        setting_value = row[DbTableSettings.KEY_SETTING_VALUE]
         super.init()
     }
     
@@ -170,9 +149,8 @@ class Setting : Record {
     
     override func encode(to container: inout PersistenceContainer) {
         container["id"] = id
-        container[DbTableSettings.KEY_NAME] = name
-        container[DbTableSettings.KEY_MASTER] = master
-        container[DbTableSettings.KEY_AUTOMATIC_CONNECTION] = automaticConnection
+        container[DbTableSettings.KEY_SETTING_NAME] = setting_name
+        container[DbTableSettings.KEY_SETTING_VALUE] = setting_value
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

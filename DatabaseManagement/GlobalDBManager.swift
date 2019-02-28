@@ -33,7 +33,7 @@ class GlobalDBManager {
             try DbTableRelationQuestionQuestion.createTable(DatabaseName: databaseURL.path)
             
             //Register migrations
-            var migrator = DatabaseMigrator()
+            /*var migrator = DatabaseMigrator()
             // v1 database
             migrator.registerMigration("v1") { db in
                 try db.drop(table: DbTableAnswerOptions.TABLE_NAME)
@@ -48,7 +48,7 @@ class GlobalDBManager {
             
             //Do migrations
             let dbQueue = try DatabaseQueue(path: databaseURL.path)
-            try migrator.migrate(dbQueue)
+            try migrator.migrate(dbQueue)*/
             
             
             //initialize settings table
