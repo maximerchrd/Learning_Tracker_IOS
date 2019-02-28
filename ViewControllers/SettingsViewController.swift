@@ -31,14 +31,6 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         }
     }
     
-    @IBAction func SaveAndGoBackButtonPressed(_ sender: Any) {
-        DbTableSettings.setNameAndMaster(name: NameTextField.text!, master: IpAddressTextField.text!)
-        self.navigationController?.popViewController(animated: true)
-    }
-    
-   
-
-    
     func deleteImages() -> Bool {
         guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else {
             let error = "error trying to delete images: problem with directory"
@@ -77,6 +69,10 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         } catch let error {
             print(error)
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        DbTableSettings.setNameAndMaster(name: NameTextField.text!, master: IpAddressTextField.text!)
     }
     
     override func didReceiveMemoryWarning() {
