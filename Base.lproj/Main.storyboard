@@ -723,38 +723,17 @@ Connection</string>
                                     <action selector="submitAnswerButtonTouched:" destination="xQz-if-Mve" eventType="touchUpInside" id="5zt-pX-TuV"/>
                                 </connections>
                             </button>
-                            <imageView contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CFj-ZS-RD3">
-                                <rect key="frame" x="134" y="168" width="103" height="115"/>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TFx-zV-JvW">
+                                <rect key="frame" x="0.0" y="89" width="375" height="474"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <gestureRecognizers/>
-                                <connections>
-                                    <outletCollection property="gestureRecognizers" destination="vz5-ls-poW" appends="YES" id="LPJ-yZ-0p5"/>
-                                </connections>
-                            </imageView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="B2h-9g-XqR">
-                                <rect key="frame" x="12" y="64" width="345" height="71"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="GE8-4f-utX">
-                                <rect key="frame" x="23" y="307" width="338" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="y2V-Ss-SUe"/>
                     </view>
                     <connections>
-                        <outlet property="AnswerTextField" destination="GE8-4f-utX" id="Kpg-WA-v9s"/>
-                        <outlet property="PictureView" destination="CFj-ZS-RD3" id="g1E-e8-75W"/>
-                        <outlet property="QuestionTextView" destination="B2h-9g-XqR" id="voR-tU-om7"/>
                         <outlet property="SubmitButton" destination="Fd8-7A-Sn6" id="9O1-cG-sw1"/>
+                        <outlet property="scrollView" destination="TFx-zV-JvW" id="weg-Y8-89o"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N3U-iA-n7w" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -764,7 +743,7 @@ Connection</string>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="2708" y="-1600"/>
+            <point key="canvasLocation" x="2708" y="-1600.7496251874063"/>
         </scene>
         <!--Synchroneous Questions Test View Controller-->
         <scene sceneID="fDh-V5-xgv">

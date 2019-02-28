@@ -78,7 +78,7 @@ class QuestionMultipleChoiceViewController: UIViewController {
         OptionsScrollView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stackView]", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: ["stackView": stackView]))
         
         let label = UILabel()
-        label.text = questionMultipleChoice.question
+        label.attributedText = justifyLabel(str: questionMultipleChoice.question)
         label.numberOfLines = 0
         label.sizeToFit()
         stackView.addArrangedSubview(label)
@@ -319,6 +319,19 @@ class QuestionMultipleChoiceViewController: UIViewController {
                 }
             } 
         }
+    }
+    
+    func justifyLabel(str: String) -> NSAttributedString
+    {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = NSTextAlignment.justified
+        let attributedString = NSAttributedString(string: str,
+                                                  attributes: [
+                                                    NSAttributedStringKey.paragraphStyle: paragraphStyle,
+                                                    NSAttributedStringKey.baselineOffset: NSNumber(value: 0)
+            ])
+        
+        return attributedString
     }
     
     func handleNavigation(alert: UIAlertAction!) {
