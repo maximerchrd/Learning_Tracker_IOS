@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="5Mp-93-vFH">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="5Mp-93-vFH">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -724,11 +724,7 @@ Connection</string>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N3U-iA-n7w" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="vz5-ls-poW">
-                    <connections>
-                        <action selector="imageTouched:" destination="xQz-if-Mve" id="1C7-qT-QrH"/>
-                    </connections>
-                </tapGestureRecognizer>
+                <tapGestureRecognizer id="vz5-ls-poW"/>
             </objects>
             <point key="canvasLocation" x="2708" y="-1600.7496251874063"/>
         </scene>
@@ -788,11 +784,7 @@ Connection</string>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="q3m-KY-4dG" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="tAQ-x1-abe">
-                    <connections>
-                        <action selector="imageTouched:" destination="s1x-ZS-Gfr" id="UUO-7J-Zs7"/>
-                    </connections>
-                </tapGestureRecognizer>
+                <tapGestureRecognizer id="tAQ-x1-abe"/>
             </objects>
             <point key="canvasLocation" x="2707.5" y="-2303.75"/>
         </scene>
@@ -1021,20 +1013,20 @@ Connection</string>
         </scene>
     </scenes>
     <resources>
-        <image name="blueclimber" width="85" height="150"/>
-        <image name="chart-icon" width="54" height="60"/>
-        <image name="city-icon" width="73" height="60"/>
-        <image name="class_activity" width="105" height="55"/>
+        <image name="blueclimber" width="68.764045715332031" height="121.34831237792969"/>
+        <image name="chart-icon" width="57.176471710205078" height="63.529411315917969"/>
+        <image name="city-icon" width="97.333335876464844" height="80"/>
+        <image name="class_activity" width="78.75" height="41.25"/>
         <image name="keepCalmCrown" width="600" height="600"/>
-        <image name="landscape" width="700" height="648"/>
-        <image name="list-icon" width="99" height="60"/>
-        <image name="play_icon" width="44" height="50"/>
-        <image name="practice" width="55" height="55"/>
+        <image name="landscape" width="566.2921142578125" height="524.2247314453125"/>
+        <image name="list-icon" width="100.39436340332031" height="60.845069885253906"/>
+        <image name="play_icon" width="54.620689392089844" height="62.068965911865234"/>
+        <image name="practice" width="17.142856597900391" height="17.142856597900391"/>
         <image name="qrImage" width="80" height="79"/>
-        <image name="redclimber" width="85" height="150"/>
-        <image name="results" width="55" height="55"/>
-        <image name="settings" width="55" height="55"/>
-        <image name="stop_icon" width="50" height="50"/>
+        <image name="redclimber" width="68.764045715332031" height="121.34831237792969"/>
+        <image name="results" width="17.142856597900391" height="17.142856597900391"/>
+        <image name="settings" width="17.142856597900391" height="17.142856597900391"/>
+        <image name="stop_icon" width="72" height="72"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="qdo-RD-ELQ"/>

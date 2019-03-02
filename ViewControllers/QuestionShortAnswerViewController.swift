@@ -85,11 +85,13 @@ class QuestionShortAnswerViewController: UIViewController, UITextFieldDelegate {
                 let imageURL = URL(fileURLWithPath: dirPath).appendingPathComponent(questionShortAnswer.image)
                 let image = UIImage(contentsOfFile: imageURL.path) ?? UIImage()
                 let ratio = image.size.height / image.size.width
-                let PictureView = UIImageView()
-                PictureView.image = UIImage(contentsOfFile: imageURL.path) ?? UIImage()
-                PictureView.contentMode = .scaleAspectFit
-                PictureView.heightAnchor.constraint(equalToConstant: screenWidth * ratio).isActive = true
-                stackView.addArrangedSubview(PictureView)
+                if !ratio.isNaN {
+                    let PictureView = UIImageView()
+                    PictureView.image = UIImage(contentsOfFile: imageURL.path) ?? UIImage()
+                    PictureView.contentMode = .scaleAspectFit
+                    PictureView.heightAnchor.constraint(equalToConstant: screenWidth * ratio).isActive = true
+                    stackView.addArrangedSubview(PictureView)
+                }
             }
         }
         
